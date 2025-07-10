@@ -1,0 +1,6 @@
+openai-agents
+asyncio
+dotenv
+openai-agents[litellm]
+pandas 
+datetime
