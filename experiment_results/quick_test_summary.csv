@@ -1,0 +1,16 @@
+Field,Value
+Experiment ID,quick_test
+Start Time,2025-07-10T12:00:33.939688
+End Time,2025-07-10T12:01:03.325584
+Duration (seconds),29.39
+Number of Agents,3
+Max Rounds,2
+Decision Rule,unanimity
+Consensus Reached,Yes
+Rounds to Consensus,1
+Total Messages,6
+Average Round Duration,29.39
+Errors Encountered,0
+Agreed Principle ID,3
+Agreed Principle Name,Maximize the Average Income with a Floor Constraint
+Agreement Confidence,70.00%

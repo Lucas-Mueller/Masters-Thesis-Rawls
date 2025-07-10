@@ -1,0 +1,23 @@
+agents:
+  confidence_threshold: 0.5
+  enable_feedback_collection: true
+  personality_variation: true
+experiment:
+  decision_rule: unanimity
+  max_rounds: 3
+  models: []
+  num_agents: 5
+  timeout_seconds: 120
+experiment_id: test_config
+output:
+  directory: experiment_results
+  formats:
+  - json
+  - csv
+  - txt
+  include_feedback: true
+  include_transcript: true
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true

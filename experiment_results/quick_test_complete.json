@@ -1,0 +1,151 @@
+{
+  "experiment_id": "quick_test",
+  "configuration": {
+    "experiment_id": "quick_test",
+    "num_agents": 3,
+    "max_rounds": 2,
+    "decision_rule": "unanimity",
+    "timeout_seconds": 60,
+    "models": [
+      "gpt-4.1-mini",
+      "gpt-4.1-mini",
+      "gpt-4.1-mini"
+    ]
+  },
+  "deliberation_transcript": [
+    {
+      "agent_id": "agent_1",
+      "agent_name": "Agent 1",
+      "message": "Evaluation of the Four Principles:\n\n1. Maximize the Minimum Income:\n- Ensures the worst-off member of society is as well-off as possible.\n- Highly protective for the poor and most vulnerable.\n- Does not explicitly concern itself with overall wealth or incentives to increase wealth.\n- From behind the veil of ignorance, this principle is very risk-averse and attractive for those worried about being assigned a poor economic position.\n- However, might reduce total wealth if it requires measures that limit overall income generation.\n\n2. Maximize the Average Income:\n- Focuses on maximizing the total income without concern for distribution.\n- Could lead to significant inequality and very poor outcomes for the worst off.\n- From behind the veil of ignorance, this is risky because you might be assigned the worst-off position with little protection.\n- Incentivizes productivity but risks social instability and unfairness.\n\n3. Maximize the Average Income with a Floor Constraint:\n- Guarantees a minimum income (a safety net) for everyone and then maximizes average income.\n- Combines wealth generation incentives with a protective floor.\n- Offers risk-averse protection for the worst off, while still encouraging overall economic growth.\n- This hybrid approach balances fairness with efficiency.\n\n4. Maximize the Average Income with a Range Constraint:\n- Limits gap between richest and poorest, then maximizes average income.\n- Controls inequality by capping disparities, possibly reducing incentives at the top.\n- Also provides some protections but might restrict economic freedom.\n- Could be complex to implement and could lessen overall growth if the range is very tight.\n\nGiven that I am behind a veil of ignorance, not knowing my future economic status, and considering I am more risk-averse and prefer safety nets, the principle that provides both protection for the worst off and encourages overall economic growth seems most just and fair.\n\nTherefore:\n\n1. Choice: Principle 3 - Maximize the Average Income with a Floor Constraint  \n2. Reasoning: It ensures a guaranteed minimum income which protects the worst-off members of society, minimizing risk from the veil of ignorance perspective. At the same time, it does not cap total wealth creation and thus maintains incentives for productivity and growth. It balances fairness and efficiency well.  \n3. Confidence: 90%",
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "Evaluation of the Four Principles:\n\n1. Maximize the Minimum Income:\n- Ensures the worst-off member of society is as well-off as possible.\n- Highly protective for the poor and most vulnerable.\n- Does not explicitly concern itself with overall wealth or incentives to increase wealth.\n- From behind the veil of ignorance, this principle is very risk-averse and attractive for those worried about being assigned a poor economic position.\n- However, might reduce total wealth if it requires measures that",
+        "confidence": 0.7
+      },
+      "round_number": 0,
+      "timestamp": "2025-07-10T12:00:46.864261"
+    },
+    {
+      "agent_id": "agent_2",
+      "agent_name": "Agent 2",
+      "message": "Evaluation of Principles:\n\n1. Maximize the Minimum Income  \n- Pros: Guarantees the worst-off are as well-off as possible, which is highly protective of the most vulnerable and aligns with a strong notion of fairness and justice.  \n- Cons: May sacrifice overall prosperity and reduce total income generated, possibly lowering overall well-being.\n\n2. Maximize the Average Income  \n- Pros: Maximizes total wealth and resources available, which can theoretically improve overall welfare and create opportunities.  \n- Cons: Allows for potentially extreme inequality, which may result in very poor conditions for the worst-off individuals if wealth concentrates heavily.\n\n3. Maximize the Average Income with a Floor Constraint  \n- Pros: Ensures a minimum safety net for everyone, protecting the worst-off to some degree, while still prioritizing overall prosperity and incentivizing productivity.  \n- Cons: The floor might be set too low or high, possibly leading to trade-offs between incentives and equity. The exact floor level is crucial.\n\n4. Maximize the Average Income with a Range Constraint  \n- Pros: Limits inequality explicitly while still maximizing average income, potentially balancing incentives with fairness.  \n- Cons: Restricting income disparity might reduce motivation for innovation and effort if the range is too tight, possibly lowering average income.\n\nReasoning:\n\nBehind the veil of ignorance, I would avoid a principle that allows extreme deprivation (as in #2) because I might end up poor. I also want to maximize total welfare because that generally produces more resources for everyone.\n\nPrinciple #1 offers maximum security but at the cost of possibly much lower overall wealth and prosperity.\n\nPrinciple #4 provides a range limit, but this could be restrictive and might reduce incentives, which affects total income negatively.\n\nPrinciple #3 offers a balanced approach: a guaranteed safety net protects the worst-off while still maximizing average income and incentives for productivity.\n\nTherefore, Principle #3 best balances fairness and overall well-being under the veil of ignorance.\n\nMy choice: 3  \nConfidence: 85%",
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "Evaluation of Principles:\n\n1. Maximize the Minimum Income  \n- Pros: Guarantees the worst-off are as well-off as possible, which is highly protective of the most vulnerable and aligns with a strong notion of fairness and justice.  \n- Cons: May sacrifice overall prosperity and reduce total income generated, possibly lowering overall well-being.\n\n2. Maximize the Average Income  \n- Pros: Maximizes total wealth and resources available, which can theoretically improve overall welfare and create opport",
+        "confidence": 0.7
+      },
+      "round_number": 0,
+      "timestamp": "2025-07-10T12:00:47.562243"
+    },
+    {
+      "agent_id": "agent_3",
+      "agent_name": "Agent 3",
+      "message": "Evaluation of the four principles behind the veil of ignorance:\n\n1. **Maximize the Minimum Income**:\n   - Pros: Ensures the worst-off are as well-off as possible, reducing extreme poverty and inequality.\n   - Cons: May limit the potential total wealth of society, possibly reducing overall economic growth and opportunity.\n   - Fairness: Strongly protective of the vulnerable, but may constrain incentives for higher earners.\n\n2. **Maximize the Average Income**:\n   - Pros: Maximizes total societal wealth, potentially increasing opportunities and resources overall.\n   - Cons: Can lead to significant inequality, with the poor potentially left very disadvantaged.\n   - Fairness: Might favor wealthy disproportionately; disadvantaged individuals have little security.\n\n3. **Maximize the Average Income with a Floor Constraint**:\n   - Pros: Guarantees a minimum safety net to everyone, preventing destitution, while still pushing for economic growth.\n   - Cons: The floor constraint may limit how much average income can be maximized, but strikes a balance.\n   - Fairness: Protects least well-off up to a point, while encouraging total wealth creation; offers both security and incentive.\n\n4. **Maximize the Average Income with a Range Constraint**:\n   - Pros: Limits inequality by controlling the gap, while maximizing average income.\n   - Cons: The range limitation may be difficult to enforce and could reduce incentives on both ends.\n   - Fairness: Attempts to balance equality and growth, but may be complex and unclear in impact.\n\n**Reasoning**:\n\nFrom behind the veil of ignorance, I do not know whether I will be rich, middle class, or poor. In this situation, I would want to ensure I am protected from extreme poverty (a reasonable safety net), but I would also want society to be prosperous overall so that there are opportunities for advancement.\n\n- Principle 1 provides the greatest protection for the worst-off but may limit overall growth.\n- Principle 2 maximizes wealth but risks leaving the poorest vulnerable.\n- Principle 3 provides a minimal safety net for all, ensuring no one falls below that floor, while also enabling maximization of average income.\n- Principle 4 limits inequality but may be challenging to apply fairly and effectively.\n\nTherefore, Principle 3 (Maximize the Average Income with a Floor Constraint) offers a balanced approach, ensuring fairness through a guaranteed minimum income and promoting prosperity through maximizing the average income.\n\n**Final Choice**:\n1. Principle: 3 (Maximize the Average Income with a Floor Constraint)\n2. Reasoning: Protects the worst-off through a guaranteed minimum, while still fostering economic prosperity and growth, which benefits all.\n3. Confidence: 85%",
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "Evaluation of the four principles behind the veil of ignorance:\n\n1. **Maximize the Minimum Income**:\n   - Pros: Ensures the worst-off are as well-off as possible, reducing extreme poverty and inequality.\n   - Cons: May limit the potential total wealth of society, possibly reducing overall economic growth and opportunity.\n   - Fairness: Strongly protective of the vulnerable, but may constrain incentives for higher earners.\n\n2. **Maximize the Average Income**:\n   - Pros: Maximizes total societal w",
+        "confidence": 0.7
+      },
+      "round_number": 0,
+      "timestamp": "2025-07-10T12:00:48.070177"
+    },
+    {
+      "agent_id": "agent_1",
+      "agent_name": "Agent 1",
+      "message": "Thank you all for thoughtful points so far.\n\nI appreciate the focus on protecting the worst-off in Principle 1, which aligns with important fairness concerns. However, prioritizing only the minimum income could limit overall prosperity and opportunities for others.\n\nPrinciple 2 promises the highest total income but ignores distribution, which is risky behind the veil of ignorance—I might end up very poor while others benefit.\n\nPrinciple 4 is interesting with its range constraint, but it could be complicated to enforce and might reduce incentives for productivity if the gap is too tightly controlled.\n\nPrinciple 3 strikes a balance: it guarantees a safety net for everyone, protecting against severe poverty, while still encouraging maximizing average income, preserving incentives and growth potential.\n\nGiven our veil of ignorance and risk aversion, I believe Principle 3 offers the fairest combination of security and opportunity for all, regardless of our eventual economic position.\n\nI am open to hearing concerns or adjustments but currently stand by **Principle 3: Maximize the Average Income with a Floor Constraint**.",
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "Thank you all for thoughtful points so far.\n\nI appreciate the focus on protecting the worst-off in Principle 1, which aligns with important fairness concerns. However, prioritizing only the minimum income could limit overall prosperity and opportunities for others.\n\nPrinciple 2 promises the highest total income but ignores distribution, which is risky behind the veil of ignorance—I might end up very poor while others benefit.\n\nPrinciple 4 is interesting with its range constraint, but it could be",
+        "confidence": 0.7
+      },
+      "round_number": 1,
+      "timestamp": "2025-07-10T12:00:53.804863"
+    },
+    {
+      "agent_id": "agent_2",
+      "agent_name": "Agent 2",
+      "message": "I appreciate the thoughtful evaluations shared so far. From a utilitarian perspective, maximizing total welfare while ensuring fairness is key. Here's how I see the principles:\n\n1. Maximize the Minimum Income: This is very protective of the worst-off, which is valuable behind the veil of ignorance. However, it may sacrifice overall prosperity, limiting total income growth and benefits to society at large.\n\n2. Maximize the Average Income: This principle maximizes total wealth but risks extreme inequality, leaving some very poor. Without any protections for the worst-off, it’s risky if you end up in the lower economic bracket.\n\n3. Maximize the Average Income with a Floor Constraint: This balances a safety net for everyone with maximizing overall income. It safeguards against destitution while promoting wealth creation. It seems like a strong compromise between fairness and efficiency.\n\n4. Maximize the Average Income with a Range Constraint: Limiting the gap can reduce inequality, but it might cap incentives for productivity and innovation, possibly reducing total income potential. It’s more restrictive than principle 3.\n\nGiven these points, I believe principle 3 best balances maximizing total income with protecting everyone from falling below a minimum threshold of well-being. It aligns with utilitarian goals by promoting the greatest good while avoiding unacceptable risks.\n\nI’m open to hearing if others feel the safety net creates significant downsides or if they have concerns about implementing principle 3, but at this moment, I support principle 3 for unanimous agreement.",
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "I appreciate the thoughtful evaluations shared so far. From a utilitarian perspective, maximizing total welfare while ensuring fairness is key. Here's how I see the principles:\n\n1. Maximize the Minimum Income: This is very protective of the worst-off, which is valuable behind the veil of ignorance. However, it may sacrifice overall prosperity, limiting total income growth and benefits to society at large.\n\n2. Maximize the Average Income: This principle maximizes total wealth but risks extreme in",
+        "confidence": 0.7
+      },
+      "round_number": 1,
+      "timestamp": "2025-07-10T12:00:54.414727"
+    },
+    {
+      "agent_id": "agent_3",
+      "agent_name": "Agent 3",
+      "message": "I appreciate the thorough evaluations from Agents 1 and 2. The Maximize the Minimum Income principle (Principle 1) offers strong protection to the worst-off but might sacrifice too much in total societal wealth, which could reduce overall well-being. The pure Maximize the Average Income principle (Principle 2) maximizes wealth but ignores inequality and risks severe deprivation for some.\n\nI find Principle 3, Maximize the Average Income with a Floor Constraint, to be a balanced approach. It establishes a safety net ensuring no one falls below a minimum standard, which protects against extreme deprivation—key behind the veil of ignorance—while also encouraging economic growth by maximizing average income.\n\nPrinciple 4’s attempt to limit income disparity is commendable but may involve complex enforcement and potentially compromise incentives that drive productivity.\n\nMy concern with Principle 1 alone is that it might limit broader prosperity, and with Principle 2, the risk to the vulnerable is too high. Principle 3 provides security plus incentive.\n\nTherefore, my current choice remains Principle 3, as it seems most just and pragmatic to society as a whole. I’m open to further discussion if others provide compelling arguments.",
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "I appreciate the thorough evaluations from Agents 1 and 2. The Maximize the Minimum Income principle (Principle 1) offers strong protection to the worst-off but might sacrifice too much in total societal wealth, which could reduce overall well-being. The pure Maximize the Average Income principle (Principle 2) maximizes wealth but ignores inequality and risks severe deprivation for some.\n\nI find Principle 3, Maximize the Average Income with a Floor Constraint, to be a balanced approach. It estab",
+        "confidence": 0.7
+      },
+      "round_number": 1,
+      "timestamp": "2025-07-10T12:00:55.338249"
+    }
+  ],
+  "consensus_result": {
+    "unanimous": true,
+    "agreed_principle": {
+      "principle_id": 3,
+      "principle_name": "Maximize the Average Income with a Floor Constraint",
+      "reasoning": "Thank you all for thoughtful points so far.\n\nI appreciate the focus on protecting the worst-off in Principle 1, which aligns with important fairness concerns. However, prioritizing only the minimum income could limit overall prosperity and opportunities for others.\n\nPrinciple 2 promises the highest total income but ignores distribution, which is risky behind the veil of ignorance—I might end up very poor while others benefit.\n\nPrinciple 4 is interesting with its range constraint, but it could be",
+      "confidence": 0.7
+    },
+    "dissenting_agents": [],
+    "rounds_to_consensus": 1,
+    "total_messages": 6
+  },
+  "feedback_responses": [
+    {
+      "agent_id": "agent_1",
+      "agent_name": "Agent 1",
+      "satisfaction_rating": 7,
+      "fairness_rating": 7,
+      "would_choose_again": true,
+      "alternative_preference": null,
+      "reasoning": "Hello Agent 1, thank you for taking the time to share your feedback. I have a few questions about your experience with the group's decision on the distributive justice principle.\n\n1. On a scale from 1 to 10, how satisfied are you with the group’s final decision to adopt Principle 3: Maximize the Average Income with a Floor Constraint?\n\n2. On a scale from 1 to 10, how fair do you perceive the chosen principle to be?\n\n3. If you were to make this decision again, would you choose the same principle,",
+      "confidence_in_feedback": 0.7,
+      "timestamp": "2025-07-10T12:00:59.437601"
+    },
+    {
+      "agent_id": "agent_2",
+      "agent_name": "Agent 2",
+      "satisfaction_rating": 7,
+      "fairness_rating": 7,
+      "would_choose_again": true,
+      "alternative_preference": null,
+      "reasoning": "Thank you for taking the time to share your feedback about the experiment. I have a few questions for you about your experience and views on the group's final decision.\n\n1. On a scale from 1 to 10, how satisfied are you with the group’s unanimous decision to adopt Principle 3: Maximize the Average Income with a Floor Constraint?\n\n2. On the same 1 to 10 scale, how fair do you think this principle is in terms of distributive justice?\n\n3. If you had to choose again, would you select Principle 3 onc",
+      "confidence_in_feedback": 0.7,
+      "timestamp": "2025-07-10T12:01:00.573039"
+    },
+    {
+      "agent_id": "agent_3",
+      "agent_name": "Agent 3",
+      "satisfaction_rating": 7,
+      "fairness_rating": 7,
+      "would_choose_again": true,
+      "alternative_preference": null,
+      "reasoning": "Thank you for taking the time to share your feedback about the experiment. I have a few questions to understand your perspective better.\n\n1. On a scale of 1 to 10, how satisfied are you with the group’s final decision to choose Principle 3, the Maximize the Average Income with a Floor Constraint?\n\n2. On a scale of 1 to 10, how fair do you think the chosen principle is in distributing income?\n\n3. If you had to make the choice again, would you select the same principle (Principle 3) again? Please ",
+      "confidence_in_feedback": 0.7,
+      "timestamp": "2025-07-10T12:01:03.325161"
+    }
+  ],
+  "performance_metrics": {
+    "total_duration_seconds": 29.385896,
+    "average_round_duration": 29.385896,
+    "total_tokens_used": 0,
+    "api_calls_made": 0,
+    "errors_encountered": 0
+  },
+  "start_time": "2025-07-10T12:00:33.939688",
+  "end_time": "2025-07-10T12:01:03.325584"
+}

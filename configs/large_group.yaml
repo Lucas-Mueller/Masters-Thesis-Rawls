@@ -1,0 +1,36 @@
+# Large group experiment configuration
+experiment_id: large_group_experiment
+
+experiment:
+  num_agents: 8
+  max_rounds: 10
+  decision_rule: unanimity
+  timeout_seconds: 600
+  models:
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+    - gpt-4.1-mini
+
+output:
+  directory: experiment_results
+  formats:
+    - json
+    - csv
+    - txt
+  include_feedback: true
+  include_transcript: true
+
+agents:
+  personality_variation: true
+  confidence_threshold: 0.7
+  enable_feedback_collection: true
+
+performance:
+  parallel_feedback: true
+  trace_enabled: true
+  debug_mode: false

@@ -1,0 +1,26 @@
+agents:
+  confidence_threshold: 0.5
+  enable_feedback_collection: true
+  personality_variation: true
+experiment:
+  decision_rule: unanimity
+  max_rounds: 5
+  models:
+  - gpt-4.1-mini
+  - gpt-4.1-mini
+  - gpt-4.1-mini
+  - gpt-4.1-mini
+  num_agents: 4
+  timeout_seconds: 300
+output:
+  directory: experiment_results
+  formats:
+  - json
+  - csv
+  - txt
+  include_feedback: true
+  include_transcript: true
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true
