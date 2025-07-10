@@ -1,0 +1,30 @@
+experiment_id: Lucas Test
+
+experiment:
+  decision_rule: unanimity
+  max_rounds: 5
+  models: ["gpt4.1-mini", "deepseek", "gpt4.1-nano"]
+  num_agents: 3
+  timeout_seconds: 240
+
+personalities:
+  - "You are an economist focused on efficiency and optimal resource allocation."
+  - "You are a philosopher concerned with justice and fairness for all members of society."
+  - "You are a risk taker who wants to maximze return."
+
+
+agents:
+  enable_feedback_collection: true
+  personality_variation: true
+output:
+  directory: experiment_results
+  formats:
+  - json
+  - csv
+  - txt
+  include_feedback: true
+  include_transcript: true
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true

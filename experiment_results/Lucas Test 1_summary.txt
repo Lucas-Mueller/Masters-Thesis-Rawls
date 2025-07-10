@@ -1,39 +1,37 @@
 EXPERIMENT SUMMARY REPORT
 ==================================================
 
-Experiment ID: quick_test
-Date: 2025-07-10 13:52:19
-Duration: 27.8 seconds
+Experiment ID: Lucas Test 1
+Date: 2025-07-10 15:15:33
+Duration: 509.2 seconds
 
 CONFIGURATION
 --------------------
-Agents: 3
-Max Rounds: 2
+Agents: 8
+Max Rounds: 10
 Decision Rule: unanimity
-Timeout: 60 seconds
+Timeout: 240 seconds
 
 RESULTS
 --------------------
 Consensus Reached: YES
-Rounds Completed: 1
-Total Messages: 6
-Average Round Duration: 27.8s
+Rounds Completed: 2
+Total Messages: 24
+Average Round Duration: 254.6s
 
 AGREED PRINCIPLE
 --------------------
 ID: 3
 Name: Maximize the Average Income with a Floor Constraint
-Confidence: 50.0%
-
 FEEDBACK SUMMARY
 --------------------
 Average Satisfaction: 7.0/10
 Average Fairness Rating: 7.0/10
-Would Choose Again: 3/3 agents
+Would Choose Again: 8/8 agents
 
 PERFORMANCE
 --------------------
-Total Duration: 27.82s
+Total Duration: 509.23s
 API Calls: 0
 Tokens Used: 0
 Errors: 0
