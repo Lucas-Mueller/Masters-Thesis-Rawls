@@ -79,8 +79,6 @@ class PerformanceMetrics(BaseModel):
     """Performance metrics for an experiment."""
     total_duration_seconds: float = Field(..., description="Total experiment duration")
     average_round_duration: float = Field(..., description="Average time per round")
-    total_tokens_used: int = Field(default=0, description="Total tokens consumed")
-    api_calls_made: int = Field(default=0, description="Total API calls made")
     errors_encountered: int = Field(default=0, description="Number of errors encountered")
 
 
@@ -93,6 +91,7 @@ class FeedbackResponse(BaseModel):
     would_choose_again: bool = Field(..., description="Whether agent would make same choice again")
     alternative_preference: Optional[int] = Field(None, ge=1, le=4, description="Alternative principle preference if any")
     reasoning: str = Field(..., description="Agent's reasoning for their feedback")
+    confidence_in_feedback: float = Field(default=0.7, description="Agent's confidence in their feedback (0.0-1.0)")
     timestamp: datetime = Field(default_factory=datetime.now, description="Feedback timestamp")
 
 

@@ -61,42 +61,6 @@ Communication guidelines:
         self.round_history: List[str] = []
 
 
-class ConsensusJudge(Agent):
-    """
-    Specialized agent for detecting unanimous agreement and analyzing consensus.
-    """
-    
-    def __init__(self, model: str = "gpt-4.1"):
-        instructions = f"""
-You are a neutral judge analyzing whether a group of agents has reached unanimous agreement on a distributive justice principle.
-
-{get_all_principles_text()}
-
-Your task is to:
-1. Review all agent responses from the current round
-2. Determine if ALL agents have chosen the SAME principle
-3. Identify any agents who have different choices
-4. Provide a clear assessment of the consensus status
-
-Rules for consensus:
-- Unanimous agreement means ALL agents chose the exact same principle (1, 2, 3, or 4)
-- Even if agents have similar reasoning, they must choose the same numbered principle
-- If any agent is uncertain or mentions multiple principles, consensus is NOT reached
-- Focus on the final principle choice, not just the reasoning
-
-Output format:
-- Clearly state whether unanimous agreement was reached (YES/NO)
-- If YES, state which principle was unanimously chosen
-- If NO, list which agents chose different principles
-- Provide brief reasoning for your assessment
-"""
-        
-        super().__init__(
-            name="Consensus Judge",
-            instructions=instructions,
-            model=model
-        )
-
 
 class DiscussionModerator(Agent):
     """
@@ -201,9 +165,6 @@ def create_deliberation_agents(num_agents: int, models: Optional[List[str]] = No
     return agents
 
 
-def create_consensus_judge() -> ConsensusJudge:
-    """Create a consensus judge agent."""
-    return ConsensusJudge()
 
 
 class FeedbackCollector(Agent):

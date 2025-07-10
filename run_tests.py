@@ -38,11 +38,7 @@ def main():
     
     # Define test files
     test_files = [
-        "tests/test_phase1.py",
-        "tests/test_phase1_comprehensive.py", 
-        "tests/test_phase2_feedback.py",
-        "tests/test_phase2_logging.py",
-        "tests/test_phase2_config.py"
+        "tests/test_core.py"
     ]
     
     # Check if API key is set

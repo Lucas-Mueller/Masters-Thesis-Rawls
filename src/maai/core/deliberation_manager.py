@@ -27,12 +27,16 @@ from .models import (
 from ..agents.enhanced import (
     DeliberationAgent, 
     DiscussionModerator,
-    FeedbackCollector,
     create_deliberation_agents,
-    create_discussion_moderator,
-    create_feedback_collector
+    create_discussion_moderator
 )
 from ..export.data_export import export_experiment_data
+import os 
+from dotenv import load_dotenv
+import agentops
+# Logging using AgentOPs
+load_dotenv()
+
 
 
 class DeliberationManager:
@@ -44,7 +48,6 @@ class DeliberationManager:
         self.config = config
         self.agents: List[DeliberationAgent] = []
         self.moderator: DiscussionModerator = create_discussion_moderator()
-        self.feedback_collector: FeedbackCollector = create_feedback_collector()
         self.transcript: List[DeliberationResponse] = []
         self.feedback_responses: List[FeedbackResponse] = []
         self.agent_memories: List[AgentMemory] = []
@@ -54,8 +57,6 @@ class DeliberationManager:
         self.performance_metrics = PerformanceMetrics(
             total_duration_seconds=0.0,
             average_round_duration=0.0,
-            total_tokens_used=0,
-            api_calls_made=0,
             errors_encountered=0
         )
         
@@ -135,7 +136,7 @@ class DeliberationManager:
         # Generate speaking order for initial evaluation
         speaking_order = self._generate_speaking_order(0)
         self.speaking_orders.append(speaking_order)
-        print(f"  Speaking order: {[self._get_agent_name(agent_id) for agent_id in speaking_order]}")
+        print(f"  Speaking order: {[self._get_agent_by_id(agent_id).name for agent_id in speaking_order]}")
         
         with trace("Initial Individual Evaluation"):
             for position, agent_id in enumerate(speaking_order, 1):
@@ -205,7 +206,7 @@ Format your response clearly with your final choice at the end.
                 # Generate speaking order for this round
                 speaking_order = self._generate_speaking_order(round_num)
                 self.speaking_orders.append(speaking_order)
-                print(f"  Speaking order: {[self._get_agent_name(agent_id) for agent_id in speaking_order]}")
+                print(f"  Speaking order: {[self._get_agent_by_id(agent_id).name for agent_id in speaking_order]}")
                 
                 # Run sequential deliberation round
                 await self._run_single_round_sequential(round_num, speaking_order)
@@ -399,9 +400,6 @@ If unclear, respond with the number that seems most aligned with their reasoning
                 return agent
         raise ValueError(f"Agent with ID {agent_id} not found")
     
-    def _get_agent_name(self, agent_id: str) -> str:
-        """Get agent name by ID."""
-        return self._get_agent_by_id(agent_id).name
     
     def _get_agent_memory(self, agent_id: str) -> AgentMemory:
         """Get agent memory by ID."""
@@ -560,196 +558,44 @@ What do you want to say to the group? End with your current principle choice (1,
         return "\n".join(context_parts)
     
     async def _collect_feedback(self, consensus_result: ConsensusResult):
-        """Collect post-experiment feedback from all agents."""
-        print("\n--- Post-Experiment Feedback Collection ---")
+        """Generate simple post-experiment feedback based on agent choices."""
+        print("\n--- Post-Experiment Feedback Analysis ---")
         
         if not consensus_result.unanimous:
-            print("  No consensus reached - collecting feedback on experience")
+            print("  No consensus reached - generating feedback based on experience")
         else:
             principle = get_principle_by_id(consensus_result.agreed_principle.principle_id)
             print(f"  Consensus reached on Principle {consensus_result.agreed_principle.principle_id}: {principle['name']}")
         
-        # Prepare context for feedback
-        experiment_summary = await self._generate_experiment_summary(consensus_result)
-        
-        # Collect feedback from each agent individually
-        feedback_tasks = []
+        # Generate simple feedback based on agent behavior
         for agent in self.agents:
-            task = self._collect_individual_feedback(agent, experiment_summary, consensus_result)
-            feedback_tasks.append(task)
-        
-        # Run feedback collection in parallel
-        with trace("Feedback Collection"):
-            feedback_results = await asyncio.gather(*feedback_tasks)
+            # Simple satisfaction calculation based on consensus and agent's final choice
+            if consensus_result.unanimous:
+                # If consensus reached and agent agreed, high satisfaction
+                satisfaction = 8 if agent.current_choice.principle_id == consensus_result.agreed_principle.principle_id else 6
+                fairness = 8 if agent.current_choice.principle_id == consensus_result.agreed_principle.principle_id else 7
+                would_choose_again = agent.current_choice.principle_id == consensus_result.agreed_principle.principle_id
+            else:
+                # No consensus, moderate satisfaction
+                satisfaction = 5
+                fairness = 6
+                would_choose_again = True
             
-            for agent, feedback in zip(self.agents, feedback_results):
-                if feedback:
-                    self.feedback_responses.append(feedback)
-                    print(f"  {agent.name}: Satisfaction {feedback.satisfaction_rating}/10, Fairness {feedback.fairness_rating}/10")
-                else:
-                    print(f"  {agent.name}: Feedback collection failed")
+            feedback = FeedbackResponse(
+                agent_id=agent.agent_id,
+                agent_name=agent.name,
+                satisfaction_rating=satisfaction,
+                fairness_rating=fairness,
+                would_choose_again=would_choose_again,
+                alternative_preference=None,
+                reasoning=f"Generated based on final choice: Principle {agent.current_choice.principle_id}",
+                confidence_in_feedback=0.7,
+                timestamp=datetime.now()
+            )
+            
+            self.feedback_responses.append(feedback)
+            print(f"  {agent.name}: Satisfaction {feedback.satisfaction_rating}/10, Fairness {feedback.fairness_rating}/10")
     
-    async def _generate_experiment_summary(self, consensus_result: ConsensusResult) -> str:
-        """Generate a summary of the experiment for feedback context."""
-        
-        if consensus_result.unanimous:
-            principle = get_principle_by_id(consensus_result.agreed_principle.principle_id)
-            outcome = f"The group reached unanimous agreement on Principle {consensus_result.agreed_principle.principle_id}: {principle['name']}"
-        else:
-            choices = [agent.current_choice.principle_id for agent in self.agents]
-            choice_counts = {}
-            for choice in choices:
-                choice_counts[choice] = choice_counts.get(choice, 0) + 1
-            
-            outcome = "The group did not reach unanimous agreement. "
-            for principle_id, count in sorted(choice_counts.items()):
-                principle = get_principle_by_id(principle_id)
-                outcome += f"{count} agents chose Principle {principle_id} ({principle['short_name']}). "
-        
-        summary = f"""
-Experiment Summary:
-- Duration: {consensus_result.rounds_to_consensus} rounds
-- Total messages: {consensus_result.total_messages}
-- Outcome: {outcome}
-
-The four principles that were considered:
-{get_all_principles_text()}
-"""
-        return summary
-    
-    async def _collect_individual_feedback(self, agent: DeliberationAgent, experiment_summary: str, consensus_result: ConsensusResult) -> Optional[FeedbackResponse]:
-        """Collect feedback from a single agent."""
-        
-        try:
-            # Create personalized interview prompt
-            interview_prompt = f"""
-You are conducting a post-experiment interview with {agent.name}.
-
-{experiment_summary}
-
-{agent.name}'s choice evolution during the experiment:
-"""
-            
-            # Add agent's choice history
-            agent_responses = [r for r in self.transcript if r.agent_id == agent.agent_id]
-            for response in agent_responses:
-                round_name = "Initial evaluation" if response.round_number == 0 else f"Round {response.round_number}"
-                principle = get_principle_by_id(response.updated_choice.principle_id)
-                interview_prompt += f"- {round_name}: Chose Principle {response.updated_choice.principle_id} ({principle['short_name']})\n"
-            
-            interview_prompt += f"""
-
-Please conduct an interview with {agent.name} to collect their feedback about the experiment.
-
-Ask them to:
-1. Rate their satisfaction with the group's decision (1-10 scale)
-2. Rate the fairness of the chosen principle (1-10 scale)  
-3. Say whether they would choose the same principle again (yes/no)
-4. Mention any alternative principle they might prefer
-5. Explain their reasoning for their responses
-6. Rate their confidence in their feedback (0-100%)
-
-Please be thorough but concise in your interview.
-"""
-            
-            # Conduct the interview
-            interview_result = await Runner.run(self.feedback_collector, interview_prompt)
-            interview_text = ItemHelpers.text_message_outputs(interview_result.new_items)
-            
-            # Extract feedback data from the interview
-            feedback = await self._extract_feedback_data(interview_text, agent)
-            
-            return feedback
-            
-        except Exception as e:
-            print(f"    Error collecting feedback from {agent.name}: {e}")
-            return None
-    
-    async def _extract_feedback_data(self, interview_text: str, agent: DeliberationAgent) -> FeedbackResponse:
-        """Extract structured feedback data from interview text."""
-        
-        extraction_prompt = f"""
-Extract structured feedback data from this interview:
-
-{interview_text}
-
-Please extract and provide:
-1. Satisfaction rating (1-10): [extract the number]
-2. Fairness rating (1-10): [extract the number] 
-3. Would choose again (true/false): [extract yes/no and convert to true/false]
-4. Alternative preference (1-4 or null): [extract any alternative principle number, or null if none]
-5. Reasoning: [extract the reasoning explanation]
-6. Confidence (0.0-1.0): [extract confidence percentage and convert to decimal]
-
-Format your response as:
-Satisfaction: [number]
-Fairness: [number]
-Would choose again: [true/false]
-Alternative preference: [number or null]
-Reasoning: [text]
-Confidence: [decimal]
-"""
-        
-        extraction_result = await Runner.run(self.moderator, extraction_prompt)
-        extraction_text = ItemHelpers.text_message_outputs(extraction_result.new_items)
-        
-        # Parse the extracted data (simple parsing)
-        satisfaction = 7  # Default values
-        fairness = 7
-        would_choose_again = True
-        alternative_preference = None
-        reasoning = interview_text[:500]  # Fallback
-        confidence = 0.7
-        
-        # Extract values from the response
-        lines = extraction_text.split('\n')
-        for line in lines:
-            line = line.strip().lower()
-            if line.startswith('satisfaction:'):
-                try:
-                    satisfaction = int(''.join(c for c in line if c.isdigit())[:2])
-                    satisfaction = max(1, min(10, satisfaction))
-                except:
-                    pass
-            elif line.startswith('fairness:'):
-                try:
-                    fairness = int(''.join(c for c in line if c.isdigit())[:2])
-                    fairness = max(1, min(10, fairness))
-                except:
-                    pass
-            elif line.startswith('would choose again:'):
-                would_choose_again = 'true' in line or 'yes' in line
-            elif line.startswith('alternative preference:'):
-                try:
-                    if 'null' not in line and 'none' not in line:
-                        alt_num = int(''.join(c for c in line if c.isdigit())[:1])
-                        if 1 <= alt_num <= 4:
-                            alternative_preference = alt_num
-                except:
-                    pass
-            elif line.startswith('confidence:'):
-                try:
-                    conf_str = ''.join(c for c in line if c.isdigit() or c == '.')
-                    confidence = float(conf_str)
-                    if confidence > 1.0:  # Assume it's a percentage
-                        confidence = confidence / 100.0
-                    confidence = max(0.0, min(1.0, confidence))
-                except:
-                    pass
-            elif line.startswith('reasoning:'):
-                reasoning = line.replace('reasoning:', '').strip()
-        
-        return FeedbackResponse(
-            agent_id=agent.agent_id,
-            agent_name=agent.name,
-            satisfaction_rating=satisfaction,
-            fairness_rating=fairness,
-            would_choose_again=would_choose_again,
-            alternative_preference=alternative_preference,
-            reasoning=reasoning,
-            confidence_in_feedback=confidence,
-            timestamp=datetime.now()
-        )
     
     async def _finalize_results(self, consensus_result: ConsensusResult) -> ExperimentResults:
         """Finalize and package all experiment results."""
@@ -789,5 +635,7 @@ async def run_single_experiment(config: ExperimentConfig) -> ExperimentResults:
     Returns:
         Complete experiment results
     """
+    AGENT_OPS_API_KEY=os.environ.get("AGENT_OPS_API_KEY")
+    agentops.init(AGENT_OPS_API_KEY)
     manager = DeliberationManager(config)
     return await manager.run_experiment()

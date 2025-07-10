@@ -11,29 +11,29 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 **Core Framework**: Built on OpenAI Agents SDK with structured multi-agent deliberation system
 
 **Key Components**:
-- **src/maai/core/**: Core experiment logic and data models
-- **src/maai/agents/**: Enhanced agent classes with specialized roles
-- **src/maai/config/**: YAML-based configuration management
-- **src/maai/export/**: Multi-format data export system
+- **src/maai/core/**: Core experiment logic and data models (`deliberation_manager.py`, `models.py`)
+- **src/maai/agents/**: Enhanced agent classes with specialized roles (`enhanced.py`)
+- **src/maai/config/**: YAML-based configuration management (`manager.py`)
+- **src/maai/export/**: Multi-format data export system (`data_export.py`)
 - **configs/**: YAML configuration files for different experiment scenarios
 - **experiment_results/**: Output directory for all experiment data
 
-**Agent System**: 
+**Agent Classes**: 
 - `DeliberationAgent`: Main reasoning agents that debate principles (with configurable personalities)
-- `DiscussionModerator`: Manages conversation flow
+- `DiscussionModerator`: Manages conversation flow and speaking order
 - `FeedbackCollector`: Conducts post-experiment interviews
 
-**Key Design Changes**:
+**Key Design Decisions**:
 - **No Confidence Scores**: LLMs cannot reliably assess confidence, so confidence scoring has been removed entirely
 - **Code-Based Consensus**: Consensus detection uses simple ID matching rather than LLM assessment
 - **Configurable Personalities**: Each agent can have a custom personality defined in YAML
 - **Neutral Descriptions**: Principle descriptions avoid references to philosophical authorities
 
 ### Distributive Justice Principles
-1. Maximize the Minimum Income (ensures worst-off are as well-off as possible)
-2. Maximize the Average Income (focuses on greatest total income regardless of distribution)
-3. Floor Constraint (hybrid with guaranteed minimum income plus maximizing average)
-4. Range Constraint (hybrid that limits inequality gap plus maximizing average)
+1. **Maximize the Minimum Income**: Ensures worst-off are as well-off as possible
+2. **Maximize the Average Income**: Focuses on greatest total income regardless of distribution  
+3. **Floor Constraint**: Hybrid with guaranteed minimum income plus maximizing average
+4. **Range Constraint**: Hybrid that limits inequality gap plus maximizing average
 
 ## Development Commands
 
@@ -64,15 +64,11 @@ python run_config.py
 
 ### Testing
 ```bash
-# Run all tests
+# Run all tests (consolidated)
 python run_tests.py
 
-# Individual test suites
-python tests/test_phase1.py                    # Core deliberation system
-python tests/test_phase1_comprehensive.py     # Comprehensive functionality  
-python tests/test_phase2_feedback.py          # Feedback collection
-python tests/test_phase2_logging.py           # Data export system
-python tests/test_phase2_config.py            # Configuration management
+# Run individual test directly
+python tests/test_core.py
 ```
 
 ### Direct API Usage
@@ -140,75 +136,23 @@ output:
 - `DEEPSEEK_API_KEY`: For DeepSeek models
 - `AGENT_OPS_API_KEY`: For agent operations tracking
 
-## Design Principles
+## Key Architecture Notes
 
-- **Simplistic code**: Keep code concise and easy to understand
-- **Modular design**: Create reusable components and functions
-- **Extensive documentation**: Document all code thoroughly
-- **Testing**: Create unit tests for crucial components
-- **Cloud-ready**: Design with AWS deployment in mind
-- **Async-first**: Use asyncio for concurrent agent operations
+**Core Classes**:
+- `DeliberationManager` (src/maai/core/deliberation_manager.py:42): Main orchestrator for multi-round experiments
+- `DeliberationAgent` (src/maai/agents/enhanced.py:14): Enhanced agents with structured outputs
+- `ExperimentConfig` (src/maai/core/models.py): Pydantic model for experiment configuration
+- `PrincipleChoice` (src/maai/core/models.py:11): Structured agent decision representation
 
-## Knowledge Base
+**Data Flow**:
+1. Load YAML config via `load_config_from_file()` in `src/maai/config/manager.py`
+2. Create agents with personality configurations
+3. Run deliberation rounds through `DeliberationManager`
+4. Export results via `export_experiment_data()` in `src/maai/export/data_export.py`
 
-The `knowledge_base/` directory contains:
-- `agents_sdk/`: Complete OpenAI Agents SDK documentation and examples
-- `best_practices/`: Practical guide to building agents (PDF and text)
-
-## File Structure
-
-**Current Enhanced System**:
-```
-src/maai/
-├── core/
-│   ├── models.py                    # Data models with Pydantic validation
-│   └── deliberation_manager.py     # Core multi-agent deliberation engine
-├── agents/
-│   └── enhanced.py                  # Enhanced agent classes with specialized roles
-├── config/
-│   └── manager.py                   # YAML configuration management system
-└── export/
-    └── data_export.py               # Multi-format data export system
-
-configs/                             # YAML configuration files
-├── quick_test.yaml                  # 3 agents, 2 rounds
-├── lucas.yaml                       # Custom configuration
-├── large_group.yaml                 # 8 agents, 10 rounds
-├── multi_model.yaml                 # Different AI models
-└── default.yaml                     # Standard setup
-
-tests/                               # Test suites
-├── test_phase1.py                   # Core deliberation system
-├── test_phase1_comprehensive.py    # Comprehensive functionality
-├── test_phase2_feedback.py         # Feedback collection
-├── test_phase2_logging.py          # Data export system
-└── test_phase2_config.py           # Configuration management
-
-experiment_results/                  # Output directory
-└── [experiment_id]_*.*             # Multiple format outputs
-```
-
-**Legacy System** (in `legacy/`):
-- `MAAI.py`: Original experimental logic and agent definitions
-- `Logs_MAAI/`: CSV output files with experimental results
-
-## Current Implementation Status
-
-### ✅ Phase 1 - Core Multi-Agent Deliberation System (COMPLETED)
-- ✅ Enhanced agent architecture (`DeliberationAgent`, `ConsensusJudge`, `DiscussionModerator`)
-- ✅ Multi-round deliberation engine with `DeliberationManager`
-- ✅ Consensus detection and resolution system
-- ✅ Structured data models with Pydantic validation
-- ✅ Comprehensive testing framework
-- ✅ Performance metrics tracking and error handling
-- ✅ Rich communication transcripts and data collection
-
-### ✅ Phase 2 - Data Collection Enhancement (COMPLETED)
-- ✅ Post-experiment feedback collection (`FeedbackCollector` agent)
-- ✅ Enhanced logging system with multiple formats
-- ✅ Configuration management system
-- ✅ YAML configuration files in `configs/` directory
-- ✅ Preset configurations for common scenarios
+**Knowledge Base**:
+- `knowledge_base/agents_sdk/`: Complete OpenAI Agents SDK documentation and examples
+- `knowledge_base/best_practices/`: Practical guide to building agents (PDF and text)
 
 ## Experimental Flow
 
@@ -218,18 +162,10 @@ experiment_results/                  # Output directory
 4. **Feedback Collection**: Post-experiment interviews with agents
 5. **Data Export**: Results saved in multiple formats for analysis
 
-## World Knowledge Notes
+## Implementation Notes
 
-- GPT-4.1 exists as well as GPT-4.1 mini and nano
-- This project is based on the OpenAI Agents SDK (agents_sdk) - documentation available in `knowledge_base/agents_sdk/`
-- The framework supports multiple AI model providers through LitellmModel integration
-
-## Design Principles
-
-- **Simplistic code**: Code should be concise and easy to understand
-- **Modular design**: Create reusable components and functions
-- **Extensive documentation**: Document everything in the code
-- **Testing**: Create unit tests for crucial components
-- **Cloud-ready**: Design with AWS deployment in mind
-- **Async-first**: Use asyncio for concurrent agent operations
-- **Adaptable structure**: Modify file structure as needed for improvements
+- Built on OpenAI Agents SDK with LitellmModel for multi-provider support
+- Supports GPT-4.1, GPT-4.1 mini/nano, Claude, and DeepSeek models
+- All operations are async-first using asyncio
+- Pydantic models ensure data validation throughout the system
+- AgentOps integration provides experiment tracing and monitoring

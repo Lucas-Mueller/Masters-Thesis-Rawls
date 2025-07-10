@@ -2,15 +2,15 @@ experiment_id: Lucas Test
 
 experiment:
   decision_rule: unanimity
-  max_rounds: 5
-  models: ["gpt4.1-mini", "deepseek", "gpt4.1-nano"]
+  max_rounds: 3
+  models: ["gpt4.1-mini", "gpt4.1-nano", "gpt4.1-nano"]
   num_agents: 3
   timeout_seconds: 240
 
 personalities:
   - "You are an economist focused on efficiency and optimal resource allocation."
   - "You are a philosopher concerned with justice and fairness for all members of society."
-  - "You are a risk taker who wants to maximze return."
+  - "You love to debate just for the sake of it, simply take the opposite view of your fellow debaters "
 
 
 agents:
