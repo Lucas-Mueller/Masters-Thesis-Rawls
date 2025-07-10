@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+
 """
 Universal experiment runner for any YAML configuration.
 Simply change the CONFIG_NAME variable below to run different experiments.
@@ -12,10 +12,12 @@ import agentops
 
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
-load_dotenv()
 
+# Intialize Tracing using Agent Ops
+load_dotenv()
 AGENT_OPS_API_KEY=os.environ.get("AGENT_OPS_API_KEY")
 agentops.init(AGENT_OPS_API_KEY)
+
 from maai.config.manager import load_config_from_file
 from maai.core.deliberation_manager import run_single_experiment
 
@@ -29,12 +31,7 @@ async def main():
     print(f"🎯 Running Configuration: {CONFIG_NAME}")
     print("=" * 60)
     
-    # Check API key
-    if not os.environ.get("OPENAI_API_KEY"):
-        print("⚠️  Please set OPENAI_API_KEY environment variable")
-        print("   export OPENAI_API_KEY='your-key-here'")
-        return
-    
+
     try:
         # Load specified config
         print(f"📋 Loading {CONFIG_NAME}.yaml configuration...")
