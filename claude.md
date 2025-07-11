@@ -15,27 +15,33 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - **src/maai/agents/**: Enhanced agent classes with specialized roles (`enhanced.py`)
 - **src/maai/config/**: YAML-based configuration management (`manager.py`)
 - **src/maai/export/**: Multi-format data export system (`data_export.py`)
+- **src/maai/services/**: Service layer for experiment orchestration
 - **configs/**: YAML configuration files for different experiment scenarios
 - **experiment_results/**: Output directory for all experiment data
 
 **Agent Classes**: 
-- `DeliberationAgent`: Main reasoning agents that debate principles (with configurable personalities)
-- `DiscussionModerator`: Manages conversation flow and speaking order
+- `DeliberationAgent` (src/maai/agents/enhanced.py:14): Main reasoning agents that debate principles (with configurable personalities)
+- `DiscussionModerator` (src/maai/agents/enhanced.py:65): Manages conversation flow and speaking order
 - `FeedbackCollector`: Conducts post-experiment interviews
 
-**Service Architecture** (Advanced):
-- `ExperimentOrchestrator`: High-level coordination of all services
-- `ConsensusService`: Multiple consensus detection strategies (ID matching, threshold-based, semantic similarity)
-- `ConversationService`: Communication pattern management (random, sequential, hierarchical)
-- `MemoryService`: Agent memory management strategies (full, recent, selective)
+**Service Architecture**:
+- `ExperimentOrchestrator` (src/maai/services/experiment_orchestrator.py): High-level coordination of all services
+- `ConsensusService` (src/maai/services/consensus_service.py): Multiple consensus detection strategies
+- `ConversationService` (src/maai/services/conversation_service.py): Communication pattern management
+- `MemoryService` (src/maai/services/memory_service.py): Agent memory management strategies
+- `EvaluationService` (src/maai/services/evaluation_service.py): Likert scale evaluation processing
 
 **Key Design Decisions**:
 - **No Confidence Scores**: LLMs cannot reliably assess confidence, so confidence scoring has been removed entirely
-- **Code-Based Consensus**: Consensus detection uses simple ID matching rather than LLM assessment
+- **Code-Based Consensus**: Consensus detection uses simple ID matching rather than LLM assessment (src/maai/core/models.py:230)
 - **Configurable Personalities**: Each agent can have a custom personality defined in YAML
 - **Neutral Descriptions**: Principle descriptions avoid references to philosophical authorities
+- **Likert Scale Evaluation**: 4-point scale for principle assessment (strongly disagree to strongly agree)
 
 ### Distributive Justice Principles
+
+The four principles tested are defined in `src/maai/core/models.py:187-208`:
+
 1. **Maximize the Minimum Income**: Ensures worst-off are as well-off as possible
 2. **Maximize the Average Income**: Focuses on greatest total income regardless of distribution  
 3. **Floor Constraint**: Hybrid with guaranteed minimum income plus maximizing average
@@ -58,12 +64,13 @@ python run_quick_demo.py
 **Universal Configuration Runner**:
 ```bash
 python run_config.py
-# Edit CONFIG_NAME variable on line 20 to switch configurations
+# Edit CONFIG_NAME variable on line 27 to switch configurations
 ```
 
 **Available Configurations**:
 - `quick_test`: 3 agents, 2 rounds (1-2 minutes)
 - `lucas`: Custom configuration for specific research scenarios
+- `smart`: Different AI models with custom personalities
 - `default`: Standard experimental setup
 - `test_custom`: Template for custom configurations
 
@@ -145,14 +152,13 @@ output:
 
 **Experiment Results** are saved to `experiment_results/` with multiple formats:
 - `[ID]_complete.json`: Full structured experiment data
-- `[ID]_summary.csv`: Key metrics and outcomes
-- `[ID]_transcript.csv`: Complete conversation data
-- `[ID]_feedback.csv`: Post-experiment agent feedback
-- `[ID]_choice_evolution.csv`: How agent choices changed over time
-- `[ID]_agent_memories.csv`: Agent memory states throughout experiment
-- `[ID]_speaking_orders.csv`: Communication patterns and turn order
+- `[ID]_data.csv`: Main conversation transcript data
+- `[ID]_initial_evaluation.csv`: Initial Likert scale assessments (before deliberation)
+- `[ID]_initial_evaluation.json`: Initial ratings with statistics
+- `[ID]_evaluation.csv`: Post-consensus principle evaluations
+- `[ID]_evaluation.json`: Final ratings with statistics
+- `[ID]_comparison.csv`: Before/after rating comparison analysis
 - `[ID]_transcript.txt`: Human-readable conversation log
-- `[ID]_summary.txt`: Executive summary of results
 
 ## Environment Variables
 
@@ -167,10 +173,11 @@ output:
 ## Key Architecture Notes
 
 **Core Classes**:
-- `DeliberationManager` (src/maai/core/deliberation_manager.py:42): Main orchestrator for multi-round experiments
+- `DeliberationManager` (src/maai/core/deliberation_manager.py:25): Main orchestrator for multi-round experiments
 - `DeliberationAgent` (src/maai/agents/enhanced.py:14): Enhanced agents with structured outputs
-- `ExperimentConfig` (src/maai/core/models.py): Pydantic model for experiment configuration
-- `PrincipleChoice` (src/maai/core/models.py:11): Structured agent decision representation
+- `ExperimentConfig` (src/maai/core/models.py:115): Pydantic model for experiment configuration
+- `PrincipleChoice` (src/maai/core/models.py:59): Structured agent decision representation
+- `LikertScale` (src/maai/core/models.py:12): 4-point scale for principle evaluation
 
 **Data Flow**:
 1. Load YAML config via `load_config_from_file()` in `src/maai/config/manager.py`
@@ -186,10 +193,11 @@ output:
 ## Experimental Flow
 
 1. **Agent Initialization**: Create agents with "veil of ignorance" context
-2. **Multi-Round Deliberation**: Agents debate until unanimous agreement or timeout
-3. **Consensus Detection**: Validate group agreement on chosen principle
-4. **Feedback Collection**: Post-experiment interviews with agents
-5. **Data Export**: Results saved in multiple formats for analysis
+2. **Initial Likert Evaluation**: Agents rate all 4 principles before deliberation
+3. **Multi-Round Deliberation**: Agents debate until unanimous agreement or timeout
+4. **Consensus Detection**: Validate group agreement on chosen principle
+5. **Final Likert Evaluation**: Agents re-rate all 4 principles after deliberation
+6. **Data Export**: Results saved in multiple formats for analysis
 
 ## Implementation Notes
 
@@ -198,6 +206,7 @@ output:
 - All operations are async-first using asyncio
 - Pydantic models ensure data validation throughout the system
 - AgentOps integration provides experiment tracing and monitoring (conditional based on model providers)
+- Model provider detection in `src/maai/core/models.py:305` determines tracing strategy
 
 ## Advanced Service Configuration
 
@@ -219,27 +228,37 @@ results = await orchestrator.run_experiment(config)
 
 This allows researchers to A/B test different consensus mechanisms, communication patterns, and memory strategies without changing core code.
 
-At the end of this message, I will ask you to do something. Please follow the "Explore, Plan, Code, Test" workflow when you start.
+## Development Guidelines
 
-Explore
-First, use parallel subagents to find and read all files that may be useful for implementing the ticket, either as examples or as edit targets. The subagents should return relevant file paths, and any other info that may be useful.
+### Code Style
+- Use descriptive variable names and method names
+- Prefer async/await patterns throughout
+- All timestamps use `datetime` objects with UTC
+- Pydantic models for all data structures
+- Type hints on all function parameters and returns
 
-Plan
-Next, think hard and write up a detailed implementation plan. Don't forget to include tests, lookbook components, and documentation. Use your judgement as to what is necessary, given the standards of this repo.
+### Testing
+- All core functionality has unit tests in `tests/`
+- Integration tests use the `quick_test` configuration
+- Test files follow the pattern `test_*.py`
+- Mock external API calls in tests
 
-If there are things you are not sure about, use parallel subagents to do some web research. They should only return useful information, no noise.
+### Configuration Management
+- All experiment parameters go in YAML files under `configs/`
+- Use the `load_config_from_file()` function consistently
+- Validate all configs with Pydantic models
+- Default values defined in `DefaultConfig` class
 
-If there are things you still do not understand or questions you have for the user, pause here to ask them before continuing.
+### Error Handling
+- All async operations wrapped in try/catch
+- Graceful degradation when services fail
+- Detailed logging for debugging
+- AgentOps automatically captures errors for tracing
 
-Code
-When you have a thorough implementation plan, you are ready to start writing code. Follow the style of the existing codebase (e.g. we prefer clearly named variables and methods to extensive comments). Make sure to run our autoformatting script when you're done, and fix linter warnings that seem reasonable to you.
-
-Test
-Use parallel subagents to run tests, and make sure they all pass.
-
-If your changes touch the UX in a major way, use the browser to make sure that everything works correctly. Make a list of what to test for, and use a subagent for this step.
-
-If your testing shows problems, go back to the planning stage and think ultrahard.
-
-Write up your work
-When you are happy with your work, write up a short report that could be used as the PR description. Include what you set out to do, the choices you made with their brief justification, and any commands you ran in the process that may be useful for future developers to know about.
+### File Structure Conventions
+- Core logic in `src/maai/core/`
+- Agent implementations in `src/maai/agents/`
+- Service layer in `src/maai/services/`
+- Configuration management in `src/maai/config/`
+- Export functionality in `src/maai/export/`
+- All modules have `__init__.py` files

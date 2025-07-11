@@ -13,7 +13,13 @@ This system allows you to:
 
 ### The Experiment
 
-AI agents are presented with four principles of distributive justice and must reach **unanimous agreement** on one principle, while operating behind a "veil of ignorance" (not knowing their future economic position):
+The experiment follows a three-phase process:
+
+**Phase 1: Initial Assessment** - Agents privately rate all 4 principles using Likert scales (NEW)
+**Phase 2: Deliberation** - Agents debate and must reach **unanimous agreement** on one principle
+**Phase 3: Final Assessment** - Agents re-rate all 4 principles after deliberation (NEW)
+
+All agents operate behind a "veil of ignorance" (not knowing their future economic position) and choose from:
 
 1. **Maximize the Minimum Income** - Ensure the worst-off are as well-off as possible (Rawlsian)
 2. **Maximize the Average Income** - Greatest total income regardless of distribution (Utilitarian)
@@ -25,21 +31,26 @@ AI agents are presented with four principles of distributive justice and must re
 Running an experiment produces:
 
 ### 📊 Rich Data Collection
+- **Initial Likert Scale Assessment** - Baseline preferences before deliberation (NEW)
 - **Complete conversation transcripts** of agent deliberations
-- **Individual feedback interviews** with satisfaction and fairness ratings
+- **Post-consensus Likert evaluation** - How views changed after deliberation (NEW)
+- **Before/after comparison data** - Rating evolution through deliberation (NEW)
 - **Choice evolution tracking** showing how agents change their minds
 - **Performance metrics** including duration, rounds, and consensus success
 
 ### 📁 Multiple Export Formats
 - **JSON files** - Complete structured data for programmatic analysis
 - **CSV files** - Spreadsheet-ready data for statistical analysis
+- **Comparison CSV** - Before/after Likert rating analysis (NEW)
 - **Text transcripts** - Human-readable conversation logs
 - **Summary reports** - Executive summaries of experiment outcomes
 
 ### 📈 Analysis-Ready Outputs
+- **Initial Likert ratings** (4-point scale: Strongly Disagree to Strongly Agree) (NEW)
+- **Final Likert ratings** (4-point scale: Strongly Disagree to Strongly Agree) (NEW)
+- **Rating evolution analysis** - How deliberation changes agent preferences (NEW)
 - Agent satisfaction ratings (1-10 scale)
 - Fairness assessments of chosen principles
-- Confidence levels in decisions
 - Round-by-round choice evolution
 - Consensus formation patterns
 
@@ -75,16 +86,20 @@ export AGENT_OPS_API_KEY="your-agentops-key"
 ### 3. Run Your First Experiment
 
 ```bash
-# Quick 3-agent test 
-python demo_phase2.py
+# Quick 3-agent test with full Likert evaluation
+python run_quick_demo.py
+
+# Or use configuration-based approach
+python run_config.py  # Edit CONFIG_NAME in file to change config
 ```
 
 This will:
-- Run a deliberation with 3 agents
-- Show the decision-making process
-- Collect post-experiment feedback
+- Collect initial Likert scale preferences (NEW)
+- Run a deliberation with agents debating principles
+- Collect final Likert scale preferences (NEW)
+- Generate before/after comparison data (NEW)
 - Export results in multiple formats
-- Display a summary of findings
+- Display a comprehensive summary
 
 ## 📖 Usage Examples
 
@@ -133,9 +148,10 @@ asyncio.run(run_single_experiment(config))
 
 | Configuration | Agents | Rounds | Description |
 |--------------|--------|--------|-------------|
-| `quick_test` | 3 | 2 | Fast validation (1-2 minutes) |
-| `multi_model` | 4 | 5 | Different AI models (3-5 minutes) |
-| `large_group` | 8 | 10 | Larger deliberation (5-10 minutes) |
+| `quick_test` | 3 | 2 | Fast validation with Likert evaluation (1-2 minutes) |
+| `lucas` | 4 | 3 | Custom personality agents (3-5 minutes) |
+| `smart` | 4 | 3 | Different AI models with custom personalities |
+| `default` | 3 | 10 | Standard experimental setup |
 
 ### Custom Configuration Files
 
@@ -144,22 +160,28 @@ Create `configs/my_experiment.yaml`:
 experiment_id: my_custom_experiment
 
 experiment:
-  num_agents: 6
   max_rounds: 7
   decision_rule: unanimity
   timeout_seconds: 400
-  models:
-    - gpt-4.1-mini
-    - gpt-4.1
-    - gpt-4.1-mini
-    - gpt-4.1
-    - gpt-4.1-mini
-    - gpt-4.1-mini
+
+agents:
+  - name: "Agent_1"
+    model: "gpt-4.1-mini"
+    personality: "You are an economist focused on efficiency."
+  - name: "Agent_2"
+    model: "gpt-4.1"
+    personality: "You are a philosopher concerned with justice."
+  - name: "Agent_3"
+    model: "gpt-4.1-mini"
+    personality: "You are a pragmatist focused on practical solutions."
+
+defaults:
+  personality: "You are an agent tasked to design a future society."
+  model: "gpt-4.1-mini"
 
 output:
   directory: experiment_results
-  include_feedback: true
-  include_transcript: true
+  formats: [json, csv]
 ```
 
 ### Environment Variables
@@ -199,14 +221,20 @@ After each experiment, find files in `experiment_results/`:
 
 ```
 experiment_results/
-├── [ID]_complete.json          # Full structured data
-├── [ID]_summary.csv           # Key metrics spreadsheet
-├── [ID]_transcript.csv        # Conversation data
-├── [ID]_feedback.csv          # Agent feedback responses
-├── [ID]_choice_evolution.csv  # How choices changed
-├── [ID]_transcript.txt        # Human-readable conversation
-└── [ID]_summary.txt          # Executive summary
+├── [ID]_complete.json              # Full structured data
+├── [ID]_data.csv                   # Main conversation transcript data
+├── [ID]_initial_evaluation.csv    # Initial Likert ratings (NEW)
+├── [ID]_initial_evaluation.json   # Initial ratings with statistics (NEW)
+├── [ID]_evaluation.csv            # Final Likert ratings (NEW)
+├── [ID]_evaluation.json           # Final ratings with statistics (NEW)
+└── [ID]_comparison.csv            # Before/after rating comparison (NEW)
 ```
+
+### Key Research Files (NEW)
+
+- **`[ID]_initial_evaluation.csv`** - Baseline preferences before deliberation
+- **`[ID]_evaluation.csv`** - Final preferences after deliberation  
+- **`[ID]_comparison.csv`** - Complete before/after analysis with rating changes
 
 ## 🔬 Research Applications
 
@@ -218,6 +246,9 @@ experiment_results/
 - **Behavioral Economics**: Compare to human experimental data
 
 ### Example Research Questions
+- **How does deliberation change agent preferences?** (NEW - use comparison data)
+- **Do initial Likert ratings predict final consensus choices?** (NEW)
+- **Which principles show the most rating volatility through deliberation?** (NEW)
 - Do AI agents naturally converge on Rawlsian principles?
 - How does group size affect consensus formation?
 - What factors influence agent satisfaction with outcomes?
@@ -227,17 +258,11 @@ experiment_results/
 
 Validate your installation:
 ```bash
-# Test core functionality
-python tests/test_phase1.py
+# Test all core functionality including new Likert evaluation
+python run_tests.py
 
-# Test feedback collection
-python tests/test_phase2_feedback.py
-
-# Test data export
-python tests/test_phase2_logging.py
-
-# Test configuration system
-python tests/test_phase2_config.py
+# Or test individual components
+python tests/test_core.py
 ```
 
 All tests should show "PASSED" status.
@@ -284,7 +309,7 @@ for config_name in config_names:
 ### Custom Analysis
 ```python
 import json
-from pathlib import Path
+import pandas as pd
 
 # Load experiment results
 with open("experiment_results/my_exp_complete.json") as f:
@@ -292,10 +317,47 @@ with open("experiment_results/my_exp_complete.json") as f:
 
 # Analyze consensus patterns
 consensus_rate = data["consensus_result"]["unanimous"]
-satisfaction_scores = [fb["satisfaction_rating"] 
-                      for fb in data["feedback_responses"]]
-avg_satisfaction = sum(satisfaction_scores) / len(satisfaction_scores)
+
+# NEW: Analyze Likert rating evolution
+comparison_df = pd.read_csv("experiment_results/my_exp_comparison.csv")
+
+# Calculate rating changes
+rating_changes = comparison_df['Rating_Change'].mean()
+print(f"Average rating change through deliberation: {rating_changes}")
+
+# Analyze principle-specific changes
+principle_changes = comparison_df.groupby('Principle_ID')['Rating_Change'].mean()
+print("Rating changes by principle:")
+print(principle_changes)
 ```
 
+### Advanced Research Analysis (NEW)
+```python
+# Load initial and final evaluations
+initial_df = pd.read_csv("experiment_results/my_exp_initial_evaluation.csv")
+final_df = pd.read_csv("experiment_results/my_exp_evaluation.csv")
 
-**Ready to explore distributive justice with AI agents?** Start with `python demo_phase2.py` and see what principles artificial minds choose when they don't know their place in society! 🤖⚖️
+# Analyze preference stability
+stable_ratings = comparison_df[comparison_df['Rating_Change'] == 0]
+volatility_rate = 1 - (len(stable_ratings) / len(comparison_df))
+print(f"Preference volatility rate: {volatility_rate:.2%}")
+
+# Find most influential principles
+principle_volatility = comparison_df.groupby('Principle_ID')['Rating_Change'].std()
+print("Principle volatility (standard deviation of changes):")
+print(principle_volatility)
+```
+
+**Ready to explore distributive justice with AI agents?** Start with `python run_quick_demo.py` and see how artificial minds' preferences evolve when they don't know their place in society! 🤖⚖️
+
+## 🆕 What's New
+
+### Latest Features (2025)
+- ✅ **Initial Likert Scale Assessment** - Collect baseline preferences before deliberation
+- ✅ **Parallel Evaluation Processing** - Faster data collection through concurrent agent processing
+- ✅ **Before/After Comparison Analysis** - Track how deliberation changes agent preferences
+- ✅ **Enhanced Export Formats** - Research-ready CSV files with comprehensive rating data
+- ✅ **Improved Error Handling** - Robust parsing with graceful fallback mechanisms
+
+### Research Impact
+The new Likert scale evaluation system enables unprecedented analysis of preference evolution in artificial agents, providing insights into how collective deliberation influences individual judgment in AI systems.

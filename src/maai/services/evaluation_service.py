@@ -332,8 +332,24 @@ Use only these rating values: "strongly_disagree", "disagree", "agree", "strongl
             result = await Runner.run(moderator_agent, parse_prompt)
             moderator_response_text = ItemHelpers.text_message_outputs(result.new_items)
             
+            # Clean the response and validate before JSON parsing
+            moderator_response_text = moderator_response_text.strip()
+            if not moderator_response_text:
+                logger.warning("Empty response from moderator, falling back to simple parsing")
+                return self._fallback_parse_evaluation(response_text)
+            
+            # Try to extract JSON from the response if it's wrapped in other text
+            json_start = moderator_response_text.find('{')
+            json_end = moderator_response_text.rfind('}')
+            
+            if json_start != -1 and json_end != -1 and json_end > json_start:
+                json_text = moderator_response_text[json_start:json_end + 1]
+            else:
+                logger.warning("No JSON found in moderator response, falling back to simple parsing")
+                return self._fallback_parse_evaluation(response_text)
+            
             # Parse JSON response and create PrincipleEvaluation objects
-            parsed_data = json.loads(moderator_response_text)
+            parsed_data = json.loads(json_text)
             evaluations = []
             
             for i in range(1, 5):
@@ -355,7 +371,7 @@ Use only these rating values: "strongly_disagree", "disagree", "agree", "strongl
             
             return evaluations
             
-        except (json.JSONDecodeError, KeyError, ValueError) as e:
+        except (json.JSONDecodeError, KeyError, ValueError, TypeError) as e:
             logger.warning(f"JSON parsing failed, falling back to simple parsing: {e}")
             return self._fallback_parse_evaluation(response_text)
     
@@ -375,13 +391,14 @@ Use only these rating values: "strongly_disagree", "disagree", "agree", "strongl
         for i in range(1, 5):
             # Look for pattern: "PRINCIPLE {i}: [rating]"
             rating = LikertScale.AGREE  # Default to agree
-            reasoning = "Failed to parse detailed reasoning"
+            reasoning = "Parsed from agent response using fallback method"
             
             # Try to find the rating in the text
             principle_patterns = [
                 f"PRINCIPLE {i}:",
                 f"principle {i}:",
-                f"Principle {i}:"
+                f"Principle {i}:",
+                f"{i}.",  # Sometimes agents just use numbers
             ]
             
             for pattern in principle_patterns:
@@ -389,31 +406,44 @@ Use only these rating values: "strongly_disagree", "disagree", "agree", "strongl
                     # Extract text after the pattern
                     start_idx = response_text.find(pattern)
                     if start_idx != -1:
-                        line_end = response_text.find('\n', start_idx)
-                        if line_end == -1:
-                            line_end = len(response_text)
+                        # Get the next 200 characters or to next principle
+                        next_principle_idx = response_text.find(f"PRINCIPLE {i+1}:", start_idx)
+                        if next_principle_idx == -1:
+                            next_principle_idx = start_idx + 200
                         
-                        line_text = response_text[start_idx:line_end].lower()
+                        section_text = response_text[start_idx:next_principle_idx].lower()
                         
-                        # Map text to rating
-                        if "strongly disagree" in line_text:
+                        # Map text to rating with more specific patterns
+                        if "strongly disagree" in section_text:
                             rating = LikertScale.STRONGLY_DISAGREE
-                        elif "disagree" in line_text:
-                            rating = LikertScale.DISAGREE
-                        elif "strongly agree" in line_text:
+                        elif "strongly agree" in section_text:
                             rating = LikertScale.STRONGLY_AGREE
-                        elif "agree" in line_text:
+                        elif "disagree" in section_text:
+                            rating = LikertScale.DISAGREE
+                        elif "agree" in section_text:
                             rating = LikertScale.AGREE
                         
-                        # Try to extract reasoning
-                        reasoning_pattern = f"REASONING {i}:"
-                        if reasoning_pattern in response_text:
-                            reasoning_start = response_text.find(reasoning_pattern)
-                            if reasoning_start != -1:
-                                reasoning_end = response_text.find('\n', reasoning_start)
-                                if reasoning_end == -1:
-                                    reasoning_end = len(response_text)
-                                reasoning = response_text[reasoning_start + len(reasoning_pattern):reasoning_end].strip()
+                        # Try to extract reasoning from the section
+                        reasoning_patterns = [
+                            f"REASONING {i}:",
+                            f"reasoning {i}:",
+                            f"Reasoning {i}:",
+                            "reasoning:",
+                            "because",
+                            "since"
+                        ]
+                        
+                        for reasoning_pattern in reasoning_patterns:
+                            if reasoning_pattern in section_text:
+                                reasoning_start = section_text.find(reasoning_pattern)
+                                if reasoning_start != -1:
+                                    reasoning_text = section_text[reasoning_start + len(reasoning_pattern):].strip()
+                                    # Get first sentence or up to 200 chars
+                                    if reasoning_text:
+                                        reasoning = reasoning_text[:200].strip()
+                                        if reasoning.endswith('.'):
+                                            reasoning = reasoning[:-1]
+                                    break
                         
                         break
             
@@ -421,7 +451,7 @@ Use only these rating values: "strongly_disagree", "disagree", "agree", "strongl
                 principle_id=i,
                 principle_name=get_principle_name(i),
                 satisfaction_rating=rating,
-                reasoning=reasoning
+                reasoning=reasoning if reasoning != "Parsed from agent response using fallback method" else f"Agent response indicated {rating.to_display().lower()} for principle {i}"
             )
             evaluations.append(evaluation)
         
