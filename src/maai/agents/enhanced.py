@@ -134,28 +134,34 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
         if "claude-sonnet-4" in model_name.lower() or "claude" in model_name.lower():
             if anthropic_key:
                 model = LitellmModel(model="anthropic/claude-sonnet-4-20250514", api_key=anthropic_key)
-        
-        if "claude-opus-4" in model_name.lower():
+            else:
+                model = model_name
+        elif "claude-opus-4" in model_name.lower():
             if anthropic_key:
                 model = LitellmModel(model="anthropic/claude-opus-4-20250514", api_key=anthropic_key)
                 print("You are using Claude 4 Opus, this is super expensive")
-        
-        if "deepseek-chat" in model_name.lower():
+            else:
+                model = model_name
+        elif "deepseek-chat" in model_name.lower():
             if deepseek_key:
                 model = LitellmModel(model="deepseek/deepseek-chat", api_key=deepseek_key)
-        if "deepseek-reasoner" in model_name.lower():
+            else:
+                model = model_name
+        elif "deepseek-reasoner" in model_name.lower():
             if deepseek_key:
                 model = LitellmModel(model="deepseek/deepseek-reasoner", api_key=deepseek_key)
-
-        if "gemini-flash" in model_name.lower():
+            else:
+                model = model_name
+        elif "gemini-flash" in model_name.lower():
             if gemini_key:
-                model = LitellmModel(model= "gemini/gemini-2.5-flash-preview-04-17", api_key=gemini_key)
-      
-        if "gemini-pro" in model_name.lower():
+                model = LitellmModel(model="gemini/gemini-2.5-flash-preview-04-17", api_key=gemini_key)
+            else:
+                model = model_name
+        elif "gemini-pro" in model_name.lower():
             if gemini_key:
-                model = LitellmModel(model= "gemini/gemini-2.5-pro", api_key=gemini_key)
-              
-       
+                model = LitellmModel(model="gemini/gemini-2.5-pro", api_key=gemini_key)
+            else:
+                model = model_name
         else:
             model = model_name
         
