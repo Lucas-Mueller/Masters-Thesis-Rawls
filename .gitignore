@@ -183,3 +183,9 @@ cython_debug/
 #  refer to https://docs.cursor.com/context/ignore-files
 .cursorignore
 .cursorindexingignore
+
+# Experiment results (archive important results separately)
+experiment_results/
+
+# Agent logs
+agentops.log

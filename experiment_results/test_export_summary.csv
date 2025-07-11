@@ -1,0 +1,15 @@
+Field,Value
+Experiment ID,test_export
+Start Time,2025-07-10T14:36:55.961065
+End Time,2025-07-10T14:36:55.961084
+Duration (seconds),10.00
+Number of Agents,3
+Max Rounds,1
+Decision Rule,unanimity
+Consensus Reached,Yes
+Rounds to Consensus,1
+Total Messages,3
+Average Round Duration,10.00
+Errors Encountered,0
+Agreed Principle ID,3
+Agreed Principle Name,Test Principle

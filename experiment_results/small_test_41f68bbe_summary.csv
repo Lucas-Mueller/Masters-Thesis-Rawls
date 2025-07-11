@@ -1,0 +1,16 @@
+Field,Value
+Experiment ID,small_test_41f68bbe
+Start Time,2025-07-10T12:14:31.206341
+End Time,2025-07-10T12:14:59.231556
+Duration (seconds),28.03
+Number of Agents,3
+Max Rounds,2
+Decision Rule,unanimity
+Consensus Reached,Yes
+Rounds to Consensus,1
+Total Messages,6
+Average Round Duration,28.03
+Errors Encountered,0
+Agreed Principle ID,3
+Agreed Principle Name,Maximize the Average Income with a Floor Constraint
+Agreement Confidence,70.00%

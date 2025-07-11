@@ -1,0 +1,16 @@
+Field,Value
+Experiment ID,test_config
+Start Time,2025-07-10T14:00:31.732390
+End Time,2025-07-10T14:01:27.962672
+Duration (seconds),56.23
+Number of Agents,8
+Max Rounds,10
+Decision Rule,unanimity
+Consensus Reached,Yes
+Rounds to Consensus,1
+Total Messages,16
+Average Round Duration,56.23
+Errors Encountered,0
+Agreed Principle ID,3
+Agreed Principle Name,Maximize the Average Income with a Floor Constraint
+Agreement Confidence,70.00%

@@ -1,0 +1,35 @@
+experiment_id: Lucas Test
+
+experiment:
+  max_rounds: 3
+  decision_rule: unanimity
+  timeout_seconds: 240
+
+agents:
+  - name: "Economist"
+    personality: "You are Elon Musk."
+    model: "gpt-4.1-mini"
+  - name: "Philosopher"
+    personality: "You are helpful assistant."
+    model: "gpt-4.1-mini"
+  - name: "Debater"
+    personality: "You love to debate just for the sake of it, simply take the opposite view of your fellow debaters"
+    model: "o4-mini"
+
+defaults:
+  personality: "You are an agent tasked to design a future society."
+  model: "gpt-4.1-nano"
+
+output:
+  directory: experiment_results
+  formats:
+    - json
+    - csv
+    - txt
+  include_feedback: true
+  include_transcript: true
+
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true

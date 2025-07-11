@@ -4,3 +4,4 @@ dotenv
 openai-agents[litellm]
 pandas 
 datetime
+agentops

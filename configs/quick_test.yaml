@@ -1,0 +1,33 @@
+# Quick test configuration for rapid validation
+experiment_id: quick_test_experiment
+
+experiment:
+  max_rounds: 2
+  decision_rule: unanimity
+  timeout_seconds: 60
+
+agents:
+  - name: "Agent_1"
+    model: "gpt-4.1-mini"
+  - name: "Agent_2" 
+    model: "gpt-4.1-mini"
+  - name: "Agent_3"
+    model: "gpt-4.1-mini"
+
+defaults:
+  personality: "You are an agent tasked to design a future society."
+  model: "gpt-4.1-mini"
+
+output:
+  directory: experiment_results
+  formats:
+    - json
+    - csv
+    - txt
+  include_feedback: true
+  include_transcript: true
+
+performance:
+  parallel_feedback: true
+  trace_enabled: true
+  debug_mode: false
