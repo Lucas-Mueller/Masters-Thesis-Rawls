@@ -123,6 +123,7 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
     gemini_key = os.environ.get("GEMINI_API_KEY")
     xai_key = os.environ.get("XAI_API_KEY")
+    groqkey = os.environ['GROQ_API_KEY']
     
     for i, agent_config in enumerate(agent_configs):
         agent_id = f"agent_{i+1}"
@@ -175,7 +176,22 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
                 model = LitellmModel(model="xai/grok-3-mini", api_key=xai_key)
             else:
                 model = model_name
+
+        elif "llama-4" or "llama-4-scout" in model_name.lower():
+            if groqkey:
+                model = LitellmModel(model="groq/meta-llama/llama-4-scout-17b-16e-instruct", api_key=groqkey)
+            else:
+                model = model_name
+
+        elif  "llama-4-maverick" in model_name.lower():
+            if groqkey:
+                model = LitellmModel(model="groq/meta-llama/llama-4-maverick-17b-128e-instruct", api_key=groqkey)
+            else:
+                model = model_name
         
+        elif "llama-3" or "llama-3-70B" in model_name.lower():
+            if groqkey:
+                model= LitellmModel(model="groq/llama-3.3-70b-versatile", api_key=groqkey)
         else:
             model = model_name
         
