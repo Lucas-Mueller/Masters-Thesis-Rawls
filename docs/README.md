@@ -91,11 +91,11 @@ This will:
 ### Basic Experiment
 ```python
 import asyncio
-from config_manager import PresetConfigs
-from deliberation_manager import run_single_experiment
+from maai.config.manager import load_config_from_file
+from maai.core.deliberation_manager import run_single_experiment
 
-# Run a quick test
-config = PresetConfigs.quick_test()
+# Run a quick test using YAML configuration
+config = load_config_from_file("quick_test")
 results = await run_single_experiment(config)
 print(f"Consensus reached: {results.consensus_result.unanimous}")
 ```
@@ -270,13 +270,13 @@ pip install -r requirements.txt
 
 ### Batch Experiments
 ```python
-configs = [
-    PresetConfigs.quick_test(),
-    PresetConfigs.standard_experiment(),
-    PresetConfigs.large_group()
-]
+from maai.config.manager import load_config_from_file
 
-for config in configs:
+# Load different YAML configurations
+config_names = ["quick_test", "multi_model", "large_group"]
+
+for config_name in config_names:
+    config = load_config_from_file(config_name)
     results = await run_single_experiment(config)
     print(f"{config.experiment_id}: {results.consensus_result.unanimous}")
 ```

@@ -313,67 +313,6 @@ class ConfigManager:
             }
 
 
-# Preset configurations for common scenarios
-class PresetConfigs:
-    """Predefined configurations for common experimental scenarios."""
-    
-    @staticmethod
-    def quick_test() -> ExperimentConfig:
-        """Quick test configuration with minimal agents and rounds."""
-        return ExperimentConfig(
-            experiment_id="quick_test",
-            max_rounds=2,
-            decision_rule="unanimity",
-            timeout_seconds=60,
-            agents=[
-                AgentConfig(name="Agent_1", model="gpt-4.1-mini"),
-                AgentConfig(name="Agent_2", model="gpt-4.1-mini"),
-                AgentConfig(name="Agent_3", model="gpt-4.1-mini")
-            ],
-            defaults=DefaultConfig()
-        )
-    
-    @staticmethod
-    def standard_experiment() -> ExperimentConfig:
-        """Standard experiment configuration."""
-        return ExperimentConfig(
-            experiment_id="standard_exp",
-            max_rounds=5,
-            decision_rule="unanimity",
-            timeout_seconds=300,
-            agents=[
-                AgentConfig(name="Agent_1", model="gpt-4.1-mini"),
-                AgentConfig(name="Agent_2", model="gpt-4.1"),
-                AgentConfig(name="Agent_3", model="gpt-4.1-mini"),
-                AgentConfig(name="Agent_4", model="gpt-4.1")
-            ],
-            defaults=DefaultConfig()
-        )
-    
-    @staticmethod
-    def large_group() -> ExperimentConfig:
-        """Large group experiment configuration."""
-        return ExperimentConfig(
-            experiment_id="large_group",
-            max_rounds=10,
-            decision_rule="unanimity",
-            timeout_seconds=600,
-            agents=[AgentConfig(name=f"Agent_{i+1}", model="gpt-4.1-mini") for i in range(8)],
-            defaults=DefaultConfig()
-        )
-    
-    @staticmethod
-    def stress_test() -> ExperimentConfig:
-        """Stress test configuration with many agents."""
-        return ExperimentConfig(
-            experiment_id="stress_test",
-            max_rounds=15,
-            decision_rule="unanimity",
-            timeout_seconds=900,
-            agents=[AgentConfig(name=f"Agent_{i+1}", model="gpt-4.1-mini") for i in range(15)],
-            defaults=DefaultConfig()
-        )
-
 
 def load_config_from_file(config_file: str, results_dir: str = "experiment_results") -> ExperimentConfig:
     """
@@ -397,14 +336,3 @@ def load_config_from_file(config_file: str, results_dir: str = "experiment_resul
     return manager.load_config(config_name)
 
 
-def create_config_from_dict(config_dict: Dict[str, Any]) -> ExperimentConfig:
-    """
-    Create ExperimentConfig from a dictionary.
-    
-    Args:
-        config_dict: Dictionary with configuration values
-        
-    Returns:
-        ExperimentConfig object
-    """
-    return ExperimentConfig(**config_dict)

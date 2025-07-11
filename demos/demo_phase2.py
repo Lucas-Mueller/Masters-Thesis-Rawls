@@ -12,7 +12,7 @@ from pathlib import Path
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from maai.config.manager import ConfigManager, PresetConfigs, load_config_from_file
+from maai.config.manager import ConfigManager, load_config_from_file
 from maai.core.deliberation_manager import run_single_experiment
 
 
@@ -37,16 +37,9 @@ async def demo_configuration_management():
             print(f"     - Models: {len(set(agent.model or config.defaults.model for agent in config.agents))} different models")
             print(f"     - Timeout: {config.timeout_seconds}s")
     
-    # Show preset configs
-    print(f"\n🎯 Preset Configurations:")
-    presets = [
-        ("Quick Test", PresetConfigs.quick_test()),
-        ("Standard", PresetConfigs.standard_experiment()),
-        ("Large Group", PresetConfigs.large_group())
-    ]
-    
-    for name, config in presets:
-        print(f"   {name}: {config.num_agents} agents, {config.max_rounds} rounds")
+    # All configurations are now YAML-based
+    print(f"\n✅ All configurations are loaded from YAML files in the configs/ directory")
+    print(f"   This provides a single, consistent way to define experiments")
 
 
 async def demo_enhanced_experiment():
@@ -58,9 +51,9 @@ async def demo_enhanced_experiment():
         print("⚠️  Please set OPENAI_API_KEY to run the experiment demo")
         return
     
-    # Use a quick test configuration
-    print("🚀 Running experiment with quick_test configuration...")
-    config = PresetConfigs.quick_test()
+    # Use a quick test configuration from YAML
+    print("🚀 Running experiment with quick_test YAML configuration...")
+    config = load_config_from_file("quick_test")
     
     print(f"   Configuration: {config.num_agents} agents, {config.max_rounds} rounds")
     print(f"   Decision Rule: {config.decision_rule}")

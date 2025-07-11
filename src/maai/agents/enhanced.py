@@ -5,7 +5,7 @@ These agents have specialized roles and structured outputs.
 
 import os
 from typing import Optional, List
-from agents import Agent
+from agents import Agent, trace
 from agents.extensions.models.litellm_model import LitellmModel
 from ..core.models import PrincipleChoice, DeliberationResponse, ConsensusResult, FeedbackResponse, get_all_principles_text, get_default_personality
 from datetime import datetime
@@ -121,6 +121,7 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
     openai_key = os.environ.get("OPENAI_API_KEY")
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
+    gemini_key = os.environ.get("GEMINI_API_KEY")
     
     for i, agent_config in enumerate(agent_configs):
         agent_id = f"agent_{i+1}"
@@ -130,16 +131,31 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
         model_name = agent_config.model or defaults.model
         
         # Create appropriate model wrapper for different providers
-        if "anthropic" in model_name.lower() or "claude" in model_name.lower():
+        if "claude-sonnet-4" in model_name.lower() or "claude" in model_name.lower():
             if anthropic_key:
                 model = LitellmModel(model="anthropic/claude-sonnet-4-20250514", api_key=anthropic_key)
-            else:
-                model = "gpt-4.1-mini"  # Fallback
-        elif "deepseek" in model_name.lower():
+        
+        if "claude-opus-4" in model_name.lower():
+            if anthropic_key:
+                model = LitellmModel(model="anthropic/claude-opus-4-20250514", api_key=anthropic_key)
+                print("You are using Claude 4 Opus, this is super expensive")
+        
+        if "deepseek-chat" in model_name.lower():
             if deepseek_key:
                 model = LitellmModel(model="deepseek/deepseek-chat", api_key=deepseek_key)
-            else:
-                model = "gpt-4.1-mini"  # Fallback
+        if "deepseek-reasoner" in model_name.lower():
+            if deepseek_key:
+                model = LitellmModel(model="deepseek/deepseek-reasoner", api_key=deepseek_key)
+
+        if "gemini-flash" in model_name.lower():
+            if gemini_key:
+                model = LitellmModel(model= "gemini/gemini-2.5-flash-preview-04-17", api_key=gemini_key)
+      
+        if "gemini-pro" in model_name.lower():
+            if gemini_key:
+                model = LitellmModel(model= "gemini/gemini-2.5-pro", api_key=gemini_key)
+              
+       
         else:
             model = model_name
         

@@ -10,12 +10,11 @@ __author__ = "MAAI Research Team"
 
 from .core.models import ExperimentConfig, ExperimentResults
 from .core.deliberation_manager import run_single_experiment
-from .config.manager import PresetConfigs, load_config_from_file
+from .config.manager import load_config_from_file
 
 __all__ = [
     "ExperimentConfig",
     "ExperimentResults", 
     "run_single_experiment",
-    "PresetConfigs",
     "load_config_from_file"
 ]

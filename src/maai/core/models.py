@@ -22,7 +22,7 @@ class DefaultConfig(BaseModel):
         description="Default personality for agents"
     )
     model: str = Field(
-        default="gpt-4.1-mini",
+        default="gpt-4.1-nano",
         description="Default LLM model for agents"
     )
 

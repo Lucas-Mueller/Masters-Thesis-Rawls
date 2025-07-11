@@ -134,7 +134,7 @@ output:
 **Optional**:
 - `ANTHROPIC_API_KEY`: For Claude models
 - `DEEPSEEK_API_KEY`: For DeepSeek models
-- `AGENT_OPS_API_KEY`: For agent operations tracking
+- `AGENT_OPS_API_KEY`: For AgentOps monitoring (session named with experiment ID)
 
 ## Key Architecture Notes
 

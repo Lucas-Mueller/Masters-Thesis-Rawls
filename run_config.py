@@ -13,20 +13,19 @@ import agentops
 # Add src to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-# Intialize Tracing using Agent Ops
+# Initialize environment and AgentOps
 load_dotenv()
-# Initialize AgentOps
 
+# Suppress OpenAI beta warnings in AgentOps
+os.environ.setdefault("AGENTOPS_SUPPRESS_OPENAI_WARNINGS", "true")
 
-AGENT_OPS_API_KEY=os.environ.get("AGENT_OPS_API_KEY")
-agentops.init(AGENT_OPS_API_KEY)
-
+# Import core modules first to avoid circular imports
 from maai.config.manager import load_config_from_file
 from maai.core.deliberation_manager import run_single_experiment
 
-# ========================================
-# CHANGE THIS LINE TO RUN DIFFERENT CONFIGS
-# ========================================
+# Initialize AgentOps after imports to avoid circular dependency issues
+
+
 CONFIG_NAME = "lucas"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default", "philosophical_debate", "economic_perspectives", "mixed_defaults"
 
 async def main():
@@ -34,17 +33,33 @@ async def main():
     print(f"🎯 Running Configuration: {CONFIG_NAME}")
     print("=" * 60)
     
-
+    # Check for AgentOps API key first
+    AGENT_OPS_API_KEY = os.environ.get("AGENT_OPS_API_KEY")
+    
     try:
         # Load specified config
         print(f" Loading {CONFIG_NAME}.yaml configuration...")
         config = load_config_from_file(CONFIG_NAME)
+        
+        # Initialize AgentOps with experiment ID as session name
+        if AGENT_OPS_API_KEY:
+            agentops.init(
+                api_key=AGENT_OPS_API_KEY,
+                auto_start_session=False,
+                tags=["distributive_justice_experiment"]
+            )
+            # Start session with experiment ID as session name
+            agentops.start_session(tags=[str(config.experiment_id), "distributive_justice_experiment"])
+            print("🔍 AgentOps monitoring enabled")
+
         
         print(f"   Configuration loaded successfully")
         print(f"   #Agents: {config.num_agents}")
         print(f"   Max Rounds: {config.max_rounds}")
         print(f"   ⏱ Timeout: {config.timeout_seconds}s")
         print(f"   Decision Rule: {config.decision_rule}")
+
+
         print(f"   Agent Details:")
         for agent in config.agents:
             model = agent.model or config.defaults.model
@@ -87,6 +102,14 @@ async def main():
         print(f"❌ Error running experiment: {e}")
         import traceback
         traceback.print_exc()
+    finally:
+        # End AgentOps session with proper status
+        if AGENT_OPS_API_KEY:
+            try:
+                agentops.end_session("Success")
+                print("🔍 AgentOps session completed - view at: https://app.agentops.ai/")
+            except Exception as e:
+                print(f"⚠️  AgentOps session end failed: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())

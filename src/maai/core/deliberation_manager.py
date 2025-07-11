@@ -5,8 +5,8 @@ Refactored to use decomposed services for better modularity and testability.
 
 import os 
 from dotenv import load_dotenv
-import agentops
 from typing import List, Optional
+from agents import trace
 
 from .models import (
     ExperimentConfig, 
@@ -17,7 +17,7 @@ from ..services.consensus_service import ConsensusService
 from ..services.conversation_service import ConversationService
 from ..services.memory_service import MemoryService
 
-# Logging using AgentOPs
+# Load environment variables
 load_dotenv()
 
 
@@ -57,7 +57,13 @@ class DeliberationManager:
         Returns:
             ExperimentResults with all data collected
         """
-        return await self.orchestrator.run_experiment(self.config)
+        with trace("deliberation_experiment"):
+            try:
+                results = await self.orchestrator.run_experiment(self.config)
+                return results
+            except Exception as e:
+                # Let AgentOps auto-capture the error
+                raise
     
     # Expose services for advanced users who want to experiment with different strategies
     @property
@@ -90,7 +96,6 @@ async def run_single_experiment(config: ExperimentConfig) -> ExperimentResults:
     Returns:
         Complete experiment results
     """
-    AGENT_OPS_API_KEY = os.environ.get("AGENT_OPS_API_KEY")
-    agentops.init(AGENT_OPS_API_KEY)
-    manager = DeliberationManager(config)
-    return await manager.run_experiment()
+    with trace("single_experiment"):
+        manager = DeliberationManager(config)
+        return await manager.run_experiment()
