@@ -118,9 +118,8 @@ class ExperimentOrchestrator:
         print("\n--- Initializing Agents ---")
         
         self.agents = create_deliberation_agents(
-            num_agents=self.config.num_agents,
-            models=self.config.models,
-            personalities=self.config.personalities
+            agent_configs=self.config.agents,
+            defaults=self.config.defaults
         )
         
         self.moderator = create_discussion_moderator()

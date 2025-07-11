@@ -8,6 +8,25 @@ from typing import List, Optional
 from pydantic import BaseModel, Field
 
 
+class AgentConfig(BaseModel):
+    """Configuration for a single agent."""
+    name: Optional[str] = Field(None, description="Human-readable name for the agent")
+    personality: Optional[str] = Field(None, description="Agent's personality/role description")
+    model: Optional[str] = Field(None, description="LLM model to use for this agent")
+
+
+class DefaultConfig(BaseModel):
+    """Default values for agent properties when not specified."""
+    personality: str = Field(
+        default="You are an agent tasked to design a future society.",
+        description="Default personality for agents"
+    )
+    model: str = Field(
+        default="gpt-4.1-mini",
+        description="Default LLM model for agents"
+    )
+
+
 class PrincipleChoice(BaseModel):
     """Represents an agent's choice of distributive justice principle."""
     principle_id: int = Field(..., ge=1, le=4, description="Principle ID (1-4)")
@@ -67,12 +86,16 @@ class ConsensusResult(BaseModel):
 class ExperimentConfig(BaseModel):
     """Configuration for a single experiment run."""
     experiment_id: str = Field(..., description="Unique experiment identifier")
-    num_agents: int = Field(..., ge=3, le=50, description="Number of participating agents")
     max_rounds: int = Field(default=10, ge=1, description="Maximum deliberation rounds")
     decision_rule: str = Field(default="unanimity", description="Decision rule (unanimity/majority)")
     timeout_seconds: int = Field(default=300, ge=30, description="Timeout per round in seconds")
-    models: List[str] = Field(default_factory=list, description="LLM models to use for agents")
-    personalities: List[str] = Field(default_factory=list, description="Agent personalities (custom text or references)")
+    agents: List[AgentConfig] = Field(..., description="List of agent configurations")
+    defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
+    
+    @property
+    def num_agents(self) -> int:
+        """Number of participating agents (derived from agents list)."""
+        return len(self.agents)
 
 
 class PerformanceMetrics(BaseModel):

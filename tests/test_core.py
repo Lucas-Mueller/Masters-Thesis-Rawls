@@ -12,7 +12,7 @@ from datetime import datetime
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from maai.core.models import ExperimentConfig, AgentMemory, MemoryEntry, PrincipleChoice
+from maai.core.models import ExperimentConfig, AgentMemory, MemoryEntry, PrincipleChoice, AgentConfig, DefaultConfig
 from maai.core.deliberation_manager import run_single_experiment, DeliberationManager
 from maai.config.manager import load_config_from_file
 
@@ -36,15 +36,21 @@ async def test_basic_functionality():
         memory.add_memory(memory_entry)
         print(f"   ✓ AgentMemory created with {len(memory.memory_entries)} entries")
         
-        # Test configuration
+        # Test configuration with new format
         config = ExperimentConfig(
             experiment_id="test_basic",
-            num_agents=3,
             max_rounds=2,
-            models=["gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini"],
-            personalities=["Test 1", "Test 2", "Test 3"]
+            agents=[
+                AgentConfig(name="Agent_1", model="gpt-4.1-mini", personality="Test 1"),
+                AgentConfig(name="Agent_2", model="gpt-4.1-mini", personality="Test 2"),
+                AgentConfig(name="Agent_3", model="gpt-4.1-mini", personality="Test 3")
+            ],
+            defaults=DefaultConfig()
         )
         print(f"   ✓ ExperimentConfig created: {config.experiment_id}")
+        print(f"   ✓ Agent configuration - num_agents: {config.num_agents}")
+        print(f"   ✓ Agent configuration - agents defined: {len(config.agents)}")
+        print(f"   ✓ Agent configuration - defaults available: {config.defaults.model}")
         
         # Test manager initialization
         manager = DeliberationManager(config)
@@ -83,19 +89,18 @@ async def test_small_experiment():
         print("⚠️  Skipping experiment test (no API key)")
         return None
     
-    # Create minimal config
+    # Create minimal config with new format
     config = ExperimentConfig(
         experiment_id=f"test_{uuid.uuid4().hex[:8]}",
-        num_agents=3,
         max_rounds=2,
         decision_rule="unanimity",
         timeout_seconds=120,
-        models=["gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini"],
-        personalities=[
-            "You are an economist focused on efficiency.",
-            "You are a philosopher concerned with fairness.",
-            "You are a pragmatist focused on practical solutions."
-        ]
+        agents=[
+            AgentConfig(name="Economist", model="gpt-4.1-mini", personality="You are an economist focused on efficiency."),
+            AgentConfig(name="Philosopher", model="gpt-4.1-mini", personality="You are a philosopher concerned with fairness."),
+            AgentConfig(name="Pragmatist", model="gpt-4.1-mini", personality="You are a pragmatist focused on practical solutions.")
+        ],
+        defaults=DefaultConfig()
     )
     
     print(f"Running experiment: {config.experiment_id}")

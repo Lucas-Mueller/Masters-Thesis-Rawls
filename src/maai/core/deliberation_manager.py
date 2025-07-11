@@ -10,8 +10,7 @@ from typing import List, Optional
 
 from .models import (
     ExperimentConfig, 
-    ExperimentResults,
-    detect_consensus  # Keep for backward compatibility
+    ExperimentResults
 )
 from ..services.experiment_orchestrator import ExperimentOrchestrator
 from ..services.consensus_service import ConsensusService

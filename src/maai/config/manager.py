@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 import glob
 
-from ..core.models import ExperimentConfig
+from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig
 
 
 class ConfigManager:
@@ -34,23 +34,27 @@ class ConfigManager:
     def _create_default_config(self):
         """Create a default configuration file."""
         default_config = {
+            "experiment_id": "default_experiment",
             "experiment": {
-                "num_agents": 4,
                 "max_rounds": 5,
                 "decision_rule": "unanimity",
-                "timeout_seconds": 300,
-                "models": ["gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini"]
+                "timeout_seconds": 300
+            },
+            "agents": [
+                {"name": "Agent_1", "model": "gpt-4.1-mini"},
+                {"name": "Agent_2", "model": "gpt-4.1-mini"},
+                {"name": "Agent_3", "model": "gpt-4.1-mini"},
+                {"name": "Agent_4", "model": "gpt-4.1-mini"}
+            ],
+            "defaults": {
+                "personality": "You are an agent tasked to design a future society.",
+                "model": "gpt-4.1-mini"
             },
             "output": {
                 "directory": "experiment_results",
                 "formats": ["json", "csv", "txt"],
                 "include_feedback": True,
                 "include_transcript": True
-            },
-            "agents": {
-                "personality_variation": True,
-                "confidence_threshold": 0.5,
-                "enable_feedback_collection": True
             },
             "performance": {
                 "parallel_feedback": True,
@@ -140,8 +144,11 @@ class ConfigManager:
         if "experiment" not in config_data:
             raise ValueError(f"Config file {config_path} missing required 'experiment' section")
         
-        required_fields = ["num_agents", "max_rounds", "models"]
-        for field in required_fields:
+        if "agents" not in config_data:
+            raise ValueError(f"Config file {config_path} missing required 'agents' section")
+        
+        required_experiment_fields = ["max_rounds"]
+        for field in required_experiment_fields:
             if field not in config_data["experiment"]:
                 raise ValueError(f"Config file {config_path} missing required field 'experiment.{field}'")
         
@@ -154,38 +161,43 @@ class ConfigManager:
         # Make sure the experiment ID is unique
         experiment_id = self._generate_unique_experiment_id(experiment_id)
         
-        # Handle personalities
-        personalities = config_data.get("personalities", [])
-        num_agents = config_data["experiment"]["num_agents"]
+        # Parse defaults
+        defaults_data = config_data.get("defaults", {})
+        defaults = DefaultConfig(**defaults_data)
         
-        if not personalities:
-            # Use default personality for all agents
-            print(f"No personalities specified - using default personality for all {num_agents} agents")
-            from ..core.models import get_default_personality
-            personalities = [get_default_personality()] * num_agents
-        elif len(personalities) < num_agents:
-            # Extend personalities to match number of agents
-            print(f"Only {len(personalities)} personalities specified for {num_agents} agents - "
-                  f"using default personality for remaining {num_agents - len(personalities)} agents")
-            from ..core.models import get_default_personality
-            default_personality = get_default_personality()
-            personalities.extend([default_personality] * (num_agents - len(personalities)))
-        elif len(personalities) > num_agents:
-            # Warn if too many personalities provided
-            print(f"Warning: {len(personalities)} personalities specified but only {num_agents} agents - "
-                  f"using first {num_agents} personalities")
-            personalities = personalities[:num_agents]
+        # Parse agent configurations
+        agents_data = config_data["agents"]
+        if not agents_data:
+            raise ValueError(f"Config file {config_path} has empty 'agents' section")
+        
+        agents = []
+        for i, agent_data in enumerate(agents_data):
+            # Ensure agent_data is a dict
+            if agent_data is None:
+                agent_data = {}
+            
+            # Generate name if not provided
+            if "name" not in agent_data or not agent_data["name"]:
+                agent_data["name"] = f"Agent_{i+1}"
+            
+            agent = AgentConfig(**agent_data)
+            agents.append(agent)
+        
+        print(f"Loaded {len(agents)} agents:")
+        for agent in agents:
+            model = agent.model or defaults.model
+            has_custom_personality = agent.personality is not None
+            print(f"  - {agent.name}: {model}" + (" (custom personality)" if has_custom_personality else " (default personality)"))
         
         # Create ExperimentConfig object with validation
         try:
             experiment_config = ExperimentConfig(
                 experiment_id=experiment_id,
-                num_agents=config_data["experiment"]["num_agents"],
                 max_rounds=config_data["experiment"]["max_rounds"],
                 decision_rule=config_data["experiment"].get("decision_rule", "unanimity"),
                 timeout_seconds=config_data["experiment"].get("timeout_seconds", 300),
-                models=config_data["experiment"]["models"],
-                personalities=personalities
+                agents=agents,
+                defaults=defaults
             )
         except Exception as e:
             raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")
@@ -197,11 +209,10 @@ class ConfigManager:
         
         # Define environment variable mappings
         env_mappings = {
-            "MAAI_NUM_AGENTS": ("experiment", "num_agents", int),
             "MAAI_MAX_ROUNDS": ("experiment", "max_rounds", int),
             "MAAI_DECISION_RULE": ("experiment", "decision_rule", str),
             "MAAI_TIMEOUT": ("experiment", "timeout_seconds", int),
-            "MAAI_MODELS": ("experiment", "models", lambda x: x.split(",")),
+            "MAAI_DEFAULT_MODEL": ("defaults", "model", str),
             "MAAI_OUTPUT_DIR": ("output", "directory", str),
             "MAAI_DEBUG": ("performance", "debug_mode", lambda x: x.lower() == "true"),
             "MAAI_EXPERIMENT_ID": ("experiment_id", None, str)
@@ -233,22 +244,17 @@ class ConfigManager:
         config_data = {
             "experiment_id": config.experiment_id,
             "experiment": {
-                "num_agents": config.num_agents,
                 "max_rounds": config.max_rounds,
                 "decision_rule": config.decision_rule,
-                "timeout_seconds": config.timeout_seconds,
-                "models": config.models
+                "timeout_seconds": config.timeout_seconds
             },
+            "agents": [agent.dict(exclude_none=True) for agent in config.agents],
+            "defaults": config.defaults.dict(),
             "output": {
                 "directory": "experiment_results",
                 "formats": ["json", "csv", "txt"],
                 "include_feedback": True,
                 "include_transcript": True
-            },
-            "agents": {
-                "personality_variation": True,
-                "confidence_threshold": 0.5,
-                "enable_feedback_collection": True
             },
             "performance": {
                 "parallel_feedback": True,
@@ -316,11 +322,15 @@ class PresetConfigs:
         """Quick test configuration with minimal agents and rounds."""
         return ExperimentConfig(
             experiment_id="quick_test",
-            num_agents=3,
             max_rounds=2,
             decision_rule="unanimity",
             timeout_seconds=60,
-            models=["gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini"]
+            agents=[
+                AgentConfig(name="Agent_1", model="gpt-4.1-mini"),
+                AgentConfig(name="Agent_2", model="gpt-4.1-mini"),
+                AgentConfig(name="Agent_3", model="gpt-4.1-mini")
+            ],
+            defaults=DefaultConfig()
         )
     
     @staticmethod
@@ -328,11 +338,16 @@ class PresetConfigs:
         """Standard experiment configuration."""
         return ExperimentConfig(
             experiment_id="standard_exp",
-            num_agents=4,
             max_rounds=5,
             decision_rule="unanimity",
             timeout_seconds=300,
-            models=["gpt-4.1-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1"]
+            agents=[
+                AgentConfig(name="Agent_1", model="gpt-4.1-mini"),
+                AgentConfig(name="Agent_2", model="gpt-4.1"),
+                AgentConfig(name="Agent_3", model="gpt-4.1-mini"),
+                AgentConfig(name="Agent_4", model="gpt-4.1")
+            ],
+            defaults=DefaultConfig()
         )
     
     @staticmethod
@@ -340,11 +355,11 @@ class PresetConfigs:
         """Large group experiment configuration."""
         return ExperimentConfig(
             experiment_id="large_group",
-            num_agents=8,
             max_rounds=10,
             decision_rule="unanimity",
             timeout_seconds=600,
-            models=["gpt-4.1-mini"] * 8
+            agents=[AgentConfig(name=f"Agent_{i+1}", model="gpt-4.1-mini") for i in range(8)],
+            defaults=DefaultConfig()
         )
     
     @staticmethod
@@ -352,11 +367,11 @@ class PresetConfigs:
         """Stress test configuration with many agents."""
         return ExperimentConfig(
             experiment_id="stress_test",
-            num_agents=15,
             max_rounds=15,
             decision_rule="unanimity",
             timeout_seconds=900,
-            models=["gpt-4.1-mini"] * 15
+            agents=[AgentConfig(name=f"Agent_{i+1}", model="gpt-4.1-mini") for i in range(15)],
+            defaults=DefaultConfig()
         )
 
 

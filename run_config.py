@@ -15,6 +15,9 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
 # Intialize Tracing using Agent Ops
 load_dotenv()
+# Initialize AgentOps
+
+
 AGENT_OPS_API_KEY=os.environ.get("AGENT_OPS_API_KEY")
 agentops.init(AGENT_OPS_API_KEY)
 
@@ -24,7 +27,7 @@ from maai.core.deliberation_manager import run_single_experiment
 # ========================================
 # CHANGE THIS LINE TO RUN DIFFERENT CONFIGS
 # ========================================
-CONFIG_NAME = "lucas"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default"
+CONFIG_NAME = "lucas"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default", "philosophical_debate", "economic_perspectives", "mixed_defaults"
 
 async def main():
     """Run experiment with the specified configuration."""
@@ -34,34 +37,38 @@ async def main():
 
     try:
         # Load specified config
-        print(f"📋 Loading {CONFIG_NAME}.yaml configuration...")
+        print(f" Loading {CONFIG_NAME}.yaml configuration...")
         config = load_config_from_file(CONFIG_NAME)
         
-        print(f"   ✓ Configuration loaded successfully")
-        print(f"   📊 Agents: {config.num_agents}")
-        print(f"   🔄 Max Rounds: {config.max_rounds}")
-        print(f"   ⏱️  Timeout: {config.timeout_seconds}s")
-        print(f"   🎯 Decision Rule: {config.decision_rule}")
-        print(f"   🤖 Models: {config.models}")
+        print(f"   Configuration loaded successfully")
+        print(f"   #Agents: {config.num_agents}")
+        print(f"   Max Rounds: {config.max_rounds}")
+        print(f"   ⏱ Timeout: {config.timeout_seconds}s")
+        print(f"   Decision Rule: {config.decision_rule}")
+        print(f"   Agent Details:")
+        for agent in config.agents:
+            model = agent.model or config.defaults.model
+            has_custom = "✨" if agent.personality else "📝"
+            print(f"      {has_custom} {agent.name}: {model}")
         print()
         
         # Run experiment
-        print("🚀 Starting experiment...")
+        print("Starting experiment...")
         results = await run_single_experiment(config)
         
         # Show results
         print("\n" + "=" * 60)
-        print("📊 EXPERIMENT RESULTS")
+        print(" EXPERIMENT RESULTS")
         print("=" * 60)
         
-        print(f"🎯 Consensus Reached: {'✅ YES' if results.consensus_result.unanimous else '❌ NO'}")
-        print(f"⏱️  Duration: {results.performance_metrics.total_duration_seconds:.1f}s")
-        print(f"🔄 Rounds: {results.consensus_result.rounds_to_consensus}")
-        print(f"💬 Messages: {len(results.deliberation_transcript)}")
+        print(f"Consensus Reached: {'✅ YES' if results.consensus_result.unanimous else '❌ NO'}")
+        print(f"⏱ Duration: {results.performance_metrics.total_duration_seconds:.1f}s")
+        print(f"#Rounds: {results.consensus_result.rounds_to_consensus}")
+        print(f"Messages: {len(results.deliberation_transcript)}")
         
         if results.consensus_result.unanimous:
             principle = results.consensus_result.agreed_principle
-            print(f"🏆 Agreed Principle: {principle.principle_id} - {principle.principle_name}")
+            print(f"Agreed Principle: {principle.principle_id} - {principle.principle_name}")
         
         # Show where results are saved
         print(f"\n📁 Results saved to: experiment_results/")

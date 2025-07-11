@@ -10,7 +10,7 @@ import os
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), 'src'))
 
-from maai.core.models import ExperimentConfig
+from maai.core.models import ExperimentConfig, AgentConfig, DefaultConfig
 from maai.core.deliberation_manager import DeliberationManager
 from maai.services.consensus_service import (
     ConsensusService, 
@@ -40,14 +40,25 @@ async def demonstrate_service_usage():
     # Base configuration
     config = ExperimentConfig(
         experiment_id="service_demo",
-        num_agents=3,
         max_rounds=2,
-        models=["gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini"],
-        personalities=[
-            "You are an economist focused on efficiency.",
-            "You are a philosopher concerned with fairness.",
-            "You are a pragmatist focused on practical solutions."
-        ]
+        agents=[
+            AgentConfig(
+                name="Economist",
+                model="gpt-4.1-mini",
+                personality="You are an economist focused on efficiency."
+            ),
+            AgentConfig(
+                name="Philosopher", 
+                model="gpt-4.1-mini",
+                personality="You are a philosopher concerned with fairness."
+            ),
+            AgentConfig(
+                name="Pragmatist",
+                model="gpt-4.1-mini", 
+                personality="You are a pragmatist focused on practical solutions."
+            )
+        ],
+        defaults=DefaultConfig()
     )
     
     print("1. Default Configuration (Backward Compatible)")

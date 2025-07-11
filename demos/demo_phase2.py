@@ -34,7 +34,7 @@ async def demo_configuration_management():
             print(f"   {config_name}:")
             print(f"     - Agents: {config.num_agents}")
             print(f"     - Max Rounds: {config.max_rounds}")
-            print(f"     - Models: {len(config.models)} different models")
+            print(f"     - Models: {len(set(agent.model or config.defaults.model for agent in config.agents))} different models")
             print(f"     - Timeout: {config.timeout_seconds}s")
     
     # Show preset configs

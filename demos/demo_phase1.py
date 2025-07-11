@@ -12,7 +12,7 @@ from datetime import datetime
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from maai.core.models import ExperimentConfig
+from maai.core.models import ExperimentConfig, AgentConfig, DefaultConfig
 from maai.core.deliberation_manager import run_single_experiment
 
 
@@ -28,11 +28,16 @@ async def run_demo():
     # Create a demo experiment configuration
     config = ExperimentConfig(
         experiment_id=f"demo_{uuid.uuid4().hex[:8]}",
-        num_agents=4,
         max_rounds=5,
-        decision_rule="unanimity",
+        decision_rule="unanimity", 
         timeout_seconds=300,
-        models=["gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini", "gpt-4.1-mini"]
+        agents=[
+            AgentConfig(name="Agent_1", model="gpt-4.1-mini"),
+            AgentConfig(name="Agent_2", model="gpt-4.1-mini"),
+            AgentConfig(name="Agent_3", model="gpt-4.1-mini"),
+            AgentConfig(name="Agent_4", model="gpt-4.1-mini")
+        ],
+        defaults=DefaultConfig()
     )
     
     print(f"🏁 Starting Demo Experiment")
@@ -122,7 +127,7 @@ async def run_demo():
             print(f"   {round_name}: {choice_str}")
         
         # Show principle definitions
-        from models import DISTRIBUTIVE_JUSTICE_PRINCIPLES
+        from maai.core.models import DISTRIBUTIVE_JUSTICE_PRINCIPLES
         print("\n📚 Principle Definitions:")
         for pid, info in DISTRIBUTIVE_JUSTICE_PRINCIPLES.items():
             print(f"   {pid}. {info['short_name']}: {info['description']}")

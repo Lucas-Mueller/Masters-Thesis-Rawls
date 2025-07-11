@@ -102,21 +102,18 @@ Communication style:
         )
 
 
-def create_deliberation_agents(num_agents: int, models: Optional[List[str]] = None, personalities: Optional[List[str]] = None) -> List[DeliberationAgent]:
+def create_deliberation_agents(agent_configs: List, defaults) -> List[DeliberationAgent]:
     """
-    Create a list of deliberation agents with diverse model configurations.
+    Create a list of deliberation agents from AgentConfig specifications.
     
     Args:
-        num_agents: Number of agents to create
-        models: Optional list of model names to use
+        agent_configs: List of AgentConfig instances
+        defaults: DefaultConfig with fallback values
     
     Returns:
         List of DeliberationAgent instances
     """
-    
-    # Default models if none provided
-    if not models:
-        models = ["gpt-4.1-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1"]
+    from ..core.models import AgentConfig, DefaultConfig
     
     agents = []
     
@@ -125,15 +122,15 @@ def create_deliberation_agents(num_agents: int, models: Optional[List[str]] = No
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
     
-    for i in range(num_agents):
+    for i, agent_config in enumerate(agent_configs):
         agent_id = f"agent_{i+1}"
-        agent_name = f"Agent {i+1}"
+        agent_name = agent_config.name or f"Agent {i+1}"
         
-        # Cycle through available models
-        model_name = models[i % len(models)]
+        # Resolve model (use agent's model or default)
+        model_name = agent_config.model or defaults.model
         
-        # Create agent with appropriate model
-        if "anthropic" in model_name.lower() or "claude" or "claude-sonnet-4" in model_name.lower():
+        # Create appropriate model wrapper for different providers
+        if "anthropic" in model_name.lower() or "claude" in model_name.lower():
             if anthropic_key:
                 model = LitellmModel(model="anthropic/claude-sonnet-4-20250514", api_key=anthropic_key)
             else:
@@ -146,12 +143,8 @@ def create_deliberation_agents(num_agents: int, models: Optional[List[str]] = No
         else:
             model = model_name
         
-        # Use provided personality or default
-        if personalities and i < len(personalities):
-            personality = personalities[i]
-        else:
-            from ..core.models import get_default_personality
-            personality = get_default_personality()
+        # Resolve personality (use agent's personality or default)
+        personality = agent_config.personality or defaults.personality
         
         agent = DeliberationAgent(
             agent_id=agent_id,
@@ -163,6 +156,8 @@ def create_deliberation_agents(num_agents: int, models: Optional[List[str]] = No
         agents.append(agent)
     
     return agents
+
+
 
 
 
