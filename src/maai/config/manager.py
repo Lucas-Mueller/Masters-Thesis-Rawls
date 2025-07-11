@@ -109,22 +109,41 @@ class ConfigManager:
             
         Returns:
             ExperimentConfig object
+            
+        Raises:
+            FileNotFoundError: If the specified config file doesn't exist
         """
         config_path = self.config_dir / f"{config_name}.yaml"
         
         if not config_path.exists():
-            if config_name != "default":
-                print(f"Warning: Config file {config_path} not found, using default")
-                config_path = self.default_config_path
-            else:
-                raise FileNotFoundError(f"Default config file not found: {config_path}")
+            # No fallback behavior - fail fast with clear error message
+            available_configs = [f.stem for f in self.config_dir.glob("*.yaml")]
+            raise FileNotFoundError(
+                f"Configuration file not found: {config_path}\n"
+                f"Available configurations: {available_configs}\n"
+                f"To create a new config, use ConfigManager.create_config_template('{config_name}')"
+            )
         
         # Load YAML config
-        with open(config_path, 'r') as f:
-            config_data = yaml.safe_load(f)
+        try:
+            with open(config_path, 'r') as f:
+                config_data = yaml.safe_load(f)
+        except yaml.YAMLError as e:
+            raise ValueError(f"Invalid YAML in config file {config_path}: {e}")
+        except Exception as e:
+            raise RuntimeError(f"Failed to read config file {config_path}: {e}")
         
         # Apply environment variable overrides
         config_data = self._apply_env_overrides(config_data)
+        
+        # Validate required structure
+        if "experiment" not in config_data:
+            raise ValueError(f"Config file {config_path} missing required 'experiment' section")
+        
+        required_fields = ["num_agents", "max_rounds", "models"]
+        for field in required_fields:
+            if field not in config_data["experiment"]:
+                raise ValueError(f"Config file {config_path} missing required field 'experiment.{field}'")
         
         # Generate experiment ID if not provided
         experiment_id = config_data.get("experiment_id")
@@ -137,26 +156,39 @@ class ConfigManager:
         
         # Handle personalities
         personalities = config_data.get("personalities", [])
+        num_agents = config_data["experiment"]["num_agents"]
+        
         if not personalities:
             # Use default personality for all agents
+            print(f"No personalities specified - using default personality for all {num_agents} agents")
             from ..core.models import get_default_personality
-            personalities = [get_default_personality()] * config_data["experiment"]["num_agents"]
-        elif len(personalities) < config_data["experiment"]["num_agents"]:
+            personalities = [get_default_personality()] * num_agents
+        elif len(personalities) < num_agents:
             # Extend personalities to match number of agents
+            print(f"Only {len(personalities)} personalities specified for {num_agents} agents - "
+                  f"using default personality for remaining {num_agents - len(personalities)} agents")
             from ..core.models import get_default_personality
             default_personality = get_default_personality()
-            personalities.extend([default_personality] * (config_data["experiment"]["num_agents"] - len(personalities)))
+            personalities.extend([default_personality] * (num_agents - len(personalities)))
+        elif len(personalities) > num_agents:
+            # Warn if too many personalities provided
+            print(f"Warning: {len(personalities)} personalities specified but only {num_agents} agents - "
+                  f"using first {num_agents} personalities")
+            personalities = personalities[:num_agents]
         
-        # Create ExperimentConfig object
-        experiment_config = ExperimentConfig(
-            experiment_id=experiment_id,
-            num_agents=config_data["experiment"]["num_agents"],
-            max_rounds=config_data["experiment"]["max_rounds"],
-            decision_rule=config_data["experiment"]["decision_rule"],
-            timeout_seconds=config_data["experiment"]["timeout_seconds"],
-            models=config_data["experiment"]["models"],
-            personalities=personalities
-        )
+        # Create ExperimentConfig object with validation
+        try:
+            experiment_config = ExperimentConfig(
+                experiment_id=experiment_id,
+                num_agents=config_data["experiment"]["num_agents"],
+                max_rounds=config_data["experiment"]["max_rounds"],
+                decision_rule=config_data["experiment"].get("decision_rule", "unanimity"),
+                timeout_seconds=config_data["experiment"].get("timeout_seconds", 300),
+                models=config_data["experiment"]["models"],
+                personalities=personalities
+            )
+        except Exception as e:
+            raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")
         
         return experiment_config
     
