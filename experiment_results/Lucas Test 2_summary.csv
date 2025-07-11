@@ -1,0 +1,15 @@
+Field,Value
+Experiment ID,Lucas Test 2
+Start Time,2025-07-10T16:17:28.372707
+End Time,2025-07-10T16:19:45.749574
+Duration (seconds),137.38
+Number of Agents,3
+Max Rounds,5
+Decision Rule,unanimity
+Consensus Reached,Yes
+Rounds to Consensus,1
+Total Messages,6
+Average Round Duration,137.38
+Errors Encountered,0
+Agreed Principle ID,3
+Agreed Principle Name,Maximize the Average Income with a Floor Constraint
