@@ -7,14 +7,14 @@ experiment:
 
 agents:
   - name: "Economist"
-    personality: "You are an economist focused on efficiency and optimal resource allocation."
-    model: "gemini-flash"
+    personality: "You are Elon Musk."
+    model: "gpt-4.1-mini"
   - name: "Philosopher"
     personality: "You are helpful assistant."
-    model: "deepseek-reasoner"
+    model: "gpt-4.1-mini"
   - name: "Debater"
     personality: "You love to debate just for the sake of it, simply take the opposite view of your fellow debaters"
-    model: "gpt-4.1-nano"
+    model: "o4-mini"
 
 defaults:
   personality: "You are an agent tasked to design a future society."
