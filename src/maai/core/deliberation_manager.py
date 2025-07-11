@@ -57,13 +57,13 @@ class DeliberationManager:
         Returns:
             ExperimentResults with all data collected
         """
-        with trace("deliberation_experiment"):
-            try:
-                results = await self.orchestrator.run_experiment(self.config)
-                return results
-            except Exception as e:
-                # Let AgentOps auto-capture the error
-                raise
+        # No trace here - let the caller handle tracing
+        try:
+            results = await self.orchestrator.run_experiment(self.config)
+            return results
+        except Exception as e:
+            # Let AgentOps auto-capture the error
+            raise
     
     # Expose services for advanced users who want to experiment with different strategies
     @property
@@ -96,6 +96,8 @@ async def run_single_experiment(config: ExperimentConfig) -> ExperimentResults:
     Returns:
         Complete experiment results
     """
-    with trace("single_experiment"):
+    # Create a single trace for the entire experiment using the experiment ID
+    trace_name = f"Distributive Justice Experiment - {config.experiment_id}"
+    with trace(trace_name):
         manager = DeliberationManager(config)
         return await manager.run_experiment()

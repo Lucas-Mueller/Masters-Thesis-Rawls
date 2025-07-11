@@ -1,4 +1,4 @@
-experiment_id: Lucas Test
+experiment_id: Smart test
 
 experiment:
   max_rounds: 3
@@ -6,20 +6,21 @@ experiment:
   timeout_seconds: 240
 
 agents:
-  - name: "Agent_1"
-    personality: "You are an  AI."
-    model: "gpt-4.1-nano"
+  - name: "Arnold"
+    personality: "You are Arnold."
+    model: "gpt-4.1"
+    
   - name: "Boris"
     personality: "You are Boris"
-    model: "gpt-4.1-nano"
+    model: "gpt-4.1"
 
   - name: "Heidi"
-    personality: "You are Heidi and you are bit stupid"
-    model: "gpt-4.1-nano"
+    personality: "You are Heidi"
+    model: "gpt-4.1"
   
   - name: "Donald"
-    personality: "You are Donald, you think that you are smarter than everybody else, but in fact you quite dumb. You use very simple langauge and over the top language."
-    model: "gpt-4.1-nano"
+    personality: "You are Donald"
+    model: "gpt-4.1"
 
 
 defaults:

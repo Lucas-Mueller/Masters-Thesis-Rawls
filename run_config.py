@@ -21,12 +21,39 @@ os.environ.setdefault("AGENTOPS_SUPPRESS_OPENAI_WARNINGS", "true")
 
 # Import core modules first to avoid circular imports
 from maai.config.manager import load_config_from_file
+from maai.core.models import all_models_are_openai
+
+# CONFIG_NAME must be defined before the tracing configuration function
+CONFIG_NAME = "smart"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default", "philosophical_debate", "economic_perspectives", "mixed_defaults"
+
+# Pre-configure OpenAI tracing based on the config
+def configure_openai_tracing():
+    """Configure OpenAI tracing based on the configuration."""
+    try:
+        config = load_config_from_file(CONFIG_NAME)
+        openai_only_run = all_models_are_openai(config)
+        
+        if openai_only_run:
+            # Enable OpenAI Agents SDK tracing for OpenAI-only runs
+            os.environ["OPENAI_AGENTS_DISABLE_TRACING"] = "0"
+            return True, config
+        else:
+            # Disable OpenAI Agents SDK tracing for mixed provider runs
+            os.environ["OPENAI_AGENTS_DISABLE_TRACING"] = "1"
+            return False, config
+    except Exception as e:
+        print(f"Error configuring tracing: {e}")
+        # Default to disabled tracing on error
+        os.environ["OPENAI_AGENTS_DISABLE_TRACING"] = "1"
+        return False, None
+
+# Configure tracing before importing deliberation_manager
+openai_tracing_enabled, _ = configure_openai_tracing()
+
+# Now import the deliberation manager after tracing is configured
 from maai.core.deliberation_manager import run_single_experiment
 
 # Initialize AgentOps after imports to avoid circular dependency issues
-
-
-CONFIG_NAME = "lucas"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default", "philosophical_debate", "economic_perspectives", "mixed_defaults"
 
 async def main():
     """Run experiment with the specified configuration."""
@@ -37,20 +64,29 @@ async def main():
     AGENT_OPS_API_KEY = os.environ.get("AGENT_OPS_API_KEY")
     
     try:
-        # Load specified config
+        # Load specified config (already loaded during tracing configuration)
         print(f" Loading {CONFIG_NAME}.yaml configuration...")
         config = load_config_from_file(CONFIG_NAME)
         
-        # Initialize AgentOps with experiment ID as session name
-        if AGENT_OPS_API_KEY:
-            agentops.init(
-                api_key=AGENT_OPS_API_KEY,
-                auto_start_session=False,
-                tags=["distributive_justice_experiment"]
-            )
-            # Start session with experiment ID as session name
-            agentops.start_session(tags=[str(config.experiment_id), "distributive_justice_experiment"])
-            print("🔍 AgentOps monitoring enabled")
+        # Conditional tracing initialization to avoid conflicts
+        # Only use AgentOps when OpenAI tracing is disabled
+        if openai_tracing_enabled:
+            print("🔍 OpenAI Agents SDK tracing enabled (all models are OpenAI)")
+            print("ℹ️  AgentOps disabled to prevent instrumentation conflict")
+        else:
+            print("ℹ️  OpenAI Agents SDK tracing disabled (mixed model providers)")
+            # Initialize AgentOps only for mixed-provider runs
+            if AGENT_OPS_API_KEY:
+                agentops.init(
+                    api_key=AGENT_OPS_API_KEY,
+                    auto_start_session=False,
+                    tags=["distributive_justice_experiment"]
+                )
+                # Start session with experiment ID as session name
+                agentops.start_session(tags=[str(config.experiment_id), "distributive_justice_experiment"])
+                print("🔍 AgentOps monitoring enabled")
+            else:
+                print("⚠️  No tracing active (AgentOps API key not found)")
 
         
         print(f"   Configuration loaded successfully")
@@ -103,8 +139,8 @@ async def main():
         import traceback
         traceback.print_exc()
     finally:
-        # End AgentOps session with proper status
-        if AGENT_OPS_API_KEY:
+        # End AgentOps session only if it was initialized (mixed-provider runs)
+        if not openai_tracing_enabled and AGENT_OPS_API_KEY:
             try:
                 agentops.end_session("Success")
                 print("🔍 AgentOps session completed - view at: https://app.agentops.ai/")

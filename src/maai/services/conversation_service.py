@@ -227,6 +227,53 @@ Format your response clearly with your final choice at the end.
         
         return new_responses
     
+    async def conduct_initial_likert_assessment(
+        self, 
+        agents: List[DeliberationAgent],
+        evaluation_service  # EvaluationService - avoiding circular import
+    ) -> List:  # List[AgentEvaluationResponse] - avoiding circular import
+        """
+        Conduct initial Likert scale assessment of all principles (parallel).
+        This is purely for data collection - no consensus detection or decision making.
+        
+        Args:
+            agents: List of agents to assess
+            evaluation_service: Service for parallel evaluation
+            
+        Returns:
+            List of initial evaluation responses
+        """
+        print("\n--- Initial Principle Assessment (Likert Scale) ---")
+        print("  Collecting baseline preference data before deliberation...")
+        
+        # Create a dummy consensus result for the evaluation service
+        # (we're not using consensus logic, just need it for the prompt)
+        from ..core.models import ConsensusResult
+        dummy_consensus = ConsensusResult(
+            unanimous=False,
+            agreed_principle=None,
+            dissenting_agents=[],
+            rounds_to_consensus=0,
+            total_messages=0
+        )
+        
+        # Create a simple moderator for parsing (reuse pattern from existing code)
+        from ..agents.enhanced import create_discussion_moderator
+        moderator = create_discussion_moderator()
+        
+        # Use evaluation service for parallel assessment
+        initial_responses = await evaluation_service.conduct_initial_assessment(
+            agents, dummy_consensus, moderator
+        )
+        
+        # Display summary
+        print(f"  ✓ Collected initial assessments from {len(initial_responses)} agents")
+        for response in initial_responses:
+            ratings = [eval.satisfaction_rating.to_display() for eval in response.principle_evaluations]
+            print(f"    {response.agent_name}: {ratings}")
+        
+        return initial_responses
+    
     async def conduct_round(self, round_context: RoundContext, 
                           memory_service, moderator) -> List[DeliberationResponse]:
         """
