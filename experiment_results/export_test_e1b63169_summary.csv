@@ -1,0 +1,16 @@
+Field,Value
+Experiment ID,export_test_e1b63169
+Start Time,2025-07-10T11:47:40.217641
+End Time,2025-07-10T11:48:21.531512
+Duration (seconds),41.31
+Number of Agents,3
+Max Rounds,2
+Decision Rule,unanimity
+Consensus Reached,Yes
+Rounds to Consensus,1
+Total Messages,6
+Average Round Duration,41.31
+Errors Encountered,0
+Agreed Principle ID,3
+Agreed Principle Name,Maximize the Average Income with a Floor Constraint
+Agreement Confidence,70.00%

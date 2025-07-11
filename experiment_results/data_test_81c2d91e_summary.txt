@@ -1,0 +1,39 @@
+EXPERIMENT SUMMARY REPORT
+==================================================
+
+Experiment ID: data_test_81c2d91e
+Date: 2025-07-10 12:15:55
+Duration: 33.6 seconds
+
+CONFIGURATION
+--------------------
+Agents: 3
+Max Rounds: 2
+Decision Rule: unanimity
+Timeout: 90 seconds
+
+RESULTS
+--------------------
+Consensus Reached: YES
+Rounds Completed: 1
+Total Messages: 6
+Average Round Duration: 33.6s
+
+AGREED PRINCIPLE
+--------------------
+ID: 3
+Name: Maximize the Average Income with a Floor Constraint
+Confidence: 70.0%
+
+FEEDBACK SUMMARY
+--------------------
+Average Satisfaction: 7.0/10
+Average Fairness Rating: 7.0/10
+Would Choose Again: 3/3 agents
+
+PERFORMANCE
+--------------------
+Total Duration: 33.64s
+API Calls: 0
+Tokens Used: 0
+Errors: 0
