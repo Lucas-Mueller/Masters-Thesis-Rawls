@@ -122,6 +122,7 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
     anthropic_key = os.environ.get("ANTHROPIC_API_KEY")
     deepseek_key = os.environ.get("DEEPSEEK_API_KEY")
     gemini_key = os.environ.get("GEMINI_API_KEY")
+    xai_key = os.environ.get("XAI_API_KEY")
     
     for i, agent_config in enumerate(agent_configs):
         agent_id = f"agent_{i+1}"
@@ -162,6 +163,19 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
                 model = LitellmModel(model="gemini/gemini-2.5-pro", api_key=gemini_key)
             else:
                 model = model_name
+
+        elif "grok-4" in model_name.lower():
+            if xai_key:
+                model = LitellmModel(model="xai/grok-4-0709", api_key=xai_key)
+            else:
+                model = model_name
+    
+        elif "grok-3" or "grok-3-mini" in model_name.lower():
+            if xai_key:
+                model = LitellmModel(model="xai/grok-3-mini", api_key=xai_key)
+            else:
+                model = model_name
+        
         else:
             model = model_name
         
