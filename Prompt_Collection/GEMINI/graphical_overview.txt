@@ -1,0 +1,7 @@
+ Please create a graphical overview how the services of this repo interact wiht one   │
+│    another when one runs this file @run_config.py I want to know what each service does │
+│     and how they interact and when. Be detail oriented. Use modern standards when       │
+│    creating this overview. Use HTML do create a clear overview. First go thrugh my      │
+│    request thoroughly. Secdon make a plan. Third execute it step by step and udpate it  │
+│    on the way. THINK ULTRAHARD ON THIS. FYI I am currently benchmarking you against     │
+│    another AI solution 

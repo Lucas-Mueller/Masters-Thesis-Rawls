@@ -1,363 +1,246 @@
-# Multi-Agent Distributive Justice Experiment
+# Multi-Agent Distributive Justice Experiment Framework
 
-A sophisticated framework for conducting automated experiments on distributive justice using autonomous AI agents. This system simulates Rawls' "veil of ignorance" scenario where multiple AI agents deliberate and reach consensus on principles of distributive justice.
+A Master's thesis project implementing a computational simulation of Rawls' "veil of ignorance" scenario, where autonomous AI agents deliberate and reach unanimous agreement on distributive justice principles without knowing their future economic position.
 
-## 🎯 What This Project Does
+## Overview
 
-This system allows you to:
-- **Run automated philosophical experiments** with 3-50 AI agents
-- **Test distributive justice theories** through multi-agent deliberation
-- **Collect comprehensive data** on agent reasoning and decision-making
-- **Analyze consensus formation** in artificial societies
-- **Export results** in multiple formats for academic research
+This framework simulates multi-agent deliberation on distributive justice using the OpenAI Agents SDK. Agents debate four different economic principles under conditions of uncertainty about their future roles in society, mimicking Rawls' original position thought experiment.
 
-### The Experiment
+### Distributive Justice Principles
 
-The experiment follows a three-phase process:
+The system tests four economic distribution principles:
 
-**Phase 1: Initial Assessment** - Agents privately rate all 4 principles using Likert scales (NEW)
-**Phase 2: Deliberation** - Agents debate and must reach **unanimous agreement** on one principle
-**Phase 3: Final Assessment** - Agents re-rate all 4 principles after deliberation (NEW)
+1. **Maximize the Minimum Income** - Ensures the worst-off are as well-off as possible (Rawlsian)
+2. **Maximize the Average Income** - Focuses on greatest total income regardless of distribution (Utilitarian)
+3. **Floor Constraint** - Hybrid approach with guaranteed minimum income plus average maximization
+4. **Range Constraint** - Hybrid that limits inequality gap while maximizing average income
 
-All agents operate behind a "veil of ignorance" (not knowing their future economic position) and choose from:
-
-1. **Maximize the Minimum Income** - Ensure the worst-off are as well-off as possible (Rawlsian)
-2. **Maximize the Average Income** - Greatest total income regardless of distribution (Utilitarian)
-3. **Floor Constraint** - Minimum guaranteed income + maximize average (Hybrid)
-4. **Range Constraint** - Limit inequality gap + maximize average (Hybrid)
-
-## 🎁 What You Get
-
-Running an experiment produces:
-
-### 📊 Rich Data Collection
-- **Initial Likert Scale Assessment** - Baseline preferences before deliberation (NEW)
-- **Complete conversation transcripts** of agent deliberations
-- **Post-consensus Likert evaluation** - How views changed after deliberation (NEW)
-- **Before/after comparison data** - Rating evolution through deliberation (NEW)
-- **Choice evolution tracking** showing how agents change their minds
-- **Performance metrics** including duration, rounds, and consensus success
-
-### 📁 Multiple Export Formats
-- **JSON files** - Complete structured data for programmatic analysis
-- **CSV files** - Spreadsheet-ready data for statistical analysis
-- **Comparison CSV** - Before/after Likert rating analysis (NEW)
-- **Text transcripts** - Human-readable conversation logs
-- **Summary reports** - Executive summaries of experiment outcomes
-
-### 📈 Analysis-Ready Outputs
-- **Initial Likert ratings** (4-point scale: Strongly Disagree to Strongly Agree) (NEW)
-- **Final Likert ratings** (4-point scale: Strongly Disagree to Strongly Agree) (NEW)
-- **Rating evolution analysis** - How deliberation changes agent preferences (NEW)
-- Agent satisfaction ratings (1-10 scale)
-- Fairness assessments of chosen principles
-- Round-by-round choice evolution
-- Consensus formation patterns
-
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
-- Python 3.9 or higher
-- OpenAI API key (required)
-- Optional: Anthropic, DeepSeek API keys for model diversity
 
-### 1. Installation
+- Python 3.8+
+- OpenAI API key
+
+### Installation
 
 ```bash
-# Clone or download the project
-cd /path/to/Masters-Thesis-Rawls-
-
-# Install dependencies
+git clone <repository-url>
+cd Masters-Thesis-Rawls-
 pip install -r requirements.txt
 ```
 
-### 2. Set API Key
+### Environment Setup
+
+Set required environment variable in a .env file:
+```
+OPENAI_API_KEY="your-api-key"
+```
+
+Optional API keys for additional model providers:
+```bash
+ANTHROPIC_API_KEY="your-claude-key"
+DEEPSEEK_API_KEY="your-deepseek-key"
+GROQ_API_KEY="your api key"
+GEMINI_API_KEY="your gemini api key"
+
+```
+If you want to use monitoring when not using OpenAI models you can use AgentOps by setting 
+this API key 
+AGENT_OPS_API_KEY="your-agentops-key"
+
+### Run Your First Experiment
 
 ```bash
-# Required: OpenAI API key
-export OPENAI_API_KEY="your-openai-api-key-here"
 
-# Optional: Additional model providers
-export ANTHROPIC_API_KEY="your-anthropic-key"
-export DEEPSEEK_API_KEY="your-deepseek-key"
-export AGENT_OPS_API_KEY="your-agentops-key"
+python run_config.py
 ```
+## Configuration
 
-### 3. Run Your First Experiment
+Experiments are configured using YAML files in the `configs/` directory. Each configuration defines, if no values are given default values are used:
 
-```bash
-# Quick 3-agent test with full Likert evaluation
-python run_quick_demo.py
+- Number of agents and deliberation rounds
+- Agent personalities and AI models
+- Output formats and directories
+- Timeout and decision rules
 
-# Or use configuration-based approach
-python run_config.py  # Edit CONFIG_NAME in file to change config
-```
 
-This will:
-- Collect initial Likert scale preferences (NEW)
-- Run a deliberation with agents debating principles
-- Collect final Likert scale preferences (NEW)
-- Generate before/after comparison data (NEW)
-- Export results in multiple formats
-- Display a comprehensive summary
+### Example Configuration
 
-## 📖 Usage Examples
-
-### Basic Experiment
-```python
-import asyncio
-from maai.config.manager import load_config_from_file
-from maai.core.deliberation_manager import run_single_experiment
-
-# Run a quick test using YAML configuration
-config = load_config_from_file("quick_test")
-results = await run_single_experiment(config)
-print(f"Consensus reached: {results.consensus_result.unanimous}")
-```
-
-### Custom Configuration
-```python
-from models import ExperimentConfig
-
-config = ExperimentConfig(
-    experiment_id="my_experiment",
-    num_agents=5,
-    max_rounds=8,
-    decision_rule="unanimity",
-    timeout_seconds=300
-)
-results = await run_single_experiment(config)
-```
-
-### Using Configuration Files
-```bash
-# Use predefined configurations
-python -c "
-import asyncio
-from config_manager import load_config_from_file
-from deliberation_manager import run_single_experiment
-
-config = load_config_from_file('large_group')  # 8 agents
-asyncio.run(run_single_experiment(config))
-"
-```
-
-## ⚙️ Configuration Options
-
-### Available Configurations
-
-| Configuration | Agents | Rounds | Description |
-|--------------|--------|--------|-------------|
-| `quick_test` | 3 | 2 | Fast validation with Likert evaluation (1-2 minutes) |
-| `lucas` | 4 | 3 | Custom personality agents (3-5 minutes) |
-| `smart` | 4 | 3 | Different AI models with custom personalities |
-| `default` | 3 | 10 | Standard experimental setup |
-
-### Custom Configuration Files
-
-Create `configs/my_experiment.yaml`:
 ```yaml
-experiment_id: my_custom_experiment
-
+experiment_id: my_experiment
 experiment:
-  max_rounds: 7
+  max_rounds: 5
   decision_rule: unanimity
-  timeout_seconds: 400
+  timeout_seconds: 300
 
 agents:
   - name: "Agent_1"
-    model: "gpt-4.1-mini"
-    personality: "You are an economist focused on efficiency."
+    model: "gpt-4o-mini"
+    personality: "You are an economist focused on efficiency and optimal resource allocation."
   - name: "Agent_2"
-    model: "gpt-4.1"
-    personality: "You are a philosopher concerned with justice."
-  - name: "Agent_3"
-    model: "gpt-4.1-mini"
-    personality: "You are a pragmatist focused on practical solutions."
-
-defaults:
-  personality: "You are an agent tasked to design a future society."
-  model: "gpt-4.1-mini"
+    model: "gpt-4o"
+    personality: "You are a philosopher concerned with justice and fairness for all members of society."
 
 output:
   directory: experiment_results
-  formats: [json, csv]
+  formats: [json, csv, txt]
+  include_feedback: true
 ```
 
-### Environment Variables
+## Architecture
 
-Customize experiments without changing code:
+### Core Components
+
+- **`src/maai/core/`** - Core experiment logic and data models
+- **`src/maai/agents/`** - Enhanced agent classes with specialized roles
+- **`src/maai/services/`** - Service layer for experiment orchestration
+- **`src/maai/config/`** - YAML-based configuration management
+- **`src/maai/export/`** - Multi-format data export system
+- **`configs/`** - YAML configuration files for different scenarios
+- **`experiment_results/`** - Output directory for all experiment data
+
+### Key Agent Classes
+
+- **`DeliberationAgent`** - Main reasoning agents that debate principles with configurable personalities
+- **`DiscussionModerator`** - Manages conversation flow and speaking order
+- **`FeedbackCollector`** - Conducts post-experiment interviews
+
+### Service Architecture
+
+- **`ExperimentOrchestrator`** - High-level coordination of all services
+- **`ConsensusService`** - Multiple consensus detection strategies
+- **`ConversationService`** - Communication pattern management
+- **`MemoryService`** - Agent memory management strategies
+- **`EvaluationService`** - Likert scale evaluation processing
+
+
+
+### Available Configurations
+
+- **`quick_test`** - 3 agents, 2 rounds (1-2 minutes)
+- **`lucas`** - Custom configuration for specific research scenarios
+- **`smart`** - Different AI models with custom personalities
+- **`default`** - Standard experimental setup
+- **`test_custom`** - Template for custom configurations
+
+## Running Experiments
+
+### Command Line Interface
+
 ```bash
-export MAAI_NUM_AGENTS=6
-export MAAI_MAX_ROUNDS=8
-export MAAI_TIMEOUT=600
-export MAAI_DEBUG=true
+# Universal configuration runner
+python run_config.py
+# Edit CONFIG_NAME variable on line 27 to switch configurations
+
+# Quick test run
+python run_quick_demo.py
+
+# Demo systems
+python demos/demo_phase1.py  # Core multi-agent deliberation
+python demos/demo_phase2.py  # Enhanced features
+
+# Advanced service usage examples
+python example_service_usage.py
 ```
 
-## 📊 Understanding Your Results
+### Programmatic API
 
-### Experiment Outcomes
+```python
+import asyncio
+from src.maai.config.manager import load_config_from_file
+from src.maai.core.deliberation_manager import run_single_experiment
 
-**Consensus Reached:**
-- Agents successfully agreed on a principle
-- View the agreed principle and reasoning
-- Analyze satisfaction and fairness ratings
-
-**No Consensus:**
-- Agents couldn't agree within time/round limits
-- See final choices and dissenting agents
-- Useful for studying disagreement patterns
-
-### Key Metrics
-
-- **Satisfaction Rating** (1-10): How happy agents are with the group decision
-- **Fairness Rating** (1-10): How fair agents think the chosen principle is
-- **Would Choose Again**: Whether agents would make the same choice
-- **Confidence Level**: Agent certainty in their feedback (0-100%)
-
-### File Outputs
-
-After each experiment, find files in `experiment_results/`:
-
-```
-experiment_results/
-├── [ID]_complete.json              # Full structured data
-├── [ID]_data.csv                   # Main conversation transcript data
-├── [ID]_initial_evaluation.csv    # Initial Likert ratings (NEW)
-├── [ID]_initial_evaluation.json   # Initial ratings with statistics (NEW)
-├── [ID]_evaluation.csv            # Final Likert ratings (NEW)
-├── [ID]_evaluation.json           # Final ratings with statistics (NEW)
-└── [ID]_comparison.csv            # Before/after rating comparison (NEW)
+# Load and run configuration
+config = load_config_from_file('quick_test')
+results = await run_single_experiment(config)
 ```
 
-### Key Research Files (NEW)
+### Advanced Service Configuration
 
-- **`[ID]_initial_evaluation.csv`** - Baseline preferences before deliberation
-- **`[ID]_evaluation.csv`** - Final preferences after deliberation  
-- **`[ID]_comparison.csv`** - Complete before/after analysis with rating changes
+```python
+from src.maai.services.experiment_orchestrator import ExperimentOrchestrator
 
-## 🔬 Research Applications
+orchestrator = ExperimentOrchestrator(
+    consensus_strategy="threshold",  # or "id_match", "semantic"
+    conversation_pattern="sequential",  # or "random", "hierarchical"
+    memory_strategy="recent"  # or "full", "selective"
+)
 
-### Academic Use Cases
-- **Philosophy Research**: Test theories of distributive justice
-- **AI Ethics**: Study moral reasoning in artificial agents
-- **Decision Science**: Analyze consensus formation mechanisms
-- **Social Choice Theory**: Examine collective decision-making
-- **Behavioral Economics**: Compare to human experimental data
+results = await orchestrator.run_experiment(config)
+```
 
-### Example Research Questions
-- **How does deliberation change agent preferences?** (NEW - use comparison data)
-- **Do initial Likert ratings predict final consensus choices?** (NEW)
-- **Which principles show the most rating volatility through deliberation?** (NEW)
-- Do AI agents naturally converge on Rawlsian principles?
-- How does group size affect consensus formation?
-- What factors influence agent satisfaction with outcomes?
-- How do different AI models reason about justice differently?
+## Experimental Process
 
-## 🧪 Running Tests
+1. **Agent Initialization** - Create agents with "veil of ignorance" context
+2. **Initial Evaluation** - Agents rate all 4 principles on Likert scale before deliberation
+3. **Multi-Round Deliberation** - Agents debate until unanimous agreement or timeout
+4. **Consensus Detection** - Validate group agreement on chosen principle
+5. **Final Evaluation** - Agents re-rate all 4 principles after deliberation
+6. **Data Export** - Results saved in multiple formats for analysis
 
-Validate your installation:
+## Data Export
+
+Experiment results are automatically saved to `experiment_results/` in multiple formats:
+
+- **`[ID]_complete.json`** - Full structured experiment data
+- **`[ID]_data.csv`** - Main conversation transcript data
+- **`[ID]_initial_evaluation.csv`** - Pre-deliberation principle ratings
+- **`[ID]_evaluation.csv`** - Post-consensus principle evaluations
+- **`[ID]_comparison.csv`** - Before/after rating comparison analysis
+- **`[ID]_transcript.txt`** - Human-readable conversation log
+
+## Testing
+
 ```bash
-# Test all core functionality including new Likert evaluation
+# Run all tests
 python run_tests.py
 
-# Or test individual components
+# Run individual test files
 python tests/test_core.py
 ```
 
-All tests should show "PASSED" status.
+## Key Design Features
 
-## 🛠️ Troubleshooting
+- **No Confidence Scores** - LLMs cannot reliably assess confidence, so confidence scoring is avoided
+- **Code-Based Consensus** - Consensus detection uses ID matching rather than LLM assessment
+- **Configurable Personalities** - Each agent can have custom personality defined in YAML
+- **Neutral Descriptions** - Principle descriptions avoid references to philosophical authorities
+- **Multi-Provider Support** - Works with OpenAI, Anthropic Claude, and DeepSeek models
+- **AgentOps Integration** - Optional experiment tracing and monitoring
 
 
-**"No consensus reached"**
-- This is normal behavior - not all groups agree
-- Try increasing `max_rounds` or `timeout_seconds`
-- Use different AI models for diversity
 
-**"Import errors"**
-```bash
-# Ensure you're in the project directory
-cd /path/to/Masters-Thesis-Rawls-
+## Development
 
-# Reinstall dependencies
-pip install -r requirements.txt
+### File Structure
+
+```
+src/maai/
+├── core/          # Core experiment logic and data models
+├── agents/        # Agent implementations
+├── services/      # Service layer
+├── config/        # Configuration management
+└── export/        # Data export functionality
+
+configs/           # YAML configuration files
+tests/            # Unit and integration tests
+experiment_results/ # Output directory
+knowledge_base/   # Documentation and examples
 ```
 
-### Getting Help
+### Code Style Guidelines
 
-1. **Check the logs** in `experiment_results/` for error details
-2. **Run tests** to identify specific issues
-3. **Try `quick_test`** configuration first
-4. **Verify API keys** are set correctly
+- Use async/await patterns throughout
+- Type hints on all function parameters and returns
+- Pydantic models for all data structures
+- Descriptive variable and method names
+- UTC timestamps with `datetime` objects
 
-## 📚 Advanced Usage
+## Contributing
 
-### Batch Experiments
-```python
-from maai.config.manager import load_config_from_file
+This is a Master's thesis research project. For questions or collaboration opportunities, please refer to the academic institution guidelines.
 
-# Load different YAML configurations
-config_names = ["quick_test", "multi_model", "large_group"]
+## License
 
-for config_name in config_names:
-    config = load_config_from_file(config_name)
-    results = await run_single_experiment(config)
-    print(f"{config.experiment_id}: {results.consensus_result.unanimous}")
-```
-
-### Custom Analysis
-```python
-import json
-import pandas as pd
-
-# Load experiment results
-with open("experiment_results/my_exp_complete.json") as f:
-    data = json.load(f)
-
-# Analyze consensus patterns
-consensus_rate = data["consensus_result"]["unanimous"]
-
-# NEW: Analyze Likert rating evolution
-comparison_df = pd.read_csv("experiment_results/my_exp_comparison.csv")
-
-# Calculate rating changes
-rating_changes = comparison_df['Rating_Change'].mean()
-print(f"Average rating change through deliberation: {rating_changes}")
-
-# Analyze principle-specific changes
-principle_changes = comparison_df.groupby('Principle_ID')['Rating_Change'].mean()
-print("Rating changes by principle:")
-print(principle_changes)
-```
-
-### Advanced Research Analysis (NEW)
-```python
-# Load initial and final evaluations
-initial_df = pd.read_csv("experiment_results/my_exp_initial_evaluation.csv")
-final_df = pd.read_csv("experiment_results/my_exp_evaluation.csv")
-
-# Analyze preference stability
-stable_ratings = comparison_df[comparison_df['Rating_Change'] == 0]
-volatility_rate = 1 - (len(stable_ratings) / len(comparison_df))
-print(f"Preference volatility rate: {volatility_rate:.2%}")
-
-# Find most influential principles
-principle_volatility = comparison_df.groupby('Principle_ID')['Rating_Change'].std()
-print("Principle volatility (standard deviation of changes):")
-print(principle_volatility)
-```
-
-**Ready to explore distributive justice with AI agents?** Start with `python run_quick_demo.py` and see how artificial minds' preferences evolve when they don't know their place in society! 🤖⚖️
-
-## 🆕 What's New
-
-### Latest Features (2025)
-- ✅ **Initial Likert Scale Assessment** - Collect baseline preferences before deliberation
-- ✅ **Parallel Evaluation Processing** - Faster data collection through concurrent agent processing
-- ✅ **Before/After Comparison Analysis** - Track how deliberation changes agent preferences
-- ✅ **Enhanced Export Formats** - Research-ready CSV files with comprehensive rating data
-- ✅ **Improved Error Handling** - Robust parsing with graceful fallback mechanisms
-
-### Research Impact
-The new Likert scale evaluation system enables unprecedented analysis of preference evolution in artificial agents, providing insights into how collective deliberation influences individual judgment in AI systems.
+Academic research project - see institution guidelines for usage terms.I 

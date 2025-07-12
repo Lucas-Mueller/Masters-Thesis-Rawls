@@ -1,7 +1,7 @@
 openai-agents
-asyncio
-dotenv
 openai-agents[litellm]
-pandas 
-datetime
+python-dotenv
+pydantic
+pandas
 agentops
+PyYAML
