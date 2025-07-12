@@ -51,7 +51,10 @@ AGENT_OPS_API_KEY="your-agentops-key"
 
 ### Run Your First Experiment
 
+
+
 ```bash
+source .venv/bin/activate
 
 python run_config.py
 ```
