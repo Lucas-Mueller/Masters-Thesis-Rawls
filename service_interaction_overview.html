@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAAI Experiment Service Interaction Flow</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background-color: #252526;
+            border: 1px solid #3c3c3c;
+            border-radius: 8px;
+            padding: 25px;
+        }
+        h1, h2 {
+            color: #9cdcfe;
+            border-bottom: 2px solid #4a4a4a;
+            padding-bottom: 10px;
+        }
+        .mermaid {
+            background-color: #2a2d34;
+            border: 1px solid #4a4a4a;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .service-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .service-card {
+            background-color: #2a2d34;
+            border: 1px solid #4a4a4a;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+        .service-card h3 {
+            margin-top: 0;
+            color: #569cd6;
+        }
+        .service-card code {
+            background-color: #1e1e1e;
+            color: #ce9178;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Fira Code", "Courier New", monospace;
+        }
+        .service-card ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        .service-card li {
+            margin-bottom: 8px;
+        }
+        .function-list {
+            margin-top: 15px;
+            border-top: 1px solid #4a4a4a;
+            padding-top: 15px;
+        }
+        .function-list h4 {
+            margin-top: 0;
+            color: #4ec9b0;
+        }
+        .function-list dl {
+            margin: 0;
+        }
+        .function-list dt {
+            font-weight: bold;
+            color: #dcdcaa;
+            margin-top: 10px;
+        }
+        .function-list dd {
+            margin-left: 20px;
+            font-size: 0.9em;
+            color: #c8c8c8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>MAAI Experiment Service Interaction Flow</h1>
+        <p>This document provides a graphical and textual overview of the service interactions within the repository when <code>run_config.py</code> is executed. The architecture is designed around a central <strong>Orchestrator</strong> that coordinates specialized services, promoting modularity and clear separation of concerns.</p>
+
+        <h2>Execution Sequence Diagram</h2>
+        <div class="mermaid">
+sequenceDiagram
+    actor User
+    participant EntryPoint as "run_config.py"
+    participant DM as "DeliberationManager"
+    participant EO as "ExperimentOrchestrator"
+    participant CM as "ConfigManager"
+    participant ConvS as "ConversationService"
+    participant MemS as "MemoryService"
+    participant ConS as "ConsensusService"
+    participant EvalS as "EvaluationService"
+    participant DE as "DataExporter"
+
+    User->>EntryPoint: Executes python run_config.py
+    activate EntryPoint
+
+    EntryPoint->>CM: load_config_from_file()
+    activate CM
+    CM-->>EntryPoint: ExperimentConfig
+    deactivate CM
+
+    EntryPoint->>DM: run_single_experiment(config)
+    activate DM
+
+    DM->>EO: run_experiment(config)
+    activate EO
+
+    Note over EO: Phase 1: Initialization
+    EO->>EO: _initialize_agents()
+    EO->>MemS: initialize_agent_memory() for each agent
+    activate MemS
+    MemS-->>EO: memories initialized
+    deactivate MemS
+
+    Note over EO: Phase 2: Initial Likert Assessment
+    EO->>ConvS: conduct_initial_likert_assessment()
+    activate ConvS
+    ConvS->>EvalS: conduct_initial_assessment()
+    activate EvalS
+    EvalS-->>ConvS: InitialEvaluationResponses
+    deactivate EvalS
+    ConvS-->>EO: InitialEvaluationResponses
+    deactivate ConvS
+
+    Note over EO: Phase 3: Initial Choice Evaluation
+    EO->>ConvS: conduct_initial_evaluation()
+    activate ConvS
+    ConvS-->>EO: Transcript updated
+    deactivate ConvS
+    EO->>ConS: detect_consensus()
+    activate ConS
+    ConS-->>EO: Initial ConsensusResult
+    deactivate ConS
+
+    Note over EO: Phase 4: Deliberation Loop
+    loop Deliberation Rounds
+        EO->>ConvS: generate_speaking_order()
+        activate ConvS
+        ConvS-->>EO: Speaking Order
+        deactivate ConvS
+
+        EO->>ConvS: conduct_round()
+        activate ConvS
+        Note right of ConvS: For each agent in order...
+        ConvS->>MemS: update_agent_memory()
+        activate MemS
+        MemS-->>ConvS: New MemoryEntry
+        deactivate MemS
+        ConvS->>ConvS: _generate_public_communication()
+        ConvS-->>EO: Transcript updated
+        deactivate ConvS
+
+        EO->>ConS: detect_consensus()
+        activate ConS
+        ConS-->>EO: Round ConsensusResult
+        deactivate ConS
+        alt Consensus Reached
+            EO->>EO: break loop
+        end
+    end
+
+    Note over EO: Phase 5: Post-Consensus Evaluation
+    EO->>EvalS: conduct_parallel_evaluation()
+    activate EvalS
+    EvalS-->>EO: Final EvaluationResponses
+    deactivate EvalS
+
+    Note over EO: Phase 6 & 7: Finalize
+    EO->>EO: _collect_feedback()
+    EO->>EO: _finalize_results()
+
+    Note over EO: Phase 8: Export
+    EO->>DE: export_experiment_data(results)
+    activate DE
+    DE-->>EO: File paths
+    deactivate DE
+
+    EO-->>DM: ExperimentResults
+    deactivate EO
+    DM-->>EntryPoint: ExperimentResults
+    deactivate DM
+    EntryPoint-->>User: Prints summary to console
+    deactivate EntryPoint
+        </div>
+
+        <h2>Core Service Descriptions</h2>
+        <div class="service-grid">
+            <div class="service-card">
+                <h3>ExperimentOrchestrator</h3>
+                <code>src/maai/services/experiment_orchestrator.py</code>
+                <p><strong>Role: The Conductor</strong></p>
+                <p>The central coordinator that manages the high-level sequence of the experiment, ensuring each phase is executed correctly.</p>
+                <ul>
+                    <li><strong>Calls:</strong> All other services.</li>
+                    <li><strong>Called by:</strong> <code>DeliberationManager</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>run_experiment(config)</code></dt>
+                        <dd><strong>Input:</strong> <code>ExperimentConfig</code> object.<br/><strong>Output:</strong> <code>ExperimentResults</code> object.<br/>The main entry point to start and execute a full experiment from configuration to results.</dd>
+                        
+                        <dt><code>_run_deliberation_rounds()</code></dt>
+                        <dd><strong>Input:</strong> None.<br/><strong>Output:</strong> <code>ConsensusResult</code> object.<br/>Manages the core loop, calling <code>ConversationService</code> for each round and <code>ConsensusService</code> to check for agreement.</dd>
+
+                        <dt><code>_finalize_results(consensus_result)</code></dt>
+                        <dd><strong>Input:</strong> <code>ConsensusResult</code> object.<br/><strong>Output:</strong> <code>ExperimentResults</code> object.<br/>Compiles all collected data (transcript, memories, evaluations, metrics) into the final results object.</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="service-card">
+                <h3>ConversationService</h3>
+                <code>src/maai/services/conversation_service.py</code>
+                <p><strong>Role: The Flow Controller</strong></p>
+                <p>Manages the turn-by-turn dynamics of the deliberation. It decides who speaks when and orchestrates the agent interactions within a round.</p>
+                <ul>
+                    <li><strong>Calls:</strong> <code>MemoryService</code>, <code>EvaluationService</code>.</li>
+                    <li><strong>Called by:</strong> <code>ExperimentOrchestrator</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>generate_speaking_order(agents, round_num)</code></dt>
+                        <dd><strong>Input:</strong> List of <code>DeliberationAgent</code>, current round number.<br/><strong>Output:</strong> List of agent IDs in speaking order.<br/>Determines the sequence of speakers for a given round based on the configured communication pattern.</dd>
+
+                        <dt><code>conduct_round(round_context, memory_service, moderator)</code></dt>
+                        <dd><strong>Input:</strong> <code>RoundContext</code>, <code>MemoryService</code>, moderator agent.<br/><strong>Output:</strong> List of new <code>DeliberationResponse</code> objects.<br/>Executes a single round of discussion, prompting each agent in order after updating their memory.</dd>
+
+                        <dt><code>conduct_initial_likert_assessment(agents, eval_service)</code></dt>
+                        <dd><strong>Input:</strong> List of <code>DeliberationAgent</code>, <code>EvaluationService</code>.<br/><strong>Output:</strong> List of <code>AgentEvaluationResponse</code>.<br/>Triggers the initial data collection of agent preferences before deliberation begins.</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="service-card">
+                <h3>MemoryService</h3>
+                <code>src/maai/services/memory_service.py</code>
+                <p><strong>Role: The Scribe</strong></p>
+                <p>Manages the internal, private state of each agent. Before an agent's turn, this service helps it reflect on the conversation and update its internal strategy.</p>
+                <ul>
+                    <li><strong>Calls:</strong> None.</li>
+                    <li><strong>Called by:</strong> <code>ExperimentOrchestrator</code>, <code>ConversationService</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>initialize_agent_memory(agent_id)</code></dt>
+                        <dd><strong>Input:</strong> Agent ID string.<br/><strong>Output:</strong> None.<br/>Creates a new, empty <code>AgentMemory</code> object for a given agent.</dd>
+
+                        <dt><code>update_agent_memory(agent, round_num, ...)</code></dt>
+                        <dd><strong>Input:</strong> <code>DeliberationAgent</code>, round number, transcript.<br/><strong>Output:</strong> New <code>MemoryEntry</code> object.<br/>Prompts an agent to perform private reflection and generates a new memory entry with its updated strategy.</dd>
+
+                        <dt><code>get_all_agent_memories()</code></dt>
+                        <dd><strong>Input:</strong> None.<br/><strong>Output:</strong> List of all <code>AgentMemory</code> objects.<br/>Retrieves the complete memory logs for all agents at the end of the experiment.</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="service-card">
+                <h3>ConsensusService</h3>
+                <code>src/maai/services/consensus_service.py</code>
+                <p><strong>Role: The Judge</strong></p>
+                <p>Determines if the group of agents has reached an agreement. It checks the choices of all agents after each round against a defined rule.</p>
+                <ul>
+                    <li><strong>Calls:</strong> None.</li>
+                    <li><strong>Called by:</strong> <code>ExperimentOrchestrator</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>detect_consensus(responses)</code></dt>
+                        <dd><strong>Input:</strong> List of <code>DeliberationResponse</code> objects.<br/><strong>Output:</strong> <code>ConsensusResult</code> object.<br/>Analyzes the latest choice from each agent to check if the consensus condition (e.g., unanimity) has been met.</dd>
+
+                        <dt><code>validate_consensus(result, responses)</code></dt>
+                        <dd><strong>Input:</strong> <code>ConsensusResult</code>, List of <code>DeliberationResponse</code>.<br/><strong>Output:</strong> Boolean.<br/>Performs sanity checks to ensure the consensus is genuine and not an artifact of the simulation.</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="service-card">
+                <h3>EvaluationService</h3>
+                <code>src/maai/services/evaluation_service.py</code>
+                <p><strong>Role: The Surveyor</strong></p>
+                <p>Conducts pre- and post-deliberation assessments of agent preferences using a Likert scale to measure how views change.</p>
+                <ul>
+                    <li><strong>Calls:</strong> None.</li>
+                    <li><strong>Called by:</strong> <code>ConversationService</code>, <code>ExperimentOrchestrator</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>conduct_parallel_evaluation(agents, consensus_result, ...)</code></dt>
+                        <dd><strong>Input:</strong> List of agents, <code>ConsensusResult</code>.<br/><strong>Output:</strong> List of <code>AgentEvaluationResponse</code>.<br/>Runs the post-consensus evaluation in parallel for all agents, asking them to rate all principles.</dd>
+
+                        <dt><code>conduct_initial_assessment(agents, ...)</code></dt>
+                        <dd><strong>Input:</strong> List of agents.<br/><strong>Output:</strong> List of <code>AgentEvaluationResponse</code>.<br/>Runs the pre-deliberation assessment in parallel to capture baseline preferences.</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="service-card">
+                <h3>ConfigManager</h3>
+                <code>src/maai/config/manager.py</code>
+                <p><strong>Role: The Loader</strong></p>
+                <p>Reads and validates the experiment setup from <code>.yaml</code> files, creating the `ExperimentConfig` object that guides the process.</p>
+                <ul>
+                    <li><strong>Calls:</strong> None.</li>
+                    <li><strong>Called by:</strong> <code>run_config.py</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>load_config(config_name)</code></dt>
+                        <dd><strong>Input:</strong> Configuration name string (e.g., "quick_test").<br/><strong>Output:</strong> <code>ExperimentConfig</code> object.<br/>Loads a YAML file, applies environment variable overrides, and validates the structure.</dd>
+                    </dl>
+                </div>
+            </div>
+            <div class="service-card">
+                <h3>DataExporter</h3>
+                <code>src/maai/export/data_export.py</code>
+                <p><strong>Role: The Archivist</strong></p>
+                <p>Takes the final, comprehensive `ExperimentResults` object and saves it to disk in multiple formats (JSON, CSV) for analysis.</p>
+                <ul>
+                    <li><strong>Calls:</strong> None.</li>
+                    <li><strong>Called by:</strong> <code>ExperimentOrchestrator</code>.</li>
+                </ul>
+                <div class="function-list">
+                    <h4>Key Functions</h4>
+                    <dl>
+                        <dt><code>export_all_formats(results)</code></dt>
+                        <dd><strong>Input:</strong> <code>ExperimentResults</code> object.<br/><strong>Output:</strong> Dictionary mapping format names to file paths.<br/>The main entry point that triggers the creation of all output files (JSON, CSVs, etc.).</dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
+
+</body>
+</html>

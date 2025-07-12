@@ -6,6 +6,35 @@ All models use Pydantic for validation and structure.
 from datetime import datetime
 from typing import List, Optional
 from pydantic import BaseModel, Field
+from enum import Enum
+
+
+class LikertScale(str, Enum):
+    """4-point Likert scale for principle evaluation."""
+    STRONGLY_DISAGREE = "strongly_disagree"
+    DISAGREE = "disagree"
+    AGREE = "agree"
+    STRONGLY_AGREE = "strongly_agree"
+    
+    def to_numeric(self) -> int:
+        """Convert to numeric scale for analysis (1-4)."""
+        mapping = {
+            "strongly_disagree": 1,
+            "disagree": 2,
+            "agree": 3,
+            "strongly_agree": 4
+        }
+        return mapping[self.value]
+    
+    def to_display(self) -> str:
+        """Convert to human-readable display format."""
+        mapping = {
+            "strongly_disagree": "Strongly Disagree",
+            "disagree": "Disagree",
+            "agree": "Agree",
+            "strongly_agree": "Strongly Agree"
+        }
+        return mapping[self.value]
 
 
 class AgentConfig(BaseModel):
@@ -105,6 +134,26 @@ class PerformanceMetrics(BaseModel):
     errors_encountered: int = Field(default=0, description="Number of errors encountered")
 
 
+class PrincipleEvaluation(BaseModel):
+    """Evaluation of a single principle using Likert scale."""
+    principle_id: int = Field(..., ge=1, le=4, description="Principle ID (1-4)")
+    principle_name: str = Field(..., description="Name of the principle")
+    satisfaction_rating: LikertScale = Field(..., description="Satisfaction rating on 4-point Likert scale")
+    reasoning: str = Field(..., description="Agent's reasoning for this rating")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Evaluation timestamp")
+
+
+class AgentEvaluationResponse(BaseModel):
+    """Complete evaluation response from an agent for all principles."""
+    agent_id: str = Field(..., description="Agent identifier")
+    agent_name: str = Field(..., description="Agent name")
+    principle_evaluations: List[PrincipleEvaluation] = Field(..., description="Evaluations for all 4 principles")
+    overall_reasoning: str = Field(..., description="Agent's overall reasoning for their ratings")
+    confidence_level: Optional[float] = Field(None, ge=0.0, le=1.0, description="Agent's confidence in evaluations")
+    evaluation_duration: Optional[float] = Field(None, description="Time taken for evaluation in seconds")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
+
+
 class FeedbackResponse(BaseModel):
     """Individual agent feedback after experiment completion."""
     agent_id: str = Field(..., description="Agent identifier")
@@ -126,7 +175,9 @@ class ExperimentResults(BaseModel):
     agent_memories: List[AgentMemory] = Field(default_factory=list, description="Private agent memories")
     speaking_orders: List[List[str]] = Field(default_factory=list, description="Speaking order for each round")
     consensus_result: ConsensusResult = Field(..., description="Consensus outcome")
-    feedback_responses: List[FeedbackResponse] = Field(default_factory=list, description="Post-experiment feedback")
+    initial_evaluation_responses: List[AgentEvaluationResponse] = Field(default_factory=list, description="Initial Likert scale assessments (before deliberation)")
+    evaluation_responses: List[AgentEvaluationResponse] = Field(default_factory=list, description="Post-consensus principle evaluations")
+    feedback_responses: List[FeedbackResponse] = Field(default_factory=list, description="Post-experiment feedback (legacy)")
     performance_metrics: PerformanceMetrics = Field(..., description="Performance data")
     start_time: datetime = Field(default_factory=datetime.now, description="Experiment start time")
     end_time: Optional[datetime] = Field(None, description="Experiment end time")
@@ -160,6 +211,12 @@ DISTRIBUTIVE_JUSTICE_PRINCIPLES = {
 def get_principle_by_id(principle_id: int) -> dict:
     """Get principle information by ID."""
     return DISTRIBUTIVE_JUSTICE_PRINCIPLES.get(principle_id, {})
+
+
+def get_principle_name(principle_id: int) -> str:
+    """Get principle name by ID."""
+    principle = get_principle_by_id(principle_id)
+    return principle.get("name", f"Unknown Principle {principle_id}")
 
 
 def get_all_principles_text() -> str:
@@ -209,7 +266,6 @@ def detect_consensus(deliberation_responses: List[DeliberationResponse]) -> Cons
     
     if len(set(principle_ids)) == 1:
         # Consensus reached - all agents chose the same principle
-        consensus_principle_id = principle_ids[0]
         # Get the principle choice from any agent (they're all the same)
         sample_response = next(iter(latest_responses.values()))
         agreed_principle = sample_response.updated_choice
@@ -244,3 +300,49 @@ def detect_consensus(deliberation_responses: List[DeliberationResponse]) -> Cons
 def get_default_personality() -> str:
     """Get the default personality for agents."""
     return "You are an agent tasked to design a future society."
+
+
+def is_openai_model(model_name: str) -> bool:
+    """
+    Check if a model name corresponds to an OpenAI model.
+    
+    Args:
+        model_name: The model name to check
+        
+    Returns:
+        True if the model is from OpenAI, False otherwise
+    """
+    if not model_name:
+        return False
+    
+    model_name = model_name.lower().strip()
+    
+    # Official OpenAI model patterns
+    openai_models = {
+        "gpt-4", "gpt-4-32k", "gpt-4-turbo", "gpt-4o", "gpt-4o-mini",
+        "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano", "gpt-4.5",
+        "gpt-3.5-turbo", "gpt-3.5-turbo-16k", "gpt-3.5-turbo-instruct",
+        "o1", "o1-mini", "o1-preview", "o3", "o3-mini", "o4-mini",
+        "gpt-image-1", "sora"
+    }
+    
+    return model_name in openai_models
+
+
+def all_models_are_openai(config: 'ExperimentConfig') -> bool:
+    """
+    Check if all models in an experiment configuration are OpenAI models.
+    
+    Args:
+        config: The experiment configuration to check
+        
+    Returns:
+        True if all models are OpenAI models, False otherwise
+    """
+    # Check all agent models
+    for agent in config.agents:
+        model_name = agent.model or config.defaults.model
+        if not is_openai_model(model_name):
+            return False
+    
+    return True

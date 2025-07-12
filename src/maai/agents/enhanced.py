@@ -171,29 +171,42 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
             else:
                 model = model_name
     
-        elif "grok-3" or "grok-3-mini" in model_name.lower():
+        elif "grok-3" in model_name.lower() or "grok-3-mini" in model_name.lower():
             if xai_key:
                 model = LitellmModel(model="xai/grok-3-mini", api_key=xai_key)
             else:
                 model = model_name
 
-        elif "llama-4" or "llama-4-scout" in model_name.lower():
+        elif "llama-4" in model_name.lower() or "llama-4-scout" in model_name.lower():
             if groqkey:
                 model = LitellmModel(model="groq/meta-llama/llama-4-scout-17b-16e-instruct", api_key=groqkey)
             else:
                 model = model_name
 
-        elif  "llama-4-maverick" in model_name.lower():
+        elif "llama-4-maverick" in model_name.lower():
             if groqkey:
                 model = LitellmModel(model="groq/meta-llama/llama-4-maverick-17b-128e-instruct", api_key=groqkey)
             else:
                 model = model_name
         
-        elif "llama-3" or "llama-3-70B" in model_name.lower():
+        elif "llama-3" in model_name.lower() or "llama-3-70B" in model_name.lower():
             if groqkey:
-                model= LitellmModel(model="groq/llama-3.3-70b-versatile", api_key=groqkey)
-        else:
+                model = LitellmModel(model="groq/llama-3.3-70b-versatile", api_key=groqkey)
+            else:
+                model = model_name
+        
+        # OpenAI models - explicit handling to ensure they're not caught by other conditions
+        elif any(openai_pattern in model_name.lower() for openai_pattern in [
+            "gpt-4", "gpt-3.5", "o1", "o3", "o4", "gpt-image", "sora"
+        ]):
+            # OpenAI models use the model name directly (no LitellmModel wrapper needed)
             model = model_name
+        
+        else:
+            # Default fallback - assume it's an OpenAI model if not explicitly handled
+            model = model_name
+        
+        # Model resolution complete
         
         # Resolve personality (use agent's personality or default)
         personality = agent_config.personality or defaults.personality

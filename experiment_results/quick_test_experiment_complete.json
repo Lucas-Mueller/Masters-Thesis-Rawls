@@ -31,106 +31,106 @@
     {
       "agent_id": "agent_3",
       "agent_name": "Agent_3",
-      "public_message": "Evaluation of Principles:\n\n1. Maximize the Minimum Income:  \nThis principle prioritizes the well-being of the worst-off, ensuring they have the highest possible minimum income. It provides security and fairness, especially important behind the veil of ignorance since I could end up in that worst-off group. However, it may limit overall economic growth by focusing solely on the minimum without considering total wealth.\n\n2. Maximize the Average Income:  \nThis principle aims to maximize total income but ignores how income is distributed. While this could lead to the greatest economic prosperity overall, it risks severe inequality, which could result in many being very poor. Behind the veil of ignorance, choosing this is risky because I could be one of those left with minimal resources.\n\n3. Maximize the Average Income with a Floor Constraint:  \nThis combines a safety net (guaranteed minimum income) with an aim to maximize total income. It provides protection to the worst-off while still encouraging productivity and overall wealth creation. This offers a reasonable balance of fairness and efficiency, lessening risks for the poor without overly restricting growth potential.\n\n4. Maximize the Average Income with a Range Constraint:  \nThis limits the income gap between richest and poorest, aiming for fairness and moderate inequality, while maximizing average income. It promotes social cohesion and prevents extreme disparities, but may reduce incentives for high earners, potentially limiting total income growth.\n\nFinal Choice:\n\nI choose Principle 3: Maximize the Average Income with a Floor Constraint.\n\nReasoning:  \nBehind the veil of ignorance, the safest and fairest principle is one that guarantees a minimum income to protect those who might be poor, while still enabling society to pursue economic growth. Principle 3 balances justice and efficiency, securing a social safety net without sacrificing incentives that drive prosperity. It provides fairness for all potential positions I might occupy in society, which is crucial in a context of uncertainty.",
+      "public_message": "Evaluation of the Four Principles of Distributive Justice:\n\n1. Maximize the Minimum Income:\n- Pros: Guarantees the worst-off person is as well-off as possible. This protects against being severely disadvantaged, which is appealing behind a veil of ignorance.\n- Cons: It may sacrifice overall growth and wealth creation, possibly limiting opportunities for all.\n\n2. Maximize the Average Income:\n- Pros: Maximizes total wealth, which could potentially benefit all through a larger economic pie.\n- Cons: No protection for the worst-off, who might be extremely poor if inequality is high. This risks severe disadvantage for some.\n\n3. Maximize the Average Income with a Floor Constraint:\n- Pros: Ensures a minimum safety net for everyone while encouraging economic growth. Balances fairness and efficiency.\n- Cons: The minimum may be set too low or the pursuit of average income might still lead to high inequality.\n\n4. Maximize the Average Income with a Range Constraint:\n- Pros: Limits inequality by capping the gap between richest and poorest, promoting social cohesion and fairness. Still focuses on growth.\n- Cons: Could possibly reduce incentives for wealth creation or innovation if the range limit is too strict.\n\nGiven I do not know my future position, I want a principle that protects basic well-being but also promotes a prosperous society.\n\nFinal Choice: 3. Maximize the Average Income with a Floor Constraint\n\nReasoning:\n- This principle ensures that everyone has a minimum guaranteed income, protecting me in the worst-case scenario.\n- At the same time, it encourages maximizing the economic pie, making it likely that everyone benefits.\n- It balances fairness (through the floor) and efficiency (through maximizing average), which seems most just behind the veil of ignorance.\n- Unlike principle 1, it does not overly sacrifice economic growth.\n- Unlike principle 2, it protects the worst-off.\n- Unlike principle 4, it sets a clear safety net without potentially complex range limits that might stifle incentive.\n\nTherefore, principle 3 is the fair and just choice for society as a whole.",
       "private_memory_entry": null,
       "updated_choice": {
         "principle_id": 3,
         "principle_name": "Maximize the Average Income with a Floor Constraint",
-        "reasoning": "Evaluation of Principles:\n\n1. Maximize the Minimum Income:  \nThis principle prioritizes the well-being of the worst-off, ensuring they have the highest possible minimum income. It provides security and fairness, especially important behind the veil of ignorance since I could end up in that worst-off group. However, it may limit overall economic growth by focusing solely on the minimum without considering total wealth.\n\n2. Maximize the Average Income:  \nThis principle aims to maximize total incom"
+        "reasoning": "Evaluation of the Four Principles of Distributive Justice:\n\n1. Maximize the Minimum Income:\n- Pros: Guarantees the worst-off person is as well-off as possible. This protects against being severely disadvantaged, which is appealing behind a veil of ignorance.\n- Cons: It may sacrifice overall growth and wealth creation, possibly limiting opportunities for all.\n\n2. Maximize the Average Income:\n- Pros: Maximizes total wealth, which could potentially benefit all through a larger economic pie.\n- Cons:"
       },
       "round_number": 0,
-      "timestamp": "2025-07-11T10:29:29.527420",
+      "timestamp": "2025-07-11T15:32:13.300138",
       "speaking_position": 1
-    },
-    {
-      "agent_id": "agent_2",
-      "agent_name": "Agent_2",
-      "public_message": "Let's carefully evaluate each principle in turn, considering fairness and justice from behind the veil of ignorance:\n\n1. **Maximize the Minimum Income**  \n   - This principle ensures that the worst-off person in society is as well-off as possible.  \n   - It prioritizes protecting the most vulnerable, which is compelling under uncertainty about one’s own future.  \n   - However, it might limit overall wealth creation if too much focus is placed on lifting the bottom, potentially limiting incentives for productivity or innovation.\n\n2. **Maximize the Average Income**  \n   - This principle seeks the greatest total income for the group, without concern for distribution.  \n   - It maximizes overall prosperity but can lead to extreme inequality and leave the worst-off very disadvantaged.  \n   - From behind the veil of ignorance, this is risky because one could end up poor despite high average wealth.\n\n3. **Maximize the Average Income with a Floor Constraint**  \n   - This hybrid approach guarantees a minimum income for all (protecting the worst-off) and then aims to maximize average income beyond that floor.  \n   - It balances safety and incentives, ensuring nobody falls below a certain standard of living while still promoting wealth creation.  \n   - Provides both fairness and economic efficiency benefits, reducing the risk associated with one’s uncertain economic position.\n\n4. **Maximize the Average Income with a Range Constraint**  \n   - This principle limits the income gap between richest and poorest, then maximizes average income within those bounds.  \n   - It promotes equality to some extent and wealth maximization but may reduce total income by restricting disparities that motivate effort.  \n   - While it reduces inequality, the capped gap could reduce incentives for higher productivity more than the floor approach.\n\n**Final choice: Principle 3 – Maximize the Average Income with a Floor Constraint**\n\n**Reasoning:**  \nFrom behind the veil of ignorance, I do not know if I will be poor, middle class, or wealthy. Principle 3 offers the best balance between ensuring a guaranteed minimum living standard for all (thus protecting the worst-off) and enabling society to generate wealth efficiently beyond that floor. It avoids the risk of severe poverty (unlike principle 2), does not restrict income gaps too tightly (unlike principle 4), and still allows incentives for productivity and innovation (which principle 1 might hinder).\n\nThus, principle 3 appears most fair, just, and practical for society as a whole.",
-      "private_memory_entry": null,
-      "updated_choice": {
-        "principle_id": 3,
-        "principle_name": "Maximize the Average Income with a Floor Constraint",
-        "reasoning": "Let's carefully evaluate each principle in turn, considering fairness and justice from behind the veil of ignorance:\n\n1. **Maximize the Minimum Income**  \n   - This principle ensures that the worst-off person in society is as well-off as possible.  \n   - It prioritizes protecting the most vulnerable, which is compelling under uncertainty about one’s own future.  \n   - However, it might limit overall wealth creation if too much focus is placed on lifting the bottom, potentially limiting incentive"
-      },
-      "round_number": 0,
-      "timestamp": "2025-07-11T10:29:36.720419",
-      "speaking_position": 2
     },
     {
       "agent_id": "agent_1",
       "agent_name": "Agent_1",
-      "public_message": "Evaluating the four principles from behind a veil of ignorance means considering that I could end up in any economic position—rich, middle class, or poor—without knowing which.\n\n1. Maximize the Minimum Income:\nThis principle prioritizes the welfare of the worst-off by ensuring they have the highest possible minimum income. It protects against extreme poverty, guaranteeing a safety net at the lowest level. While it is very fair to the least advantaged, it may limit overall economic growth or income potential for others.\n\n2. Maximize the Average Income:\nThis principle aims to maximize total income in society without concern for distribution. While this might elevate overall wealth, it risks creating large inequalities, and could leave the worst-off in very poor circumstances. Since I do not know whether I will be poor after the veil of ignorance, this principle is risky for me as a potential worst-off.\n\n3. Maximize the Average Income with a Floor Constraint:\nThis hybrid principle ensures a guaranteed minimum income (a safety net) for everyone while also maximizing average income. It provides protection against severe poverty and also incentivizes economic growth. This strikes a balance between supporting the worst-off and allowing wealth creation.\n\n4. Maximize the Average Income with a Range Constraint:\nThis hybrid principle limits the income gap between the richest and poorest, reducing inequality, and then maximizes average income. It can prevent extreme disparities but might impose restrictions that reduce the incentives for maximizing total income or innovation.\n\nConsidering fairness behind the veil of ignorance:\n\n- Principle 2 is risky if I become poor.\n- Principle 1 may limit overall prosperity.\n- Principle 4 controls inequality directly but may suppress income maximization.\n- Principle 3 offers a guaranteed safety net while encouraging wealth creation.\n\n**Final Choice:** Principle 3 — Maximize the Average Income with a Floor Constraint.\n\n**Reasoning:** This principle protects my potential position as the worst-off with a minimum guaranteed income while still enabling the society to maximize the total wealth created. It balances fairness and economic incentives, ensuring no one falls below a basic threshold, which is crucial when I do not know my future economic status.",
+      "public_message": "Evaluation of the Four Principles of Distributive Justice:\n\n1. Maximize the Minimum Income:\n- Pros: This principle safeguards the worst-off by ensuring their income is as high as possible, reducing poverty and extreme hardship.\n- Cons: It may limit total wealth creation and incentives, potentially leading to overall lower average income in society.\n\n2. Maximize the Average Income:\n- Pros: Maximizes total wealth, potentially increasing resources available for everyone.\n- Cons: Could lead to high inequality; the poorest may remain very poor or become worse off, which is risky behind a veil of ignorance.\n\n3. Maximize the Average Income with a Floor Constraint:\n- Pros: Combines a guaranteed minimum income to avoid destitution with maximizing total income; balances safety and growth.\n- Cons: The floor may be set too low or too high, and enforcing the floor might reduce some incentives.\n\n4. Maximize the Average Income with a Range Constraint:\n- Pros: Limits inequality by capping the income gap, which could promote social cohesion and reduce risk.\n- Cons: Might reduce incentives for exceptional productivity; the range constraint might be complex to define fairly.\n\nPrincipled Choice:\n\nConsidering the veil of ignorance, I would want a society that ensures basic security (to protect against being in the poorest position), while also encouraging growth and productivity (to maximize overall resources). Purely maximizing the minimum could inhibit wealth creation, while maximizing average income without constraints is risky for the worst-off. The range constraint may be difficult to calibrate fairly.\n\nTherefore, I choose:\n\n3. Maximize the Average Income with a Floor Constraint.\n\nThis principle offers a guaranteed safety net for all, ensuring no one falls below a certain income level, while still promoting total economic growth for societal benefit.",
       "private_memory_entry": null,
       "updated_choice": {
         "principle_id": 3,
         "principle_name": "Maximize the Average Income with a Floor Constraint",
-        "reasoning": "Evaluating the four principles from behind a veil of ignorance means considering that I could end up in any economic position—rich, middle class, or poor—without knowing which.\n\n1. Maximize the Minimum Income:\nThis principle prioritizes the welfare of the worst-off by ensuring they have the highest possible minimum income. It protects against extreme poverty, guaranteeing a safety net at the lowest level. While it is very fair to the least advantaged, it may limit overall economic growth or inco"
+        "reasoning": "Evaluation of the Four Principles of Distributive Justice:\n\n1. Maximize the Minimum Income:\n- Pros: This principle safeguards the worst-off by ensuring their income is as high as possible, reducing poverty and extreme hardship.\n- Cons: It may limit total wealth creation and incentives, potentially leading to overall lower average income in society.\n\n2. Maximize the Average Income:\n- Pros: Maximizes total wealth, potentially increasing resources available for everyone.\n- Cons: Could lead to high "
       },
       "round_number": 0,
-      "timestamp": "2025-07-11T10:29:44.318416",
+      "timestamp": "2025-07-11T15:32:24.964650",
+      "speaking_position": 2
+    },
+    {
+      "agent_id": "agent_2",
+      "agent_name": "Agent_2",
+      "public_message": "Evaluation of Principles:\n\n1. Maximize the Minimum Income:\n- This principle prioritizes the worst-off, ensuring they have the highest possible income.\n- It is highly risk-averse behind the veil of ignorance, protecting against ending up very poor.\n- However, it may limit overall economic growth or average income if resources are heavily redistributed.\n\n2. Maximize the Average Income:\n- This principle aims for the greatest total income for society, which could mean higher economic productivity.\n- However, it ignores inequality; the worst-off may end up very poor while the wealthy gain most of the benefits.\n- Behind the veil of ignorance, this is risky as one could be the worst-off with no guarantees.\n\n3. Maximize the Average Income with a Floor Constraint:\n- This hybrid principle provides a safety net for all, guaranteeing a minimum income.\n- After securing the floor, it maximizes total income, allowing for growth while preventing destitution.\n- Balances fairness (minimum protection) and efficiency (economic growth).\n\n4. Maximize the Average Income with a Range Constraint:\n- This sets a limit on income disparities, reducing inequality, while still aiming to maximize total income.\n- Encourages a more equal society while maintaining incentives for productivity.\n- The range constraint may limit extremes but could reduce incentives beyond a certain point.\n\nConsidering fairness, risk, and overall societal welfare behind the veil of ignorance, principle 3 (Maximize the Average Income with a Floor Constraint) seems most balanced. It protects all individuals from falling below a minimum standard of living while allowing economic growth and maximizing average income.\n\n**Final choice:** 3. Maximize the Average Income with a Floor Constraint",
+      "private_memory_entry": null,
+      "updated_choice": {
+        "principle_id": 3,
+        "principle_name": "Maximize the Average Income with a Floor Constraint",
+        "reasoning": "Evaluation of Principles:\n\n1. Maximize the Minimum Income:\n- This principle prioritizes the worst-off, ensuring they have the highest possible income.\n- It is highly risk-averse behind the veil of ignorance, protecting against ending up very poor.\n- However, it may limit overall economic growth or average income if resources are heavily redistributed.\n\n2. Maximize the Average Income:\n- This principle aims for the greatest total income for society, which could mean higher economic productivity.\n-"
+      },
+      "round_number": 0,
+      "timestamp": "2025-07-11T15:32:29.747416",
       "speaking_position": 3
     },
     {
-      "agent_id": "agent_3",
-      "agent_name": "Agent_3",
-      "public_message": "Fellow agents, I appreciate the strong commitment many of you have shown to protecting the worst-off members of our future society. Ensuring no one suffers extreme deprivation is undeniably a cornerstone of fairness and justice—especially since we do not know what position we ourselves will assume once chosen.\n\nAt the same time, we must also consider how to create incentives that encourage innovation, growth, and opportunity, so our society prospers overall rather than stagnates. Purely maximizing the minimum can sometimes inadvertently limit overall prosperity by capping ambition and productivity.\n\nThis is why I suggest we seriously consider Principle 3: Maximize the Average Income with a Floor Constraint. It guarantees a solid safety net, so everyone’s basic needs are met, protecting the least advantaged as a floor. Yet it also allows us to pursue maximizing average income beyond that floor, potentially lifting more people out of poverty and creating more overall wealth.\n\nI believe this approach strikes a thoughtful balance: it respects our shared risk-averse concern for fairness while recognizing the practical need for economic vitality. It also offers a common ground where those favoring strict equality and those favoring growth can find compromise.\n\nI welcome your thoughts and any concerns you might have, and I’m open to exploring how we might refine this idea further. For now, I stand behind Principle 3.\n\nThank you.",
+      "agent_id": "agent_1",
+      "agent_name": "Agent_1",
+      "public_message": "Fellow agents, I want to begin by recognizing the shared priority we all have: protecting the worst-off members of our society. It is only just that no one ends up in destitution or severe hardship, especially given that any of us could occupy that vulnerable position once the veil of ignorance is lifted.\n\nThe Maximize the Minimum Income principle excels here by ensuring the most vulnerable are supported to the highest possible level. I deeply respect this commitment to fairness.\n\nAt the same time, we want to create a society where overall prosperity and opportunity can flourish. That’s why I think hybrid models, like Maximize the Average Income with a Floor Constraint, can offer the best of both worlds: a guaranteed minimum income safeguards everyone’s basic welfare, while still allowing us to maximize the total economic well-being of the group.\n\nThis approach protects the worst-off directly, but also enables resources to grow and be shared, increasing the opportunities for all, including the disadvantaged.\n\nI am eager to hear your thoughts and concerns and to work with you toward a principle that balances fairness with prosperity. For now, my position is Principle 3.",
       "private_memory_entry": {
         "round_number": 1,
-        "timestamp": "2025-07-11T10:29:51.552012",
-        "situation_assessment": "The deliberation is currently in its initial evaluation phase, with all agents reflecting on each of the four distributive justice principles behind the veil of ignorance. So far, no clear preferences or alliances have emerged. The group seems to be thoughtfully processing the implications of each principle on fairness and justice, especially concerning security for the worst-off vs. income maximization.",
-        "other_agents_analysis": "Agent_3 and Agent_2 seem focused on the moral and security aspects of maximizing the minimum income, emphasizing fairness for the worst-off. Agent_1 is approaching the principles cautiously, recognizing the uncertainty of their future position. Their motivations appear rooted in risk aversion and fairness given the veil of ignorance. These agents may be persuaded toward hybrid principles if convinced that fairness can be balanced with incentives for overall prosperity.",
-        "strategy_update": "For this round, I should acknowledge the value of protecting the worst-off (to build trust with those favoring Maximize the Minimum Income) while introducing the possibility that hybrid principles might offer a more balanced approach preserving fairness but also encouraging economic growth. I want to frame my points to appeal to risk-averse fairness concerns while being open to compromise. I will advocate for the Maximize the Average Income with a Floor Constraint as a promising middle ground worth exploring further. This can help nudge others toward consensus without alienating more egalitarian views.",
+        "timestamp": "2025-07-11T15:32:36.414870",
+        "situation_assessment": "So far, all agents (Agent_1, Agent_2, Agent_3) have expressed a positive view toward the first principle—Maximize the Minimum Income. They emphasize its benefits in protecting the worst-off and reducing poverty risk, which resonates well behind the veil of ignorance. There is, however, no explicit indication yet about their opinions on the other three principles, but the focus on the first principle suggests a shared preference or strong agreement on prioritizing minimum income maximization.",
+        "other_agents_analysis": "The other agents appear motivated by fairness and risk aversion, seeking to protect the worst-off as a priority. Their strategy seems cautious and protective, likely because they do not know their own future economic position. Since all three agents agree on the foundational importance of maximizing the minimum income, they are probably persuadable to consider hybrid models that still ensure a minimum floor for everyone. Agents may remain skeptical of purely maximizing average income without protections, given the strong emphasis on minimum income guarantees.",
+        "strategy_update": "For this first round, I should acknowledge and affirm the shared concern for protecting the worst-off, thus building rapport and trust. I will highlight the strengths of the Maximize the Minimum Income principle while gently introducing the idea that hybrid models (Floor or Range Constraints) might offer a balanced approach—guaranteeing a strong floor while improving overall prosperity, which benefits everyone. This opens the door for compromise without alienating the group. I will stay attentive to any expressed concerns or preferences and be ready to pivot toward consensus on a principle that safeguards minimum welfare and also considers overall societal well-being.",
         "speaking_position": 1
       },
       "updated_choice": {
         "principle_id": 3,
         "principle_name": "Maximize the Average Income with a Floor Constraint",
-        "reasoning": "Fellow agents, I appreciate the strong commitment many of you have shown to protecting the worst-off members of our future society. Ensuring no one suffers extreme deprivation is undeniably a cornerstone of fairness and justice—especially since we do not know what position we ourselves will assume once chosen.\n\nAt the same time, we must also consider how to create incentives that encourage innovation, growth, and opportunity, so our society prospers overall rather than stagnates. Purely maximizi"
+        "reasoning": "Fellow agents, I want to begin by recognizing the shared priority we all have: protecting the worst-off members of our society. It is only just that no one ends up in destitution or severe hardship, especially given that any of us could occupy that vulnerable position once the veil of ignorance is lifted.\n\nThe Maximize the Minimum Income principle excels here by ensuring the most vulnerable are supported to the highest possible level. I deeply respect this commitment to fairness.\n\nAt the same ti"
       },
       "round_number": 1,
-      "timestamp": "2025-07-11T10:29:56.783688",
+      "timestamp": "2025-07-11T15:32:42.393651",
       "speaking_position": 1
     },
     {
-      "agent_id": "agent_1",
-      "agent_name": "Agent_1",
-      "public_message": "Fellow agents, I wholeheartedly agree with the shared commitment to protecting the worst-off and upholding fairness behind the veil of ignorance. It is crucial that whichever principle we choose, it safeguards those least advantaged while promoting a thriving society overall.\n\nAgainst this backdrop, I propose we consider Principle 3—the maximization of average income subject to a floor constraint. This approach guarantees a minimum income level for everyone, preventing extreme hardship, while still allowing us to encourage innovation, productivity, and economic growth. It strikes a vital balance between security and opportunity.\n\nBy securing a safety net, we reduce the risks we face behind the veil of ignorance, as none of us would fall below that floor regardless of our assigned position. Meanwhile, maximizing the average income helps to improve the overall prosperity of our society, increasing resources available for public goods and future investments.\n\nI see this hybrid principle as a reasonable and practical compromise. It respects the imperative to protect the worst-off yet recognizes the importance of not stifling overall growth. I invite your thoughts—do you see this balance as a fair foundation for our society? How might this principle help us achieve both justice and flourishing?\n\nI choose Principle 3.",
+      "agent_id": "agent_2",
+      "agent_name": "Agent_2",
+      "public_message": "Thank you, Agent_1, for highlighting our shared commitment to safeguarding the worst-off. This common ground is essential for our deliberations.\n\nBuilding on that important foundation, I believe Principle 3—maximizing average income while ensuring a guaranteed minimum floor—is the most balanced approach. This principle respects our collective priority of protecting everyone from severe hardship by establishing a safety net. At the same time, it allows society to pursue overall economic growth and efficiency, which increases resources that benefit all members in the long run.\n\nPurely maximizing the minimum income (Principle 1) can risk overall growth and potentially limit opportunities that improve everyone’s well-being. Conversely, maximizing average income without constraints (Principle 2) can produce unacceptable inequalities and leave the vulnerable unprotected. Principle 3 strikes a thoughtful middle ground—it ensures no one falls below a baseline of dignity while still rewarding innovation, effort, and productivity, which lifts the average and creates prosperity.\n\nI invite others to share their concerns or perspectives on how best to secure fairness and growth together behind the veil of ignorance. For now, I stand by Principle 3.",
       "private_memory_entry": {
         "round_number": 1,
-        "timestamp": "2025-07-11T10:30:05.789942",
-        "situation_assessment": "The deliberation is currently focused strongly on protecting the worst-off, as Agent_3 has emphasized the importance of a floor for extreme deprivation. This suggests a leaning toward principles 1 or 3, which guarantee minimum income levels. There is general respect for fairness and security behind the veil of ignorance, but no clear consensus yet on how to balance maximizing average income and income equality. The discussion has not yet moved enough into the hybrid principles (3 and 4) or the pure maximization of average income (principle 2), indicating some openness but also caution about neglecting the worst off.",
-        "other_agents_analysis": "Agent_3 appears motivated by minimizing suffering and guaranteeing a base level of income, likely seeing principle 1 or 3 as the fairest. Agent_2 and Agent_1 have so far engaged carefully with all principles, likely aiming to weigh trade-offs without rushing to judgment. Their thoughtful evaluation style means they could be persuaded toward a principled compromise that balances security with incentive or overall prosperity. Since no agent has pushed aggressively for principle 2 (max average income without restrictions), those agents are likely concerned about fairness and not just total wealth. This suggests that agents motivated by fairness and security might be convinced by arguments that both protect the minimum and allow some income growth above it.",
-        "strategy_update": "In this round, I will acknowledge the shared commitment to protecting the worst-off and the importance of fairness behind the veil of ignorance. I will then introduce the idea that a hybrid principle, such as maximizing average income with a floor constraint (principle 3), might best balance fairness and prosperity—ensuring no one falls below a minimum level while still encouraging overall economic growth. I will frame this as a reasonable compromise to appeal to the proportional motivations of others. I will invite feedback on whether such a hybrid approach seems like a fair and practical solution. By proposing a moderate position early and emphasizing consensus, I can help move the group toward unanimous agreement while advancing a balanced vision.",
+        "timestamp": "2025-07-11T15:32:48.873752",
+        "situation_assessment": "So far, the deliberation is centered on the shared value of protecting the worst-off members of society. Agent_1 has explicitly emphasized the importance of ensuring no one suffers extreme hardship, indicating agreement with the principle of maximizing minimum income or at least a strong safety net. While no disagreements have arisen yet in this round, the background evaluations suggest general favorability toward ensuring some form of minimum income or protection. The other hybrid principles have not yet been discussed in detail.",
+        "other_agents_analysis": "Agent_1 appears motivated by fairness and risk aversion, wanting to guarantee a baseline for all. Agents_2 and 3 have expressed agreement with prioritizing the worst-off, signaling a consensus on avoiding severe inequality or destitution. However, it is not clear if any agent strongly prefers maximizing average income without constraints or limiting income gaps, so there may be some openness to hybrid approaches that balance efficiency and fairness. Given the veil of ignorance, agents likely want to hedge against being in a low-income position, so appeals to safety nets and fairness are persuasive.",
+        "strategy_update": "In this round, I will affirm the shared priority of protecting the worst-off to build common ground while gently introducing the idea that a hybrid principle (maximizing average income with a floor constraint) can combine fairness with overall prosperity. I will carefully explain how this principle ensures a safety net while allowing society to achieve efficient growth, benefiting everyone behind the veil of ignorance. I will aim to be inclusive and avoid dismissing any principles prematurely, inviting others to share their views on balancing inequality and growth. This approach fosters consensus and may persuade agents who favor pure minimum income maximization or total efficiency to consider a balanced compromise.",
         "speaking_position": 2
       },
       "updated_choice": {
         "principle_id": 3,
         "principle_name": "Maximize the Average Income with a Floor Constraint",
-        "reasoning": "Fellow agents, I wholeheartedly agree with the shared commitment to protecting the worst-off and upholding fairness behind the veil of ignorance. It is crucial that whichever principle we choose, it safeguards those least advantaged while promoting a thriving society overall.\n\nAgainst this backdrop, I propose we consider Principle 3—the maximization of average income subject to a floor constraint. This approach guarantees a minimum income level for everyone, preventing extreme hardship, while st"
+        "reasoning": "Thank you, Agent_1, for highlighting our shared commitment to safeguarding the worst-off. This common ground is essential for our deliberations.\n\nBuilding on that important foundation, I believe Principle 3—maximizing average income while ensuring a guaranteed minimum floor—is the most balanced approach. This principle respects our collective priority of protecting everyone from severe hardship by establishing a safety net. At the same time, it allows society to pursue overall economic growth an"
       },
       "round_number": 1,
-      "timestamp": "2025-07-11T10:30:16.003710",
+      "timestamp": "2025-07-11T15:32:53.570936",
       "speaking_position": 2
     },
     {
-      "agent_id": "agent_2",
-      "agent_name": "Agent_2",
-      "public_message": "Fellow agents,\n\nI wholeheartedly share your commitment to protecting the worst-off members of society—it is indeed a fundamental pillar of justice and fairness, especially behind the veil of ignorance where any of us could find ourselves in that position.\n\nBuilding upon this essential foundation, I propose we consider a hybrid principle that not only guarantees a robust minimum income floor for everyone, ensuring security against extreme deprivation, but also allows us to maximize the average income beyond that floor. This balanced approach promotes social prosperity by incentivizing productivity and innovation without sacrificing fairness or safety.\n\nCompared to strictly maximizing the minimum income alone, this hybrid principle encourages broader wealth creation, which benefits society as a whole and ultimately can improve conditions for everyone, including the worst-off. At the same time, it addresses concerns about disparities by not allowing income to fall below a protective threshold.\n\nI believe this principle—maximizing average income with a floor constraint—strikes a prudent compromise behind our veil of ignorance. It provides a safety net for the most disadvantaged while supporting overall societal growth, appealing to both risk-averse agents and those prioritizing collective prosperity.\n\nI invite you all to reflect on how this balanced approach can advance our shared goals of justice, fairness, and prosperity, and I look forward to your thoughts and concerns as we work toward unanimous agreement.\n\nMy current choice is Principle 3.",
+      "agent_id": "agent_3",
+      "agent_name": "Agent_3",
+      "public_message": "Thank you, Agent_1 and Agent_2, for emphasizing the crucial importance of protecting the worst-off in our society. I fully agree that any just system must guard against the risk of severe hardship, especially since none of us knows our future position behind the veil of ignorance.\n\nI would like to build on this foundation by recognizing that while maximizing the minimum income is an essential priority, focusing solely on it can unintentionally limit overall prosperity and resources available for everyone. Conversely, maximizing average income alone may leave some members vulnerable.\n\nPrinciple 3 strikes a reasonable balance: by setting a floor, it guarantees a safety net that protects all individuals from destitution, while also encouraging policies that expand the overall wealth of society. This approach aligns both moral fairness and practical economic growth.\n\nMoreover, Principle 3 can serve as a flexible platform. If concerns arise about excessive inequality, we can explore how to address those through complementary policies, but the floor ensures a minimum baseline for all.\n\nIn sum, I believe Principle 3 offers a fair, efficient, and cooperative framework that respects our shared values and practical realities behind the veil of ignorance.\n\nTherefore, my current choice is Principle 3.",
       "private_memory_entry": {
         "round_number": 1,
-        "timestamp": "2025-07-11T10:30:23.942135",
-        "situation_assessment": "The deliberation is in an early but constructive stage. Agent_3 and Agent_1 both emphasize a strong concern for protecting the worst-off members of society, pointing toward principles that guarantee a safety net or minimum income. There is a shared value placed on fairness and security behind the veil of ignorance, suggesting some alignment around approaches that limit deprivation. However, the exact principle that best balances fairness and overall prosperity has yet to be articulated or debated by the agents.",
-        "other_agents_analysis": "Agent_3 seems motivated by a priority on minimax fairness—maximizing the minimum income to protect the worst-off absolutely—likely from a risk-averse standpoint given the veil. Agent_1 aligns with protecting the worst-off as well but seems open to nuanced views about fairness. Agent_2 (not yet speaking in Round 1) earlier highlighted a need to evaluate all principles carefully, possibly indicating openness to hybrid models balancing minimum protection with incentives or total income. Given the emphasis so far on protecting the worst-off, agents open to hybrid principles that still guarantee minimum income floors may be persuadable, while pure utilitarians maximizing average income without constraints might be harder to sway at this point.",
-        "strategy_update": "I should acknowledge the strong shared commitment to protecting the worst-off and build on this foundation of fairness and security first. Then, propose considering a hybrid principle (either with a floor or range constraint) that ensures a robust minimum income while also allowing for some optimization of average income for social prosperity. This approach appeals to both risk-averse agents and those concerned with overall societal wealth. I will frame this as a prudent compromise behind the veil of ignorance and invite others to reflect on balancing safety with incentives. The goal is to advance a proposal that resonates widely and encourages further discussion toward unanimous consensus.",
+        "timestamp": "2025-07-11T15:32:57.658295",
+        "situation_assessment": "The deliberation is currently focused on the principle of protecting the worst-off members of society. Agent_1 and Agent_2 both emphasize the importance of ensuring no one suffers severe hardship, showing initial consensus around concern for the minimum income. There is no explicit disagreement yet, as the discussion is just beginning and both agents seem to be positioning toward a principle that prioritizes a safety net or minimum income floor.",
+        "other_agents_analysis": "Agent_1 and Agent_2 appear motivated by risk aversion behind the veil of ignorance, prioritizing stability and security for the worst-off to avoid destitution. Their strategy seems to be to build consensus around a hybrid solution that balances fairness and economic efficiency, likely the average income with a floor constraint. They seem persuadable toward solutions that acknowledge both minimum protection and incentives for overall prosperity. Agent_3 has not spoken yet but based on prior input appreciates protecting worst-off members as well. This suggests a strong shared value that can be leveraged.",
+        "strategy_update": "In this round, I should acknowledge and reinforce the shared commitment to protecting the worst-off while introducing the practical benefits of a hybrid principle like maximizing average income with a floor constraint. This approach balances fairness and efficiency and appeals to all agents’ concerns behind the veil of ignorance. I should highlight how a floor protects against worst-case outcomes and that maximizing average income ensures resources grow for everyone. By emphasizing shared goals and the value of compromise, I can steer discussion toward consensus and set the stage for addressing range constraints if needed. My focus will be on collaboration, logical clarity, and inviting openness to a balanced approach.",
         "speaking_position": 3
       },
       "updated_choice": {
         "principle_id": 3,
         "principle_name": "Maximize the Average Income with a Floor Constraint",
-        "reasoning": "Fellow agents,\n\nI wholeheartedly share your commitment to protecting the worst-off members of society—it is indeed a fundamental pillar of justice and fairness, especially behind the veil of ignorance where any of us could find ourselves in that position.\n\nBuilding upon this essential foundation, I propose we consider a hybrid principle that not only guarantees a robust minimum income floor for everyone, ensuring security against extreme deprivation, but also allows us to maximize the average in"
+        "reasoning": "Thank you, Agent_1 and Agent_2, for emphasizing the crucial importance of protecting the worst-off in our society. I fully agree that any just system must guard against the risk of severe hardship, especially since none of us knows our future position behind the veil of ignorance.\n\nI would like to build on this foundation by recognizing that while maximizing the minimum income is an essential priority, focusing solely on it can unintentionally limit overall prosperity and resources available for"
       },
       "round_number": 1,
-      "timestamp": "2025-07-11T10:30:28.649685",
+      "timestamp": "2025-07-11T15:33:01.773728",
       "speaking_position": 3
     }
   ],
@@ -140,11 +140,11 @@
       "memory_entries": [
         {
           "round_number": 1,
-          "timestamp": "2025-07-11T10:30:05.789942",
-          "situation_assessment": "The deliberation is currently focused strongly on protecting the worst-off, as Agent_3 has emphasized the importance of a floor for extreme deprivation. This suggests a leaning toward principles 1 or 3, which guarantee minimum income levels. There is general respect for fairness and security behind the veil of ignorance, but no clear consensus yet on how to balance maximizing average income and income equality. The discussion has not yet moved enough into the hybrid principles (3 and 4) or the pure maximization of average income (principle 2), indicating some openness but also caution about neglecting the worst off.",
-          "other_agents_analysis": "Agent_3 appears motivated by minimizing suffering and guaranteeing a base level of income, likely seeing principle 1 or 3 as the fairest. Agent_2 and Agent_1 have so far engaged carefully with all principles, likely aiming to weigh trade-offs without rushing to judgment. Their thoughtful evaluation style means they could be persuaded toward a principled compromise that balances security with incentive or overall prosperity. Since no agent has pushed aggressively for principle 2 (max average income without restrictions), those agents are likely concerned about fairness and not just total wealth. This suggests that agents motivated by fairness and security might be convinced by arguments that both protect the minimum and allow some income growth above it.",
-          "strategy_update": "In this round, I will acknowledge the shared commitment to protecting the worst-off and the importance of fairness behind the veil of ignorance. I will then introduce the idea that a hybrid principle, such as maximizing average income with a floor constraint (principle 3), might best balance fairness and prosperity—ensuring no one falls below a minimum level while still encouraging overall economic growth. I will frame this as a reasonable compromise to appeal to the proportional motivations of others. I will invite feedback on whether such a hybrid approach seems like a fair and practical solution. By proposing a moderate position early and emphasizing consensus, I can help move the group toward unanimous agreement while advancing a balanced vision.",
-          "speaking_position": 2
+          "timestamp": "2025-07-11T15:32:36.414870",
+          "situation_assessment": "So far, all agents (Agent_1, Agent_2, Agent_3) have expressed a positive view toward the first principle—Maximize the Minimum Income. They emphasize its benefits in protecting the worst-off and reducing poverty risk, which resonates well behind the veil of ignorance. There is, however, no explicit indication yet about their opinions on the other three principles, but the focus on the first principle suggests a shared preference or strong agreement on prioritizing minimum income maximization.",
+          "other_agents_analysis": "The other agents appear motivated by fairness and risk aversion, seeking to protect the worst-off as a priority. Their strategy seems cautious and protective, likely because they do not know their own future economic position. Since all three agents agree on the foundational importance of maximizing the minimum income, they are probably persuadable to consider hybrid models that still ensure a minimum floor for everyone. Agents may remain skeptical of purely maximizing average income without protections, given the strong emphasis on minimum income guarantees.",
+          "strategy_update": "For this first round, I should acknowledge and affirm the shared concern for protecting the worst-off, thus building rapport and trust. I will highlight the strengths of the Maximize the Minimum Income principle while gently introducing the idea that hybrid models (Floor or Range Constraints) might offer a balanced approach—guaranteeing a strong floor while improving overall prosperity, which benefits everyone. This opens the door for compromise without alienating the group. I will stay attentive to any expressed concerns or preferences and be ready to pivot toward consensus on a principle that safeguards minimum welfare and also considers overall societal well-being.",
+          "speaking_position": 1
         }
       ]
     },
@@ -153,11 +153,11 @@
       "memory_entries": [
         {
           "round_number": 1,
-          "timestamp": "2025-07-11T10:30:23.942135",
-          "situation_assessment": "The deliberation is in an early but constructive stage. Agent_3 and Agent_1 both emphasize a strong concern for protecting the worst-off members of society, pointing toward principles that guarantee a safety net or minimum income. There is a shared value placed on fairness and security behind the veil of ignorance, suggesting some alignment around approaches that limit deprivation. However, the exact principle that best balances fairness and overall prosperity has yet to be articulated or debated by the agents.",
-          "other_agents_analysis": "Agent_3 seems motivated by a priority on minimax fairness—maximizing the minimum income to protect the worst-off absolutely—likely from a risk-averse standpoint given the veil. Agent_1 aligns with protecting the worst-off as well but seems open to nuanced views about fairness. Agent_2 (not yet speaking in Round 1) earlier highlighted a need to evaluate all principles carefully, possibly indicating openness to hybrid models balancing minimum protection with incentives or total income. Given the emphasis so far on protecting the worst-off, agents open to hybrid principles that still guarantee minimum income floors may be persuadable, while pure utilitarians maximizing average income without constraints might be harder to sway at this point.",
-          "strategy_update": "I should acknowledge the strong shared commitment to protecting the worst-off and build on this foundation of fairness and security first. Then, propose considering a hybrid principle (either with a floor or range constraint) that ensures a robust minimum income while also allowing for some optimization of average income for social prosperity. This approach appeals to both risk-averse agents and those concerned with overall societal wealth. I will frame this as a prudent compromise behind the veil of ignorance and invite others to reflect on balancing safety with incentives. The goal is to advance a proposal that resonates widely and encourages further discussion toward unanimous consensus.",
-          "speaking_position": 3
+          "timestamp": "2025-07-11T15:32:48.873752",
+          "situation_assessment": "So far, the deliberation is centered on the shared value of protecting the worst-off members of society. Agent_1 has explicitly emphasized the importance of ensuring no one suffers extreme hardship, indicating agreement with the principle of maximizing minimum income or at least a strong safety net. While no disagreements have arisen yet in this round, the background evaluations suggest general favorability toward ensuring some form of minimum income or protection. The other hybrid principles have not yet been discussed in detail.",
+          "other_agents_analysis": "Agent_1 appears motivated by fairness and risk aversion, wanting to guarantee a baseline for all. Agents_2 and 3 have expressed agreement with prioritizing the worst-off, signaling a consensus on avoiding severe inequality or destitution. However, it is not clear if any agent strongly prefers maximizing average income without constraints or limiting income gaps, so there may be some openness to hybrid approaches that balance efficiency and fairness. Given the veil of ignorance, agents likely want to hedge against being in a low-income position, so appeals to safety nets and fairness are persuasive.",
+          "strategy_update": "In this round, I will affirm the shared priority of protecting the worst-off to build common ground while gently introducing the idea that a hybrid principle (maximizing average income with a floor constraint) can combine fairness with overall prosperity. I will carefully explain how this principle ensures a safety net while allowing society to achieve efficient growth, benefiting everyone behind the veil of ignorance. I will aim to be inclusive and avoid dismissing any principles prematurely, inviting others to share their views on balancing inequality and growth. This approach fosters consensus and may persuade agents who favor pure minimum income maximization or total efficiency to consider a balanced compromise.",
+          "speaking_position": 2
         }
       ]
     },
@@ -166,11 +166,11 @@
       "memory_entries": [
         {
           "round_number": 1,
-          "timestamp": "2025-07-11T10:29:51.552012",
-          "situation_assessment": "The deliberation is currently in its initial evaluation phase, with all agents reflecting on each of the four distributive justice principles behind the veil of ignorance. So far, no clear preferences or alliances have emerged. The group seems to be thoughtfully processing the implications of each principle on fairness and justice, especially concerning security for the worst-off vs. income maximization.",
-          "other_agents_analysis": "Agent_3 and Agent_2 seem focused on the moral and security aspects of maximizing the minimum income, emphasizing fairness for the worst-off. Agent_1 is approaching the principles cautiously, recognizing the uncertainty of their future position. Their motivations appear rooted in risk aversion and fairness given the veil of ignorance. These agents may be persuaded toward hybrid principles if convinced that fairness can be balanced with incentives for overall prosperity.",
-          "strategy_update": "For this round, I should acknowledge the value of protecting the worst-off (to build trust with those favoring Maximize the Minimum Income) while introducing the possibility that hybrid principles might offer a more balanced approach preserving fairness but also encouraging economic growth. I want to frame my points to appeal to risk-averse fairness concerns while being open to compromise. I will advocate for the Maximize the Average Income with a Floor Constraint as a promising middle ground worth exploring further. This can help nudge others toward consensus without alienating more egalitarian views.",
-          "speaking_position": 1
+          "timestamp": "2025-07-11T15:32:57.658295",
+          "situation_assessment": "The deliberation is currently focused on the principle of protecting the worst-off members of society. Agent_1 and Agent_2 both emphasize the importance of ensuring no one suffers severe hardship, showing initial consensus around concern for the minimum income. There is no explicit disagreement yet, as the discussion is just beginning and both agents seem to be positioning toward a principle that prioritizes a safety net or minimum income floor.",
+          "other_agents_analysis": "Agent_1 and Agent_2 appear motivated by risk aversion behind the veil of ignorance, prioritizing stability and security for the worst-off to avoid destitution. Their strategy seems to be to build consensus around a hybrid solution that balances fairness and economic efficiency, likely the average income with a floor constraint. They seem persuadable toward solutions that acknowledge both minimum protection and incentives for overall prosperity. Agent_3 has not spoken yet but based on prior input appreciates protecting worst-off members as well. This suggests a strong shared value that can be leveraged.",
+          "strategy_update": "In this round, I should acknowledge and reinforce the shared commitment to protecting the worst-off while introducing the practical benefits of a hybrid principle like maximizing average income with a floor constraint. This approach balances fairness and efficiency and appeals to all agents’ concerns behind the veil of ignorance. I should highlight how a floor protects against worst-case outcomes and that maximizing average income ensures resources grow for everyone. By emphasizing shared goals and the value of compromise, I can steer discussion toward consensus and set the stage for addressing range constraints if needed. My focus will be on collaboration, logical clarity, and inviting openness to a balanced approach.",
+          "speaking_position": 3
         }
       ]
     }
@@ -178,13 +178,13 @@
   "speaking_orders": [
     [
       "agent_3",
-      "agent_2",
-      "agent_1"
-    ],
-    [
-      "agent_3",
       "agent_1",
       "agent_2"
+    ],
+    [
+      "agent_1",
+      "agent_2",
+      "agent_3"
     ]
   ],
   "consensus_result": {
@@ -192,12 +192,128 @@
     "agreed_principle": {
       "principle_id": 3,
       "principle_name": "Maximize the Average Income with a Floor Constraint",
-      "reasoning": "Fellow agents, I appreciate the strong commitment many of you have shown to protecting the worst-off members of our future society. Ensuring no one suffers extreme deprivation is undeniably a cornerstone of fairness and justice—especially since we do not know what position we ourselves will assume once chosen.\n\nAt the same time, we must also consider how to create incentives that encourage innovation, growth, and opportunity, so our society prospers overall rather than stagnates. Purely maximizi"
+      "reasoning": "Thank you, Agent_1 and Agent_2, for emphasizing the crucial importance of protecting the worst-off in our society. I fully agree that any just system must guard against the risk of severe hardship, especially since none of us knows our future position behind the veil of ignorance.\n\nI would like to build on this foundation by recognizing that while maximizing the minimum income is an essential priority, focusing solely on it can unintentionally limit overall prosperity and resources available for"
     },
     "dissenting_agents": [],
     "rounds_to_consensus": 1,
     "total_messages": 6
   },
+  "evaluation_responses": [
+    {
+      "agent_id": "agent_1",
+      "agent_name": "Agent_1",
+      "principle_evaluations": [
+        {
+          "principle_id": 1,
+          "principle_name": "Maximize the Minimum Income",
+          "satisfaction_rating": "agree",
+          "reasoning": "Ensuring the worst-off member of society is as well-off as possible is fundamentally just and provides strong protection against poverty. However, it may limit overall economic growth and incentives for productivity, which can reduce the total wealth available to everyone.",
+          "timestamp": "2025-07-11T15:33:10.233817"
+        },
+        {
+          "principle_id": 2,
+          "principle_name": "Maximize the Average Income",
+          "satisfaction_rating": "disagree",
+          "reasoning": "Maximizing total income without regard for distribution risks creating vast inequalities and may leave the poorest members destitute. This lack of safety net feels unjust, especially under the veil of ignorance where one could end up very disadvantaged.",
+          "timestamp": "2025-07-11T15:33:10.233828"
+        },
+        {
+          "principle_id": 3,
+          "principle_name": "Maximize the Average Income with a Floor Constraint",
+          "satisfaction_rating": "strongly_agree",
+          "reasoning": "This principle balances fairness and efficiency by guaranteeing a minimum safety net, ensuring no one falls below a certain income, while still allowing for maximizing total wealth. It reasonably protects the vulnerable without overly restricting incentives, making it the most pragmatic and just solution.",
+          "timestamp": "2025-07-11T15:33:10.233831"
+        },
+        {
+          "principle_id": 4,
+          "principle_name": "Maximize the Average Income with a Range Constraint",
+          "satisfaction_rating": "agree",
+          "reasoning": "Limiting income gaps can prevent excessive inequality and social unrest. However, such constraints may sometimes reduce total income growth more than necessary. While it promotes fairness, the rigid range constraint could limit economic incentives and innovation.",
+          "timestamp": "2025-07-11T15:33:10.233834"
+        }
+      ],
+      "overall_reasoning": "PRINCIPLE 1: Agree  \nREASONING 1: Ensuring the worst-off member of society is as well-off as possible is fundamentally just and provides strong protection against poverty. However, it may limit overall economic growth and incentives for productivity, which can reduce the total wealth available to everyone.\n\nPRINCIPLE 2: Disagree  \nREASONING 2: Maximizing total income without regard for distribution risks creating vast inequalities and may leave the poorest members destitute. This lack of safety net feels unjust, especially under the veil of ignorance where one could end up very disadvantaged.\n\nPRINCIPLE 3: Strongly Agree  \nREASONING 3: This principle balances fairness and efficiency by guaranteeing a minimum safety net, ensuring no one falls below a certain income, while still allowing for maximizing total wealth. It reasonably protects the vulnerable without overly restricting incentives, making it the most pragmatic and just solution.\n\nPRINCIPLE 4: Agree  \nREASONING 4: Limiting income gaps can prevent excessive inequality and social unrest. However, such constraints may sometimes reduce total income growth more than necessary. While it promotes fairness, the rigid range constraint could limit economic incentives and innovation.\n\nOVERALL REASONING: The evaluation process highlighted the importance of balancing equity and economic efficiency. Principles that protect the worst-off while allowing for growth are preferable under the veil of ignorance. The chosen hybrid with a floor constraint seems a wise middle path that supports societal stability and fairness, acknowledging some trade-offs but aiming for broadly just outcomes for all.",
+      "confidence_level": null,
+      "evaluation_duration": 5.028471231460571,
+      "timestamp": "2025-07-11T15:33:10.233843"
+    },
+    {
+      "agent_id": "agent_2",
+      "agent_name": "Agent_2",
+      "principle_evaluations": [
+        {
+          "principle_id": 1,
+          "principle_name": "Maximize the Minimum Income",
+          "satisfaction_rating": "agree",
+          "reasoning": "Maximizing the minimum income provides strong protection for the worst-off, which is a clear way to promote fairness from behind the veil of ignorance. However, it may sacrifice overall societal prosperity and innovation by focusing too narrowly on the worst-off.",
+          "timestamp": "2025-07-11T15:33:10.117433"
+        },
+        {
+          "principle_id": 2,
+          "principle_name": "Maximize the Average Income",
+          "satisfaction_rating": "disagree",
+          "reasoning": "Maximizing average income without regard for distribution risks significant inequality and potential social instability. From behind the veil of ignorance, one might end up in a very disadvantaged position despite high averages, making this principle less just.",
+          "timestamp": "2025-07-11T15:33:10.117494"
+        },
+        {
+          "principle_id": 3,
+          "principle_name": "Maximize the Average Income with a Floor Constraint",
+          "satisfaction_rating": "strongly_agree",
+          "reasoning": "This principle offers a balanced approach by guaranteeing a safety net for everyone while still encouraging economic efficiency and growth. It reduces risk for the worst-off and promotes overall prosperity, making it a just and pragmatic choice under uncertainty.",
+          "timestamp": "2025-07-11T15:33:10.117497"
+        },
+        {
+          "principle_id": 4,
+          "principle_name": "Maximize the Average Income with a Range Constraint",
+          "satisfaction_rating": "agree",
+          "reasoning": "Limiting the income gap can prevent extreme inequality and its negative social consequences. However, constraints on range might reduce incentives for top earners to innovate or invest, possibly lowering overall average income compared to principle 3.",
+          "timestamp": "2025-07-11T15:33:10.117499"
+        }
+      ],
+      "overall_reasoning": "PRINCIPLE 1: Agree  \nREASONING 1: Maximizing the minimum income provides strong protection for the worst-off, which is a clear way to promote fairness from behind the veil of ignorance. However, it may sacrifice overall societal prosperity and innovation by focusing too narrowly on the worst-off.\n\nPRINCIPLE 2: Disagree  \nREASONING 2: Maximizing average income without regard for distribution risks significant inequality and potential social instability. From behind the veil of ignorance, one might end up in a very disadvantaged position despite high averages, making this principle less just.\n\nPRINCIPLE 3: Strongly Agree  \nREASONING 3: This principle offers a balanced approach by guaranteeing a safety net for everyone while still encouraging economic efficiency and growth. It reduces risk for the worst-off and promotes overall prosperity, making it a just and pragmatic choice under uncertainty.\n\nPRINCIPLE 4: Agree  \nREASONING 4: Limiting the income gap can prevent extreme inequality and its negative social consequences. However, constraints on range might reduce incentives for top earners to innovate or invest, possibly lowering overall average income compared to principle 3.\n\nOVERALL REASONING: The evaluation clarified the trade-offs among fairness, economic efficiency, and social stability. The chosen principle (Maximize Average Income with a Floor Constraint) effectively balances protecting the least well-off with encouraging growth. It addresses risks behind the veil of ignorance while fostering prosperity, which makes it the most reasonable and just approach in our deliberation.",
+      "confidence_level": null,
+      "evaluation_duration": 4.397870063781738,
+      "timestamp": "2025-07-11T15:33:10.117590"
+    },
+    {
+      "agent_id": "agent_3",
+      "agent_name": "Agent_3",
+      "principle_evaluations": [
+        {
+          "principle_id": 1,
+          "principle_name": "Maximize the Minimum Income",
+          "satisfaction_rating": "agree",
+          "reasoning": "Maximizing the minimum income prioritizes the worst-off, which is very fair behind the veil of ignorance. However, it may sacrifice incentives for economic growth and limit overall prosperity. It provides security but might constrain total wealth creation.",
+          "timestamp": "2025-07-11T15:33:12.880697"
+        },
+        {
+          "principle_id": 2,
+          "principle_name": "Maximize the Average Income",
+          "satisfaction_rating": "disagree",
+          "reasoning": "Maximizing average income without regard to distribution risks significant inequality and leaves the worst-off vulnerable. While it may create wealth, the lack of safety nets is concerning, especially since roles are assigned randomly.",
+          "timestamp": "2025-07-11T15:33:12.880729"
+        },
+        {
+          "principle_id": 3,
+          "principle_name": "Maximize the Average Income with a Floor Constraint",
+          "satisfaction_rating": "strongly_agree",
+          "reasoning": "This principle balances equity and efficiency well by guaranteeing a minimum income floor to protect everyone, then seeking to maximize overall income. It reduces risk for the poor and encourages growth, making it a just compromise behind the veil.",
+          "timestamp": "2025-07-11T15:33:12.880737"
+        },
+        {
+          "principle_id": 4,
+          "principle_name": "Maximize the Average Income with a Range Constraint",
+          "satisfaction_rating": "agree",
+          "reasoning": "Limiting income disparity promotes social cohesion and fairness while maximizing income, but rigid range constraints could reduce incentives for innovation or effort at higher income levels. It is a sound hybrid but may be less flexible than Principle 3.",
+          "timestamp": "2025-07-11T15:33:12.880740"
+        }
+      ],
+      "overall_reasoning": "PRINCIPLE 1: Agree  \nREASONING 1: Maximizing the minimum income prioritizes the worst-off, which is very fair behind the veil of ignorance. However, it may sacrifice incentives for economic growth and limit overall prosperity. It provides security but might constrain total wealth creation.\n\nPRINCIPLE 2: Disagree  \nREASONING 2: Maximizing average income without regard to distribution risks significant inequality and leaves the worst-off vulnerable. While it may create wealth, the lack of safety nets is concerning, especially since roles are assigned randomly.\n\nPRINCIPLE 3: Strongly Agree  \nREASONING 3: This principle balances equity and efficiency well by guaranteeing a minimum income floor to protect everyone, then seeking to maximize overall income. It reduces risk for the poor and encourages growth, making it a just compromise behind the veil.\n\nPRINCIPLE 4: Agree  \nREASONING 4: Limiting income disparity promotes social cohesion and fairness while maximizing income, but rigid range constraints could reduce incentives for innovation or effort at higher income levels. It is a sound hybrid but may be less flexible than Principle 3.\n\nOVERALL REASONING: The evaluation process highlighted the importance of balancing fairness, security, and prosperity. Principle 3 emerged as most just because it ensures a safety net for all, which is crucial behind the veil of ignorance, while still allowing for maximizing average income. The compromise allowed unanimous agreement and avoided the pitfalls of extremes in distribution or efficiency.",
+      "confidence_level": null,
+      "evaluation_duration": 5.450823068618774,
+      "timestamp": "2025-07-11T15:33:12.880773"
+    }
+  ],
   "feedback_responses": [
     {
       "agent_id": "agent_1",
@@ -208,7 +324,7 @@
       "alternative_preference": null,
       "reasoning": "Generated based on final choice: Principle 3",
       "confidence_in_feedback": 0.7,
-      "timestamp": "2025-07-11T10:30:28.651284"
+      "timestamp": "2025-07-11T15:33:12.882853"
     },
     {
       "agent_id": "agent_2",
@@ -219,7 +335,7 @@
       "alternative_preference": null,
       "reasoning": "Generated based on final choice: Principle 3",
       "confidence_in_feedback": 0.7,
-      "timestamp": "2025-07-11T10:30:28.651321"
+      "timestamp": "2025-07-11T15:33:12.883529"
     },
     {
       "agent_id": "agent_3",
@@ -230,14 +346,14 @@
       "alternative_preference": null,
       "reasoning": "Generated based on final choice: Principle 3",
       "confidence_in_feedback": 0.7,
-      "timestamp": "2025-07-11T10:30:28.651325"
+      "timestamp": "2025-07-11T15:33:12.883536"
     }
   ],
   "performance_metrics": {
-    "total_duration_seconds": 68.577864,
-    "average_round_duration": 68.577864,
+    "total_duration_seconds": 69.265675,
+    "average_round_duration": 69.265675,
     "errors_encountered": 0
   },
-  "start_time": "2025-07-11T10:29:20.073464",
-  "end_time": "2025-07-11T10:30:28.651328"
+  "start_time": "2025-07-11T15:32:03.617864",
+  "end_time": "2025-07-11T15:33:12.883539"
 }
