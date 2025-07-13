@@ -242,6 +242,8 @@ This allows researchers to A/B test different consensus mechanisms, communicatio
 - Integration tests use the `quick_test` configuration
 - Test files follow the pattern `test_*.py`
 - Mock external API calls in tests
+- **Prefer simple, focused tests** over complex multi-purpose test scripts
+- Each test should verify one specific functionality clearly and concisely
 
 ### Configuration Management
 - All experiment parameters go in YAML files under `configs/`

@@ -50,6 +50,17 @@ class ConfigManager:
                 "personality": "You are an agent tasked to design a future society.",
                 "model": "gpt-4.1-mini"
             },
+            # Example temperature configurations (uncomment to use)
+            # "global_temperature": 0.0,  # Global temperature for all agents (for reproducible results)
+            # "defaults": {
+            #     "personality": "You are an agent tasked to design a future society.",
+            #     "model": "gpt-4.1-mini",
+            #     "temperature": 0.2  # Default temperature for agents
+            # },
+            # "agents": [
+            #     {"name": "Agent_1", "model": "gpt-4.1-mini", "temperature": 0.0},  # Agent-specific temperature
+            #     {"name": "Agent_2", "model": "gpt-4.1-mini"},  # Uses default temperature
+            # ],
             "output": {
                 "directory": "experiment_results",
                 "formats": ["json", "csv", "txt"],
@@ -197,7 +208,8 @@ class ConfigManager:
                 decision_rule=config_data["experiment"].get("decision_rule", "unanimity"),
                 timeout_seconds=config_data["experiment"].get("timeout_seconds", 300),
                 agents=agents,
-                defaults=defaults
+                defaults=defaults,
+                global_temperature=config_data.get("global_temperature")
             )
         except Exception as e:
             raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")
@@ -250,6 +262,13 @@ class ConfigManager:
             },
             "agents": [agent.dict(exclude_none=True) for agent in config.agents],
             "defaults": config.defaults.dict(),
+        }
+        
+        # Include global_temperature if specified
+        if config.global_temperature is not None:
+            config_data["global_temperature"] = config.global_temperature
+        
+        config_data.update({
             "output": {
                 "directory": "experiment_results",
                 "formats": ["json", "csv", "txt"],
@@ -261,7 +280,7 @@ class ConfigManager:
                 "trace_enabled": True,
                 "debug_mode": False
             }
-        }
+        })
         
         with open(config_path, 'w') as f:
             yaml.dump(config_data, f, indent=2, default_flow_style=False)

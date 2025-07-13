@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from typing import List, Optional
 # No longer need trace import - handled by main caller
+from agents.model_settings import ModelSettings
 from ..core.models import (
     ExperimentConfig,
     ExperimentResults,
@@ -132,10 +133,17 @@ class ExperimentOrchestrator:
         
         self.agents = create_deliberation_agents(
             agent_configs=self.config.agents,
-            defaults=self.config.defaults
+            defaults=self.config.defaults,
+            global_temperature=self.config.global_temperature
         )
         
-        self.moderator = create_discussion_moderator()
+        # Create ModelSettings for moderator (always create, never None)
+        if self.config.global_temperature is not None:
+            moderator_model_settings = ModelSettings(temperature=self.config.global_temperature)
+        else:
+            moderator_model_settings = ModelSettings()  # Empty but valid ModelSettings
+        
+        self.moderator = create_discussion_moderator(model_settings=moderator_model_settings)
         
         print(f"Created {len(self.agents)} deliberation agents")
         for agent in self.agents:

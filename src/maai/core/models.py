@@ -42,6 +42,7 @@ class AgentConfig(BaseModel):
     name: Optional[str] = Field(None, description="Human-readable name for the agent")
     personality: Optional[str] = Field(None, description="Agent's personality/role description")
     model: Optional[str] = Field(None, description="LLM model to use for this agent")
+    temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Temperature setting for this agent (0.0-2.0)")
 
 
 class DefaultConfig(BaseModel):
@@ -54,6 +55,7 @@ class DefaultConfig(BaseModel):
         default="gpt-4.1-nano",
         description="Default LLM model for agents"
     )
+    temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Default temperature for agents (0.0-2.0)")
 
 
 class PrincipleChoice(BaseModel):
@@ -120,6 +122,7 @@ class ExperimentConfig(BaseModel):
     timeout_seconds: int = Field(default=300, ge=30, description="Timeout per round in seconds")
     agents: List[AgentConfig] = Field(..., description="List of agent configurations")
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
+    global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
     
     @property
     def num_agents(self) -> int:

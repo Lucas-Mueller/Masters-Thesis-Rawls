@@ -38,7 +38,8 @@ def main():
     
     # Define test files
     test_files = [
-        "tests/test_core.py"
+        "tests/test_core.py",
+        "tests/test_temperature_configuration.py"
     ]
     
     # Check if API key is set
