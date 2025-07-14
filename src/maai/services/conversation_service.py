@@ -193,7 +193,6 @@ Please carefully evaluate each of these four principles of distributive justice.
 Consider that:
 - You are behind a 'veil of ignorance' - you don't know your future economic position
 - Your position (wealthy, middle class, or poor) will be randomly assigned AFTER the group decides
-- You should choose the principle that would be most fair and just for society as a whole
 
 After your evaluation, please:
 1. State which principle you choose (1, 2, 3, or 4)
@@ -341,11 +340,6 @@ STRATEGY: {memory_entry.strategy_update}
 
 {public_context}
 
-Please communicate with the other agents. Your goals:
-1. Work toward reaching unanimous agreement
-2. Present compelling arguments for your position
-3. Respond to others' concerns and proposals
-4. Be persuasive but respectful
 
 What do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).
 """

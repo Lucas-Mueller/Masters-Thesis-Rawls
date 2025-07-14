@@ -69,6 +69,7 @@ python run_config.py
 
 **Available Configurations**:
 - `quick_test`: 3 agents, 2 rounds (1-2 minutes)
+- `decomposed_memory_test`: 3 agents with decomposed memory strategy (test new memory system)
 - `lucas`: Custom configuration for specific research scenarios
 - `smart`: Different AI models with custom personalities
 - `default`: Standard experimental setup
@@ -119,6 +120,18 @@ python example_service_usage.py
 - Personalities can be full text descriptions or references to saved personality templates
 - Default personality: "You are an agent tasked to design a future society."
 
+**Memory Strategy System**:
+- Configure how agents generate and manage private memories using `memory_strategy` field
+- Available strategies:
+  - `"full"`: Include all previous memory entries (default)
+  - `"recent"`: Include only the most recent N memory entries
+  - `"decomposed"`: Use focused, sequential prompts for improved memory quality
+- Decomposed strategy breaks memory generation into three focused steps:
+  1. **Factual Recap**: "What actually happened?" (objective events only)
+  2. **Agent Analysis**: "Focus on ONE agent's behavior" (specific observations)
+  3. **Strategic Action**: "What's ONE concrete thing you could do next?" (actionable strategy)
+- Decomposed strategy reduces cognitive overload and produces more specific, actionable memories
+
 **Example Configuration Structure**:
 ```yaml
 experiment_id: my_experiment
@@ -126,6 +139,9 @@ experiment:
   max_rounds: 5
   decision_rule: unanimity
   timeout_seconds: 300
+
+# Memory strategy configuration
+memory_strategy: "decomposed"
 
 agents:
   - name: "Agent_1"
@@ -219,7 +235,7 @@ from src.maai.services.experiment_orchestrator import ExperimentOrchestrator
 orchestrator = ExperimentOrchestrator(
     consensus_strategy="threshold",  # or "id_match", "semantic"
     conversation_pattern="sequential",  # or "random", "hierarchical"
-    memory_strategy="recent"  # or "full", "selective"
+    memory_strategy="decomposed"  # or "full", "recent"
 )
 
 # Configure different experimental conditions

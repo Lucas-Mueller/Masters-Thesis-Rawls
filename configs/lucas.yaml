@@ -1,4 +1,5 @@
 experiment_id: Lucas Test
+global_temperature: 0.0 
 
 experiment:
   max_rounds: 3

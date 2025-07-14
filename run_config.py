@@ -24,7 +24,7 @@ from maai.config.manager import load_config_from_file
 from maai.core.models import all_models_are_openai
 
 # CONFIG_NAME must be defined before the tracing configuration function
-CONFIG_NAME = "temperature_test"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default", "philosophical_debate", "economic_perspectives", "mixed_defaults"
+CONFIG_NAME = "decomposed_memory_test"  # Options: "lucas", "quick_test", "large_group", "multi_model", "default", "philosophical_debate", "economic_perspectives", "mixed_defaults"
 
 # Pre-configure OpenAI tracing based on the config
 def configure_openai_tracing():

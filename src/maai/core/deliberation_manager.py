@@ -20,7 +20,7 @@ from .models import (
 from ..services.experiment_orchestrator import ExperimentOrchestrator
 from ..services.consensus_service import ConsensusService
 from ..services.conversation_service import ConversationService
-from ..services.memory_service import MemoryService
+from ..services.memory_service import MemoryService, create_memory_strategy
 
 # Load environment variables (like API keys) from .env file
 load_dotenv()
@@ -159,9 +159,12 @@ async def run_single_experiment(config: ExperimentConfig) -> ExperimentResults:
     
     # CONTEXT MANAGER: The 'with' statement ensures the trace is properly closed
     with trace(trace_name):
-        # FACTORY PATTERN: Create a manager with default services
-        # This is the most common way users will run experiments
-        manager = DeliberationManager(config)
+        # FACTORY PATTERN: Create services based on configuration
+        memory_strategy = create_memory_strategy(config.memory_strategy)
+        memory_service = MemoryService(memory_strategy=memory_strategy)
+        
+        # Create a manager with configured services
+        manager = DeliberationManager(config, memory_service=memory_service)
         
         # DELEGATION: Let the manager handle all the complex work
         return await manager.run_experiment()

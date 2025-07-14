@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class EvaluationService:
     """Service for conducting post-consensus principle evaluations."""
     
-    def __init__(self, max_concurrent_evaluations: int = 10):
+    def __init__(self, max_concurrent_evaluations: int = 50):
         """
         Initialize the evaluation service.
         

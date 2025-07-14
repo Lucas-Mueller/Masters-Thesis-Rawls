@@ -123,6 +123,7 @@ class ExperimentConfig(BaseModel):
     agents: List[AgentConfig] = Field(..., description="List of agent configurations")
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
+    memory_strategy: str = Field(default="full", description="Memory strategy: full|recent|decomposed")
     
     @property
     def num_agents(self) -> int:

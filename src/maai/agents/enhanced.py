@@ -32,12 +32,9 @@ You are participating in a deliberation about distributive justice principles.
 
 {get_all_principles_text()}
 
+IMPORTANT: 
 Your task is to:
-1. Carefully consider each principle and its implications
-2. Engage in thoughtful discussion with other agents
-3. Provide clear reasoning for your choices
-4. Be open to changing your mind based on compelling arguments
-5. Work toward reaching unanimous agreement with the group
+To agree with the best principle for your society 
 
 Important context:
 - You are behind a "veil of ignorance" - you don't know what economic position you'll have

@@ -209,7 +209,8 @@ class ConfigManager:
                 timeout_seconds=config_data["experiment"].get("timeout_seconds", 300),
                 agents=agents,
                 defaults=defaults,
-                global_temperature=config_data.get("global_temperature")
+                global_temperature=config_data.get("global_temperature"),
+                memory_strategy=config_data.get("memory_strategy", "full")
             )
         except Exception as e:
             raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")
