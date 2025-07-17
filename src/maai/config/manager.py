@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 import glob
 
-from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig
+from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig, OutputConfig
 
 
 class ConfigManager:
@@ -176,6 +176,10 @@ class ConfigManager:
         defaults_data = config_data.get("defaults", {})
         defaults = DefaultConfig(**defaults_data)
         
+        # Parse output configuration
+        output_data = config_data.get("output", {})
+        output = OutputConfig(**output_data)
+        
         # Parse agent configurations
         agents_data = config_data["agents"]
         if not agents_data:
@@ -210,7 +214,8 @@ class ConfigManager:
                 agents=agents,
                 defaults=defaults,
                 global_temperature=config_data.get("global_temperature"),
-                memory_strategy=config_data.get("memory_strategy", "full")
+                memory_strategy=config_data.get("memory_strategy", "full"),
+                output=output
             )
         except Exception as e:
             raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")
@@ -269,13 +274,10 @@ class ConfigManager:
         if config.global_temperature is not None:
             config_data["global_temperature"] = config.global_temperature
         
+        # Include output configuration
+        config_data["output"] = config.output.dict()
+        
         config_data.update({
-            "output": {
-                "directory": "experiment_results",
-                "formats": ["json", "csv", "txt"],
-                "include_feedback": True,
-                "include_transcript": True
-            },
             "performance": {
                 "parallel_feedback": True,
                 "trace_enabled": True,
@@ -334,18 +336,19 @@ class ConfigManager:
 
 
 
-def load_config_from_file(config_file: str, results_dir: str = "experiment_results") -> ExperimentConfig:
+def load_config_from_file(config_file: str, results_dir: str = "experiment_results", config_dir: str = "configs") -> ExperimentConfig:
     """
     Convenience function to load configuration from a file.
     
     Args:
         config_file: Path to YAML config file or config name
         results_dir: Directory where experiment results are stored
+        config_dir: Directory where configuration files are stored
         
     Returns:
         ExperimentConfig object
     """
-    manager = ConfigManager(results_dir=results_dir)
+    manager = ConfigManager(config_dir=config_dir, results_dir=results_dir)
     
     # If it's a path, extract the name
     if "/" in config_file or "\\" in config_file:

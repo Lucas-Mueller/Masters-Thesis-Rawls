@@ -68,6 +68,14 @@ class LoggingConfig(BaseModel):
     include_processing_times: bool = Field(default=True, description="Include timing information for all operations")
 
 
+class OutputConfig(BaseModel):
+    """Configuration for experiment output."""
+    directory: str = Field(default="experiment_results", description="Output directory for experiment files")
+    formats: List[str] = Field(default=["json", "csv", "txt"], description="Export formats")
+    include_feedback: bool = Field(default=True, description="Include feedback in export")
+    include_transcript: bool = Field(default=True, description="Include transcript in export")
+
+
 class PrincipleChoice(BaseModel):
     """Represents an agent's choice of distributive justice principle."""
     principle_id: int = Field(..., ge=1, le=4, description="Principle ID (1-4)")
@@ -135,6 +143,7 @@ class ExperimentConfig(BaseModel):
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
     memory_strategy: str = Field(default="full", description="Memory strategy: full|recent|decomposed")
     logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
+    output: OutputConfig = Field(default_factory=OutputConfig, description="Output configuration")
     
     @property
     def num_agents(self) -> int:

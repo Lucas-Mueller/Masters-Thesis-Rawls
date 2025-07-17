@@ -239,14 +239,14 @@ class MemoryService:
             # Get previous rounds (not current round)
             previous_responses = [r for r in transcript if r.round_number < round_number]
             for response in previous_responses[-10:]:  # Last 10 messages
-                context_parts.append(f"Round {response.round_number} - {response.agent_name}: {response.public_message[:200]}...")
+                context_parts.append(f"Round {response.round_number} - {response.agent_name}: {response.public_message}")
         
         # Add current round so far (speakers before this agent)
         current_round_responses = [r for r in transcript if r.round_number == round_number]
         if current_round_responses:
             context_parts.append(f"\nCURRENT ROUND {round_number} SO FAR:")
             for response in current_round_responses:
-                context_parts.append(f"{response.agent_name}: {response.public_message[:200]}...")
+                context_parts.append(f"{response.agent_name}: {response.public_message}")
         
         # Add agent's own memory (filtered by strategy)
         agent_memory = self.get_agent_memory(agent_id)
@@ -264,7 +264,7 @@ class MemoryService:
             relevant_memories = relevant_memories[-max_entries:]
             
             for entry in relevant_memories:
-                context_parts.append(f"Round {entry.round_number} Strategy: {entry.strategy_update[:100]}...")
+                context_parts.append(f"Round {entry.round_number} Strategy: {entry.strategy_update}")
         
         return "\n".join(context_parts)
     
@@ -444,7 +444,7 @@ class DecomposedMemoryStrategy(MemoryStrategy):
             return "No recent conversation to summarize."
         
         recent_transcript = "\n".join([
-            f"Round {r.round_number} - {r.agent_name}: {r.public_message[:300]}..."
+            f"Round {r.round_number} - {r.agent_name}: {r.public_message}"
             for r in recent_responses
         ])
         

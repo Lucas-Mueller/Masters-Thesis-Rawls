@@ -207,48 +207,20 @@ Format your response clearly with your final choice at the end.
             import time
             start_time = time.time()
             
-            # Log input prompt
-            if self.logger:
-                self.logger.log_agent_interaction(
-                    agent_id=agent.agent_id,
-                    agent_name=agent.name,
-                    round_num=0,
-                    speaking_position=position,
-                    input_prompt=evaluation_prompt,
-                    model_used=getattr(agent, 'model', 'unknown'),
-                    temperature=getattr(agent, 'temperature', None)
-                )
-            
             result = await Runner.run(agent, evaluation_prompt)
             response_text = ItemHelpers.text_message_outputs(result.new_items)
             processing_time_ms = (time.time() - start_time) * 1000
             
-            # Log raw response
-            if self.logger:
-                self.logger.log_agent_interaction(
-                    agent_id=agent.agent_id,
-                    agent_name=agent.name,
-                    round_num=0,
-                    speaking_position=position,
-                    raw_llm_response=response_text,
-                    processing_time_ms=processing_time_ms
-                )
-            
             choice = await self._extract_principle_choice(response_text, agent.agent_id, agent.name)
             
-            # Log parsed response
+            # Log initial evaluation (round_0) with new unified format
             if self.logger:
-                self.logger.log_agent_interaction(
+                self.logger.log_initial_evaluation(
                     agent_id=agent.agent_id,
-                    agent_name=agent.name,
-                    round_num=0,
-                    speaking_position=position,
-                    parsed_response={
-                        "principle_id": choice.principle_id,
-                        "principle_name": choice.principle_name,
-                        "reasoning": choice.reasoning,
-                        "public_message": response_text
-                    }
+                    input_prompt=evaluation_prompt,
+                    raw_response=response_text,
+                    rating_likert=choice.principle_name,
+                    rating_numeric=choice.principle_id
                 )
             
             agent.current_choice = choice
@@ -315,6 +287,79 @@ Format your response clearly with your final choice at the end.
         for response in initial_responses:
             ratings = [eval.satisfaction_rating.to_display() for eval in response.principle_evaluations]
             print(f"    {response.agent_name}: {ratings}")
+            
+            # Log structured initial evaluation data
+            if self.logger:
+                # Create principle ratings dictionary
+                principle_ratings = {}
+                for eval in response.principle_evaluations:
+                    principle_ratings[str(eval.principle_id)] = {
+                        "rating": eval.satisfaction_rating.to_numeric(),
+                        "rating_text": eval.satisfaction_rating.to_display(),
+                        "principle_name": eval.principle_name,
+                        "reasoning": eval.reasoning
+                    }
+                
+                # Find the chosen principle (highest rating or explicit choice)
+                if response.principle_evaluations:
+                    chosen_principle = max(response.principle_evaluations, 
+                                         key=lambda x: x.satisfaction_rating.to_numeric())
+                    
+                    self.logger.log_initial_evaluation(
+                        agent_id=response.agent_id,
+                        input_prompt="[Initial Likert Assessment - details in principle_ratings]",
+                        raw_response=response.overall_reasoning,
+                        rating_likert=chosen_principle.principle_name,
+                        rating_numeric=chosen_principle.principle_id,
+                        principle_ratings=principle_ratings
+                    )
+                else:
+                    # Fallback if no principle evaluations
+                    self.logger.log_initial_evaluation(
+                        agent_id=response.agent_id,
+                        input_prompt="[Initial Likert Assessment - details in principle_ratings]",
+                        raw_response=response.overall_reasoning,
+                        rating_likert="Unknown",
+                        rating_numeric=1,
+                        principle_ratings=principle_ratings
+                    )
+        
+        # Set agent.current_choice for each agent based on their highest-rated principle
+        # and create DeliberationResponse objects for transcript
+        deliberation_responses = []
+        
+        for agent in agents:
+            # Find the corresponding response for this agent
+            agent_response = next((r for r in initial_responses if r.agent_id == agent.agent_id), None)
+            if agent_response and agent_response.principle_evaluations:
+                # Find the highest-rated principle
+                chosen_principle = max(agent_response.principle_evaluations, 
+                                     key=lambda x: x.satisfaction_rating.to_numeric())
+                
+                # Create PrincipleChoice object
+                from ..core.models import PrincipleChoice, DeliberationResponse
+                agent.current_choice = PrincipleChoice(
+                    principle_id=chosen_principle.principle_id,
+                    principle_name=chosen_principle.principle_name,
+                    reasoning=chosen_principle.reasoning
+                )
+                
+                # Create DeliberationResponse for consensus detection
+                deliberation_response = DeliberationResponse(
+                    agent_id=agent.agent_id,
+                    agent_name=agent.name,
+                    public_message=agent_response.overall_reasoning,
+                    private_memory_entry=None,
+                    updated_choice=agent.current_choice,
+                    round_number=0,  # Round 0 for initial evaluation
+                    timestamp=datetime.now(),
+                    speaking_position=0
+                )
+                deliberation_responses.append(deliberation_response)
+        
+        # Add to transcript for consensus detection
+        if hasattr(self, 'transcript') and self.transcript is not None:
+            self.transcript.extend(deliberation_responses)
         
         return initial_responses
     
@@ -337,10 +382,29 @@ Format your response clearly with your final choice at the end.
             agent = round_context.get_agent_by_id(agent_id)
             print(f"    {agent.name} (Position {position})")
             
+            # Log round start with unified format
+            if self.logger:
+                public_history = self._build_public_context(agent_id, round_context)
+                self.logger.log_round_start(
+                    agent_id=agent.agent_id,
+                    round_num=round_context.round_number,
+                    speaking_order=position,
+                    public_history=public_history
+                )
+            
             # 1. Update agent memory
             private_memory_entry = await memory_service.update_agent_memory(
                 agent, round_context.round_number, position, round_context.transcript
             )
+            
+            # Log memory generation
+            if self.logger:
+                self.logger.log_memory_generation(
+                    agent_id=agent.agent_id,
+                    round_num=round_context.round_number,
+                    memory_content=private_memory_entry.situation_assessment,
+                    strategy=private_memory_entry.strategy_update
+                )
             
             # 2. Generate public communication
             public_message = await self._generate_public_communication(
@@ -350,6 +414,15 @@ Format your response clearly with your final choice at the end.
             # 3. Extract principle choice
             updated_choice = await self._extract_principle_choice(public_message, agent.agent_id, agent.name, moderator)
             agent.current_choice = updated_choice
+            
+            # Log communication and choice
+            if self.logger:
+                self.logger.log_communication(
+                    agent_id=agent.agent_id,
+                    round_num=round_context.round_number,
+                    communication=public_message,
+                    choice=updated_choice.principle_name
+                )
             
             # 4. Create response entry
             response = DeliberationResponse(
@@ -367,7 +440,7 @@ Format your response clearly with your final choice at the end.
             round_context.transcript.append(response)
             
             print(f"      Chose Principle {updated_choice.principle_id}")
-            print(f"      Strategy: {private_memory_entry.strategy_update[:100]}...")
+            print(f"      Strategy: {private_memory_entry.strategy_update}")
         
         return new_responses
     
@@ -393,31 +466,28 @@ What do you want to say to the group? End with your current principle choice (1,
         import time
         start_time = time.time()
         
-        # Log input prompt
+        # Log interaction with unified format
         if self.logger:
             self.logger.log_agent_interaction(
                 agent_id=agent.agent_id,
-                agent_name=agent.name,
                 round_num=round_context.round_number,
-                speaking_position=getattr(agent, '_current_speaking_position', 0),
+                interaction_type="communication",
                 input_prompt=communication_prompt,
-                model_used=getattr(agent, 'model', 'unknown'),
-                temperature=getattr(agent, 'temperature', None)
+                sequence_num=1  # Communication generation step
             )
         
         comm_result = await Runner.run(agent, communication_prompt)
         response_text = ItemHelpers.text_message_outputs(comm_result.new_items)
         processing_time_ms = (time.time() - start_time) * 1000
         
-        # Log raw response
+        # Log response with unified format
         if self.logger:
             self.logger.log_agent_interaction(
                 agent_id=agent.agent_id,
-                agent_name=agent.name,
                 round_num=round_context.round_number,
-                speaking_position=getattr(agent, '_current_speaking_position', 0),
-                raw_llm_response=response_text,
-                processing_time_ms=processing_time_ms
+                interaction_type="communication",
+                raw_response=response_text,
+                sequence_num=1  # Communication generation step
             )
         
         return response_text
@@ -431,7 +501,7 @@ What do you want to say to the group? End with your current principle choice (1,
         if current_round_responses:
             context_parts.append(f"SPEAKERS IN THIS ROUND SO FAR:")
             for response in current_round_responses:
-                context_parts.append(f"{response.agent_name}: {response.public_message[:300]}...")
+                context_parts.append(f"{response.agent_name}: {response.public_message}")
         
         # Agent's current choice
         agent = round_context.get_agent_by_id(agent_id)
@@ -478,7 +548,7 @@ If unclear, respond with the number that seems most aligned with their reasoning
         return PrincipleChoice(
             principle_id=principle_id,
             principle_name=principle_info["name"],
-            reasoning=response_text[:500]  # Truncate for storage
+            reasoning=response_text  # Full reasoning text, no truncation
         )
     
     def get_speaking_orders(self) -> List[List[str]]:

@@ -9,13 +9,17 @@ from typing import List, Dict, Any
 from run_experiment import run_experiment
 
 
-async def run_batch(config_paths: List[str], max_concurrent: int = 3) -> List[Dict[str, Any]]:
+async def run_batch(config_paths: List[str], max_concurrent: int = 3, output_dir: str = None, config_dir: str = "configs") -> List[Dict[str, Any]]:
     """
     Run multiple experiments in parallel.
     
     Args:
         config_paths: List of configuration file paths or names
         max_concurrent: Maximum number of concurrent experiments
+        output_dir: Optional custom output directory for experiment logs. 
+                   Defaults to "experiment_results" if not specified.
+        config_dir: Directory where configuration files are stored.
+                   Defaults to "configs" if not specified.
     
     Returns:
         List of experiment results dictionaries
@@ -30,7 +34,7 @@ async def run_batch(config_paths: List[str], max_concurrent: int = 3) -> List[Di
             print(f"🧪 [{index+1}/{len(config_paths)}] Starting: {config_path}")
             
             start_time = time.time()
-            result = await run_experiment(config_path)
+            result = await run_experiment(config_path, output_dir, config_dir)
             duration = time.time() - start_time
             
             # Add timing info
@@ -39,6 +43,7 @@ async def run_batch(config_paths: List[str], max_concurrent: int = 3) -> List[Di
             
             if result["success"]:
                 print(f"✅ [{index+1}/{len(config_paths)}] SUCCESS: {result['experiment_id']} ({duration:.1f}s)")
+                print(f"   Output saved to: {result['output_path']}")
             else:
                 print(f"❌ [{index+1}/{len(config_paths)}] FAILED: {config_path} ({duration:.1f}s)")
                 print(f"   Error: {result['error']}")
@@ -53,6 +58,10 @@ async def run_batch(config_paths: List[str], max_concurrent: int = 3) -> List[Di
     
     # Execute all experiments in parallel
     print(f"🚀 Starting batch execution: {len(config_paths)} experiments, max {max_concurrent} concurrent")
+    if output_dir:
+        print(f"📁 Output directory: {output_dir}")
+    else:
+        print(f"📁 Output directory: experiment_results (default)")
     batch_start_time = time.time()
     
     results = await asyncio.gather(*tasks, return_exceptions=True)
@@ -97,69 +106,21 @@ async def run_batch(config_paths: List[str], max_concurrent: int = 3) -> List[Di
     return processed_results
 
 
-def run_batch_sync(config_paths: List[str], max_concurrent: int = 3) -> List[Dict[str, Any]]:
+def run_batch_sync(config_paths: List[str], max_concurrent: int = 3, output_dir: str = None, config_dir: str = "configs") -> List[Dict[str, Any]]:
     """
     Synchronous wrapper for run_batch().
     
     Args:
         config_paths: List of configuration file paths or names
         max_concurrent: Maximum number of concurrent experiments
+        output_dir: Optional custom output directory for experiment logs
+        config_dir: Directory where configuration files are stored
     
     Returns:
         List of experiment results dictionaries
     """
-    return asyncio.run(run_batch(config_paths, max_concurrent))
+    return asyncio.run(run_batch(config_paths, max_concurrent, output_dir, config_dir))
 
 
-def run_test_batch(count: int = 3, max_concurrent: int = 2) -> List[Dict[str, Any]]:
-    """
-    Run a test batch with the specified number of test configurations.
-    
-    Args:
-        count: Number of test experiments to run
-        max_concurrent: Maximum concurrent experiments
-    
-    Returns:
-        List of experiment results
-    """
-    
-    # Create simple test configurations
-    test_configs = []
-    for i in range(count):
-        test_configs.append(f"test_config_{i+1}")
-    
-    print(f"🧪 Running test batch with {count} experiments")
-    return run_batch_sync(test_configs, max_concurrent)
 
 
-if __name__ == "__main__":
-    # Simple CLI interface
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="Run multiple experiments in parallel")
-    parser.add_argument("configs", nargs="+", help="Configuration file paths or names")
-    parser.add_argument("--max-concurrent", type=int, default=3, help="Maximum concurrent experiments")
-    parser.add_argument("--test", action="store_true", help="Run test batch instead")
-    parser.add_argument("--test-count", type=int, default=3, help="Number of test experiments")
-    
-    args = parser.parse_args()
-    
-    if args.test:
-        results = run_test_batch(args.test_count, args.max_concurrent)
-    else:
-        results = run_batch_sync(args.configs, args.max_concurrent)
-    
-    # Simple summary
-    successful = sum(1 for r in results if r["success"])
-    failed = len(results) - successful
-    
-    print(f"\n📊 Final Results:")
-    print(f"   ✅ Successful: {successful}")
-    print(f"   ❌ Failed: {failed}")
-    print(f"   📈 Success rate: {successful/len(results)*100:.1f}%")
-    
-    if failed > 0:
-        print("\n❌ Failed experiments:")
-        for result in results:
-            if not result["success"]:
-                print(f"   - {result['experiment_id']}: {result['error']}")

@@ -1,6 +1,6 @@
 """
-ExperimentLogger for comprehensive single-file experiment data collection.
-Collects all experiment data in memory and exports single JSON file at completion.
+ExperimentLogger for unified agent-centric JSON logging system.
+Replaces all legacy feedback and conversation tracking mechanisms.
 """
 
 import json
@@ -14,8 +14,8 @@ from ..core.models import ExperimentConfig, ConsensusResult, PrincipleChoice
 
 class ExperimentLogger:
     """
-    Simple in-memory data collector that exports single comprehensive JSON file.
-    Replaces the multi-file export system with single-file solution.
+    Unified agent-centric logging system that captures all experiment data
+    organized by agent ID with comprehensive round-by-round tracking.
     """
     
     def __init__(self, experiment_id: str, config: ExperimentConfig):
@@ -23,218 +23,253 @@ class ExperimentLogger:
         self.config = config
         self.start_time = datetime.now()
         
-        # In-memory data collection
-        self.agent_interactions: List[Dict[str, Any]] = []
-        self.memory_events: List[Dict[str, Any]] = []
-        self.round_events: List[Dict[str, Any]] = []
-        self.evaluation_data = {"initial": [], "final": []}
-        self.consensus_result: Optional[ConsensusResult] = None
-        self.performance_metrics: Dict[str, Any] = {}
+        # Agent-centric data structure
+        self.agent_data: Dict[str, Dict[str, Any]] = {}
+        
+        # Experiment metadata
+        self.experiment_metadata = {
+            "experiment_id": experiment_id,
+            "start_time": self.start_time.isoformat(),
+            "end_time": None,
+            "total_duration_seconds": None,
+            "max_rounds": config.max_rounds,
+            "decision_rule": config.decision_rule,
+            "final_consensus": None
+        }
+        
+        # Initialize agents
+        self._initialize_agents()
         
         # Logging configuration
         self.logging_config = config.logging
-        self.capture_raw_inputs = self.logging_config.capture_raw_inputs
-        self.capture_raw_outputs = self.logging_config.capture_raw_outputs
-        self.capture_memory_context = self.logging_config.capture_memory_context
-        self.capture_memory_steps = self.logging_config.capture_memory_steps
-        self.include_processing_times = self.logging_config.include_processing_times
+        
+    def _initialize_agents(self):
+        """Initialize agent data structures."""
+        # Get agent configurations
+        agent_configs = self.config.agents
+        defaults = self.config.defaults
+        
+        for i, agent_config in enumerate(agent_configs):
+            # Use the same agent_id format as the actual DeliberationAgent objects
+            agent_id = f"agent_{i+1}"
+            
+            # Initialize agent overall data
+            self.agent_data[agent_id] = {
+                "overall": {
+                    "model": agent_config.model or defaults.model,
+                    "persona": agent_config.personality or defaults.personality,
+                    "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+                    "temperature": self.config.global_temperature or agent_config.temperature or getattr(defaults, "temperature", None)
+                }
+            }
     
-    def log_agent_interaction(self, agent_id: str, agent_name: str, round_num: int, 
-                             speaking_position: int, input_prompt: str = None, 
-                             raw_llm_response: str = None, parsed_response: Dict = None,
-                             processing_time_ms: float = None, model_used: str = None,
-                             temperature: float = None):
-        """Log agent interaction data (prompts, responses, timing)."""
-        interaction = {
-            "timestamp": datetime.now().isoformat(),
-            "agent_id": agent_id,
-            "agent_name": agent_name,
-            "round": round_num,
-            "speaking_position": speaking_position
+    def log_initial_evaluation(self, agent_id: str, input_prompt: str, 
+                             raw_response: str, rating_likert: str = None, 
+                             rating_numeric: int = None, principle_ratings: dict = None):
+        """Log initial evaluation (round_0) for an agent."""
+        if agent_id not in self.agent_data:
+            self.agent_data[agent_id] = {"overall": {}}
+            
+        round_data = {
+            "input": input_prompt,
+            "output": raw_response,
+            "rating_likert": rating_likert,
+            "rating_numeric": rating_numeric
         }
         
-        if self.capture_raw_inputs and input_prompt:
-            interaction["input_prompt"] = input_prompt
+        # Add structured principle ratings if provided
+        if principle_ratings:
+            round_data["principle_ratings"] = principle_ratings
             
-        if self.capture_raw_outputs and raw_llm_response:
-            interaction["raw_llm_response"] = raw_llm_response
-            
-        if parsed_response:
-            interaction["parsed_response"] = parsed_response
-            
-        if self.include_processing_times and processing_time_ms is not None:
-            interaction["processing_time_ms"] = processing_time_ms
-            
-        if model_used:
-            interaction["model_used"] = model_used
-            
-        if temperature is not None:
-            interaction["temperature"] = temperature
-            
-        self.agent_interactions.append(interaction)
+        self.agent_data[agent_id]["round_0"] = round_data
     
-    def log_memory_event(self, agent_id: str, round_num: int, memory_context: str = None,
-                        memory_strategy: str = None, decomposed_steps: List[Dict] = None,
-                        final_memory_entry: Dict = None):
-        """Log memory system events (context, decomposed steps, final entry)."""
-        memory_event = {
-            "timestamp": datetime.now().isoformat(),
-            "agent_id": agent_id,
-            "round": round_num
+    def log_round_start(self, agent_id: str, round_num: int, speaking_order: int = None,
+                       public_history: str = None):
+        """Initialize round data for an agent."""
+        if agent_id not in self.agent_data:
+            self.agent_data[agent_id] = {"overall": {}}
+            
+        round_key = f"round_{round_num}"
+        if round_key not in self.agent_data[agent_id]:
+            self.agent_data[agent_id][round_key] = {}
+            
+        if speaking_order is not None:
+            self.agent_data[agent_id][round_key]["speaking_order"] = speaking_order
+            
+        if public_history:
+            self.agent_data[agent_id][round_key]["public_history"] = public_history
+    
+    def log_memory_generation(self, agent_id: str, round_num: int, 
+                            memory_content: str, strategy: str = None):
+        """Log memory generation for an agent in a specific round."""
+        round_key = f"round_{round_num}"
+        if agent_id not in self.agent_data:
+            self.agent_data[agent_id] = {"overall": {}}
+        if round_key not in self.agent_data[agent_id]:
+            self.agent_data[agent_id][round_key] = {}
+            
+        self.agent_data[agent_id][round_key]["memory"] = memory_content
+        if strategy:
+            self.agent_data[agent_id][round_key]["strategy"] = strategy
+    
+    def log_communication(self, agent_id: str, round_num: int, 
+                         communication: str, choice: str = None):
+        """Log public communication and choice for an agent."""
+        round_key = f"round_{round_num}"
+        if agent_id not in self.agent_data:
+            self.agent_data[agent_id] = {"overall": {}}
+        if round_key not in self.agent_data[agent_id]:
+            self.agent_data[agent_id][round_key] = {}
+            
+        self.agent_data[agent_id][round_key]["communication"] = communication
+        if choice:
+            self.agent_data[agent_id][round_key]["choice"] = choice
+    
+    def log_agent_interaction(self, agent_id: str, round_num: int, 
+                            interaction_type: str, input_prompt: str = None,
+                            raw_response: str = None, sequence_num: int = 0):
+        """Log individual agent interactions with sequence tracking."""
+        round_key = f"round_{round_num}"
+        if agent_id not in self.agent_data:
+            self.agent_data[agent_id] = {"overall": {}}
+        if round_key not in self.agent_data[agent_id]:
+            self.agent_data[agent_id][round_key] = {}
+            
+        # Initialize input/output dicts if they don't exist
+        if "input_dict" not in self.agent_data[agent_id][round_key]:
+            self.agent_data[agent_id][round_key]["input_dict"] = {}
+        if "output_dict" not in self.agent_data[agent_id][round_key]:
+            self.agent_data[agent_id][round_key]["output_dict"] = {}
+            
+        # Store input/output with sequence number
+        if input_prompt:
+            self.agent_data[agent_id][round_key]["input_dict"][str(sequence_num)] = input_prompt
+        if raw_response:
+            self.agent_data[agent_id][round_key]["output_dict"][str(sequence_num)] = raw_response
+    
+    def log_final_consensus(self, agent_id: str, agreement_reached: bool,
+                          agreement_choice: str = None, num_rounds: int = None,
+                          satisfaction: int = None):
+        """Log final consensus data for an agent."""
+        if agent_id not in self.agent_data:
+            self.agent_data[agent_id] = {"overall": {}}
+            
+        self.agent_data[agent_id]["final"] = {
+            "agreement_reached": agreement_reached,
+            "agreement_choice": agreement_choice,
+            "num_rounds": num_rounds,
+            "satisfaction": satisfaction
         }
+    
+    def log_experiment_completion(self, consensus_result: ConsensusResult = None,
+                                total_rounds: int = None):
+        """Log overall experiment completion data."""
+        end_time = datetime.now()
+        self.experiment_metadata["end_time"] = end_time.isoformat()
+        self.experiment_metadata["total_duration_seconds"] = (end_time - self.start_time).total_seconds()
         
-        if self.capture_memory_context and memory_context:
-            memory_event["memory_context_provided"] = memory_context
-            memory_event["context_length_chars"] = len(memory_context)
-            
-        if memory_strategy:
-            memory_event["memory_strategy"] = memory_strategy
-            
-        if self.capture_memory_steps and decomposed_steps:
-            memory_event["decomposed_steps"] = decomposed_steps
-            
-        if final_memory_entry:
-            memory_event["final_memory_entry"] = final_memory_entry
-            
-        self.memory_events.append(memory_event)
+        if consensus_result:
+            self.experiment_metadata["final_consensus"] = {
+                "agreement_reached": consensus_result.unanimous,
+                "agreed_principle": consensus_result.agreed_principle.principle_name if consensus_result.agreed_principle else None,
+                "num_rounds": total_rounds or consensus_result.rounds_to_consensus,
+                "total_messages": getattr(consensus_result, 'total_messages', 0)
+            }
     
-    def log_round_event(self, round_num: int, start_time: datetime = None, 
-                       end_time: datetime = None, speaking_order: List[str] = None,
-                       agent_choices_start: List[int] = None, agent_choices_end: List[int] = None,
-                       consensus_check_result: Dict = None):
-        """Log round-level events (timing, choices, consensus)."""
-        round_event = {
-            "round": round_num
-        }
-        
-        if start_time:
-            round_event["start_time"] = start_time.isoformat()
-            
-        if end_time:
-            round_event["end_time"] = end_time.isoformat()
-            if start_time:
-                duration_ms = (end_time - start_time).total_seconds() * 1000
-                round_event["duration_ms"] = duration_ms
-                
-        if speaking_order:
-            round_event["speaking_order"] = speaking_order
-            
-        if agent_choices_start:
-            round_event["agent_choices_start"] = agent_choices_start
-            
-        if agent_choices_end:
-            round_event["agent_choices_end"] = agent_choices_end
-            
-        if consensus_check_result:
-            round_event["consensus_check_result"] = consensus_check_result
-            
-        self.round_events.append(round_event)
-    
-    def log_evaluation(self, evaluation_type: str, agent_id: str, agent_name: str,
-                      principle_ratings: List[Dict], evaluation_duration_ms: float = None,
-                      overall_reasoning: str = None):
-        """Log Likert scale evaluations (initial or final)."""
-        evaluation = {
-            "timestamp": datetime.now().isoformat(),
-            "agent_id": agent_id,
-            "agent_name": agent_name,
-            "principle_ratings": principle_ratings
-        }
-        
-        if self.include_processing_times and evaluation_duration_ms is not None:
-            evaluation["evaluation_duration_ms"] = evaluation_duration_ms
-            
-        if overall_reasoning:
-            evaluation["overall_reasoning"] = overall_reasoning
-            
-        self.evaluation_data[evaluation_type].append(evaluation)
-    
-    def log_consensus_result(self, consensus_result: ConsensusResult):
-        """Log final consensus result."""
-        self.consensus_result = consensus_result
-    
-    def log_performance_metrics(self, total_duration_seconds: float, 
-                               average_round_duration: float = None,
-                               total_agent_interactions: int = None,
-                               total_memory_generations: int = None,
-                               errors_encountered: int = 0):
-        """Log performance and timing metrics."""
-        self.performance_metrics = {
-            "total_duration_seconds": total_duration_seconds,
-            "errors_encountered": errors_encountered
-        }
-        
-        if average_round_duration is not None:
-            self.performance_metrics["average_round_duration"] = average_round_duration
-            
-        if total_agent_interactions is not None:
-            self.performance_metrics["total_agent_interactions"] = total_agent_interactions
-            
-        if total_memory_generations is not None:
-            self.performance_metrics["total_memory_generations"] = total_memory_generations
-    
-    def export_complete_json(self, output_dir: str = "experiment_results") -> str:
+    def export_unified_json(self, output_dir: Optional[str] = None) -> str:
         """
-        Export single comprehensive JSON file with all experiment data.
+        Export single unified JSON file with agent-centric structure.
+        
+        Args:
+            output_dir: Optional output directory override. If None, uses config.output.directory
         
         Returns:
             Path to exported JSON file
         """
+        if output_dir is None:
+            output_dir = self.config.output.directory
+        
         output_path = Path(output_dir)
         output_path.mkdir(exist_ok=True)
         
-        end_time = datetime.now()
-        total_duration_ms = (end_time - self.start_time).total_seconds() * 1000
-        
-        # Build complete experiment data structure
-        experiment_data = {
-            "experiment_metadata": {
-                "experiment_id": self.experiment_id,
-                "start_time": self.start_time.isoformat(),
-                "end_time": end_time.isoformat(),
-                "total_duration_ms": total_duration_ms,
-                "configuration": self.config.model_dump() if hasattr(self.config, 'model_dump') else self.config.dict()
-            },
-            "agent_interactions": self.agent_interactions,
-            "memory_events": self.memory_events,
-            "round_events": self.round_events,
-            "evaluations": {
-                "initial_likert_assessments": self.evaluation_data["initial"],
-                "final_likert_assessments": self.evaluation_data["final"]
-            },
-            "consensus_result": (
-                self.consensus_result.model_dump() if hasattr(self.consensus_result, 'model_dump') 
-                else self.consensus_result.dict() if self.consensus_result else None
-            ),
-            "performance_metrics": self.performance_metrics
+        # Build complete unified structure
+        unified_data = {
+            "experiment_metadata": self.experiment_metadata
         }
+        
+        # Add all agent data
+        unified_data.update(self.agent_data)
         
         # Export to single JSON file
         json_file = output_path / f"{self.experiment_id}.json"
         
-        # Custom JSON encoder for datetime objects and LitellmModel objects
+        # Custom JSON encoder for datetime objects and other types
         def json_serializer(obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
             # Handle LitellmModel objects by converting to string representation
             if hasattr(obj, '__class__') and 'LitellmModel' in str(type(obj)):
                 return str(obj)
+            # Handle Pydantic models by converting to dict
+            if hasattr(obj, 'model_dump'):
+                return obj.model_dump()
+            elif hasattr(obj, 'dict'):
+                return obj.dict()
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
         with open(json_file, 'w', encoding='utf-8') as f:
-            json.dump(experiment_data, f, indent=2, ensure_ascii=False, default=json_serializer)
+            json.dump(unified_data, f, indent=2, ensure_ascii=False, default=json_serializer)
         
         return str(json_file)
     
     def get_experiment_summary(self) -> Dict[str, Any]:
         """Get summary of collected data for debugging."""
+        total_rounds = 0
+        total_interactions = 0
+        
+        for agent_id, agent_data in self.agent_data.items():
+            # Count only deliberation rounds (round_1+), not initial evaluation (round_0)
+            agent_rounds = len([k for k in agent_data.keys() if k.startswith("round_") and k != "round_0"])
+            total_rounds = max(total_rounds, agent_rounds)
+            
+            for round_key, round_data in agent_data.items():
+                if round_key.startswith("round_") and "input_dict" in round_data:
+                    total_interactions += len(round_data["input_dict"])
+        
         return {
             "experiment_id": self.experiment_id,
-            "agent_interactions_count": len(self.agent_interactions),
-            "memory_events_count": len(self.memory_events),
-            "round_events_count": len(self.round_events),
-            "initial_evaluations_count": len(self.evaluation_data["initial"]),
-            "final_evaluations_count": len(self.evaluation_data["final"]),
-            "consensus_result_available": self.consensus_result is not None,
-            "performance_metrics_available": bool(self.performance_metrics)
+            "total_agents": len(self.agent_data),
+            "total_rounds": total_rounds,
+            "total_interactions": total_interactions,
+            "experiment_completed": self.experiment_metadata["end_time"] is not None,
+            "consensus_recorded": self.experiment_metadata["final_consensus"] is not None
         }
+    
+    # Legacy method compatibility (for gradual migration)
+    def export_complete_json(self, output_dir: Optional[str] = None) -> str:
+        """Legacy method name - delegates to new unified export."""
+        return self.export_unified_json(output_dir)
+    
+    def log_memory_event(self, agent_id: str, round_num: int, memory_context: str = None,
+                        memory_strategy: str = None, decomposed_steps: List[Dict] = None,
+                        final_memory_entry: Dict = None):
+        """Legacy method compatibility - delegates to new unified methods."""
+        import warnings
+        warnings.warn(
+            "log_memory_event is deprecated. Use log_memory_generation instead.",
+            DeprecationWarning,
+            stacklevel=2
+        )
+        
+        # Map to new method calls
+        if memory_context:
+            self.log_memory_generation(agent_id, round_num, memory_context, memory_strategy)
+        
+        if final_memory_entry:
+            # Extract the memory content from the final entry
+            memory_content = final_memory_entry.get("situation_assessment", "")
+            strategy = final_memory_entry.get("strategy_update", "")
+            self.log_memory_generation(agent_id, round_num, memory_content, strategy)
+        
+        # Note: decomposed_steps are not used in the new system
+        # as they're handled differently in the new agent-centric approach

@@ -122,9 +122,7 @@ performance:
   # Whether to run feedback collection in parallel (faster but uses more API calls)
   parallel_feedback: true
   
-  # Whether to enable AgentOps tracing (requires AGENT_OPS_API_KEY)
-  # Provides detailed experiment monitoring and debugging
-  trace_enabled: true
+  # Tracing functionality has been removed
   
   # Enable debug mode for verbose logging
   debug_mode: false

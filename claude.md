@@ -38,6 +38,7 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - **Configurable Personalities**: Each agent can have a custom personality defined in YAML
 - **Neutral Descriptions**: Principle descriptions avoid references to philosophical authorities
 - **Likert Scale Evaluation**: 4-point scale for principle assessment (strongly disagree to strongly agree)
+- **No Output Truncation**: All agent outputs, messages, and reasoning are stored in full without character limits or truncation
 
 ### Distributive Justice Principles
 
@@ -57,26 +58,38 @@ pip install -r requirements.txt
 
 ### Running Experiments
 
-**Quick Test (3 agents, 2 rounds)**:
-```bash
-# Note: run_quick_demo.py file not found in current codebase
-# Use run_config.py with quick_test configuration instead
-python run_config.py  # Edit DEFAULT_CONFIG_NAME to "quick_test" first
+**Single Experiment Runner**:
+```python
+# Import and run directly
+from run_experiment import run_experiment
+
+# Run with default output directory (experiment_results)
+result = await run_experiment('lucas')
+
+# Run with custom output directory
+result = await run_experiment('lucas', output_dir='custom_experiments/test_run')
 ```
 
-**Universal Configuration Runner**:
-```bash
-python run_config.py
-# Edit DEFAULT_CONFIG_NAME variable on line 30 to switch configurations (currently set to "lucas")
+**Batch Experiment Runner**:
+```python
+# Import and run directly
+from run_batch import run_batch
+
+# Run multiple experiments with default settings
+results = await run_batch(['config1', 'config2', 'config3'])
+
+# Run with custom output directory and concurrency
+results = await run_batch(
+    ['config1', 'config2'], 
+    max_concurrent=5, 
+    output_dir='custom_experiments/batch_run'
+)
 ```
 
-**Parallel Experiment Execution**:
+**Configuration Generation**:
 ```bash
-# Run experiments in parallel for faster execution
-python run_experiments_parallel.py --num-experiments 10 --max-concurrent 3
-
-# Jupyter notebook with parallel execution
-# experiment_runner.ipynb (includes parallel execution with semaphore-based rate limiting)
+# Generate batch configurations with variations
+python config_generator.py
 ```
 
 **Available Configurations**:
@@ -93,44 +106,72 @@ python run_experiments_parallel.py --num-experiments 10 --max-concurrent 3
 ### Testing
 ```bash
 # Run all tests (consolidated)
-python run_tests.py
+python tests/run_all_tests.py
 
 # Run individual test files
 python tests/test_core.py
 python tests/test_decomposed_memory.py
 python tests/test_experiment_logger.py
 python tests/test_temperature_configuration.py
+python tests/test_unified_logging.py
 ```
 
 ### Direct API Usage
+
+**Single Experiment**:
 ```python
 import asyncio
-from src.maai.config.manager import load_config_from_file
-from src.maai.core.deliberation_manager import run_single_experiment
+from run_experiment import run_experiment
 
-# Load and run configuration
-config = load_config_from_file('quick_test')
-results = await run_single_experiment(config)
+# Run with default output directory (experiment_results)
+results = await run_experiment('default')
+
+# Run with custom output directory
+results = await run_experiment('default', output_dir='custom_experiments/test_run')
+
+# Access output path
+print(f"Results saved to: {results['output_path']}")
+```
+
+**Batch Experiments**:
+```python
+import asyncio
+from run_batch import run_batch
+
+# Run multiple experiments with default settings
+config_names = ['config1', 'config2', 'config3']
+results = await run_batch(config_names)
+
+# Run with custom output directory and concurrency
+results = await run_batch(
+    config_names, 
+    max_concurrent=5, 
+    output_dir='custom_experiments/batch_run'
+)
+
+# Check results
+for result in results:
+    if result['success']:
+        print(f"✅ {result['experiment_id']}: {result['output_path']}")
+    else:
+        print(f"❌ {result['experiment_id']}: {result['error']}")
 ```
 
 ### Additional Development Tools
 
-**Random Configuration Generation**:
+**Configuration Generation**:
 ```bash
-python generate_random_configs.py
+# Generate batch configurations with variations
+python config_generator.py
 ```
 
-**Hypothesis Testing**:
+**Jupyter Notebook Analysis**:
 ```bash
-# Use Jupyter notebooks for hypothesis testing
-jupyter notebook hypothesis_testing_experiment_refined.ipynb
-jupyter notebook hypothesis_analysis.ipynb
-jupyter notebook experiment_runner.ipynb
-```
+# Main experiment analysis notebook
+jupyter notebook Experiment.ipynb
 
-**Test Fixes**:
-```bash
-python test_fixes.py
+# Additional analysis notebooks
+jupyter notebook analysis.ipynb
 ```
 
 ## Configuration System
@@ -223,17 +264,17 @@ MAX_CONCURRENT_EXPERIMENTS = 3  # Conservative default
 
 **Usage Examples**:
 ```bash
-# Command line parallel execution
-python run_experiments_parallel.py --num-experiments 20 --max-concurrent 5
+# Batch execution with custom configs
+python run_batch.py
 
-# Jupyter notebook (experiment_runner.ipynb)
-# Uses asyncio.gather() with semaphore control for optimal performance
+# Single experiment execution
+python run_experiment.py
 ```
 
 ## Data Export System
 
 **Experiment Results** are saved to `experiment_results/` with multiple formats:
-- `[ID].json`: Full structured experiment data (single file format)
+- `[ID].json`: Full structured experiment data (single file format) - **Complete data with no truncation**
 - `[ID]_complete.json`: Full structured experiment data (legacy format)
 - `[ID]_data.csv`: Main conversation transcript data
 - `[ID]_initial_evaluation.csv`: Initial Likert scale assessments (before deliberation)
@@ -242,6 +283,8 @@ python run_experiments_parallel.py --num-experiments 20 --max-concurrent 5
 - `[ID]_evaluation.json`: Final ratings with statistics
 - `[ID]_comparison.csv`: Before/after rating comparison analysis
 - `[ID]_transcript.txt`: Human-readable conversation log
+
+**Important**: All agent outputs, messages, reasoning, and evaluation text are stored in full without any character limits or truncation. The logging system preserves complete conversation history and agent reasoning.
 
 **Batch Experiment Results** are organized into timestamped directories:
 - `hypothesis_test_batch_[TIMESTAMP]/`: Contains batch execution results
@@ -260,7 +303,6 @@ python run_experiments_parallel.py --num-experiments 20 --max-concurrent 5
 - `DEEPSEEK_API_KEY`: For DeepSeek models
 - `GROQ_API_KEY`: For Groq models
 - `GEMINI_API_KEY`: For Google Gemini models
-- `AGENT_OPS_API_KEY`: For AgentOps monitoring (session named with experiment ID)
 
 ## Key Architecture Notes
 
@@ -278,10 +320,19 @@ python run_experiments_parallel.py --num-experiments 20 --max-concurrent 5
 3. Run deliberation rounds through `DeliberationManager`
 4. Export results via `export_experiment_data()` in `src/maai/export/data_export.py`
 
+**Main Entry Points**:
+- `run_experiment.py`: Single experiment runner with detailed result reporting and custom output directory support
+- `run_batch.py`: Parallel batch execution with semaphore-based rate limiting and custom output directory support
+- `config_generator.py`: Generate multiple configuration variations for batch testing
+
+**Output Directory Control**:
+- **Default**: All experiments save to `experiment_results/` directory
+- **Custom**: Use `--output-dir` flag (CLI) or `output_dir` parameter (API) to specify custom location
+- **Path Format**: Results saved as `{output_dir}/{experiment_id}.json`
+
 **Knowledge Base**:
 - `knowledge_base/agents_sdk/`: Complete OpenAI Agents SDK documentation and examples
 - `knowledge_base/best_practices/`: Practical guide to building agents (PDF and text)
-- `knowledge_base/agentops/`: AgentOps integration documentation and examples
 
 ## Experimental Flow
 
@@ -298,8 +349,6 @@ python run_experiments_parallel.py --num-experiments 20 --max-concurrent 5
 - Supports GPT-4.1, GPT-4.1 mini/nano, Claude, and DeepSeek models
 - All operations are async-first using asyncio
 - Pydantic models ensure data validation throughout the system
-- AgentOps integration provides experiment tracing and monitoring (conditional based on model providers)
-- Model provider detection in `src/maai/core/models.py:305` determines tracing strategy
 
 ## Advanced Service Configuration
 
@@ -344,6 +393,7 @@ This allows researchers to A/B test different consensus mechanisms, communicatio
 - All timestamps use `datetime` objects with UTC
 - Pydantic models for all data structures
 - Type hints on all function parameters and returns
+- **Never truncate output**: All agent messages, reasoning, and outputs must be stored in full without character limits
 
 ### Testing
 - All core functionality has unit tests in `tests/`
@@ -363,7 +413,6 @@ This allows researchers to A/B test different consensus mechanisms, communicatio
 - All async operations wrapped in try/catch
 - Graceful degradation when services fail
 - Detailed logging for debugging
-- AgentOps automatically captures errors for tracing
 
 ### File Structure Conventions
 - Core logic in `src/maai/core/`

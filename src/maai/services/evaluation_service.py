@@ -438,9 +438,9 @@ Use only these rating values: "strongly_disagree", "disagree", "agree", "strongl
                                 reasoning_start = section_text.find(reasoning_pattern)
                                 if reasoning_start != -1:
                                     reasoning_text = section_text[reasoning_start + len(reasoning_pattern):].strip()
-                                    # Get first sentence or up to 200 chars
+                                    # Get full reasoning text
                                     if reasoning_text:
-                                        reasoning = reasoning_text[:200].strip()
+                                        reasoning = reasoning_text.strip()
                                         if reasoning.endswith('.'):
                                             reasoning = reasoning[:-1]
                                     break

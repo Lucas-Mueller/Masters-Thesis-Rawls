@@ -102,8 +102,8 @@ class ExperimentOrchestrator:
             # Phase 2: Initial Likert scale assessment (NEW - data collection only)
             await self._initial_likert_assessment()
             
-            # Phase 3: Initial individual evaluation (existing - principle choice)
-            await self._initial_evaluation()
+            # Phase 3: Initial individual evaluation (REMOVED - redundant, now handled by Phase 2)
+            # await self._initial_evaluation()
             
             # Phase 4: Multi-round deliberation
             consensus_result = await self._run_deliberation_rounds()
@@ -124,11 +124,11 @@ class ExperimentOrchestrator:
                 print(f"Agreed principle: {principle['name']}")
             print(f"Total rounds: {consensus_result.rounds_to_consensus}")
             
-            # Phase 8: Log final data and export single JSON file
+            # Phase 8: Log final data and export unified JSON file
             self._log_final_data(consensus_result, results)
-            exported_file = self.logger.export_complete_json()
+            exported_file = self.logger.export_unified_json()
             print(f"\n--- Data Export Complete ---")
-            print(f"  Comprehensive JSON: {exported_file}")
+            print(f"  Unified Agent-Centric JSON: {exported_file}")
             
             return results
             
@@ -172,15 +172,22 @@ class ExperimentOrchestrator:
         )
         
         print(f"  ✓ Initial assessment complete - {len(self.initial_evaluation_responses)} responses collected")
+        
+        # Check if already unanimous after initial evaluation
+        initial_consensus = await self.consensus_service.detect_consensus(self.transcript)
+        if initial_consensus.unanimous:
+            print(f"  ✓ Unanimous agreement reached in initial evaluation!")
+        else:
+            print(f"  Initial choices: {[agent.current_choice.principle_id for agent in self.agents]}")
     
     async def _initial_evaluation(self):
         """Have each agent individually evaluate the principles."""
         print("\n--- Initial Individual Evaluation ---")
         
         # No trace here - part of the main experiment trace
-        # Use conversation service to conduct initial evaluation
-        await self.conversation_service.conduct_initial_evaluation(
-            self.agents, self.transcript
+        # Use conversation service to conduct initial Likert assessment
+        await self.conversation_service.conduct_initial_likert_assessment(
+            self.agents, self.evaluation_service
         )
         
         # Check if already unanimous after initial evaluation
@@ -345,59 +352,37 @@ class ExperimentOrchestrator:
         return results
     
     def _log_final_data(self, consensus_result: ConsensusResult, results: ExperimentResults):
-        """Log final experiment data to the logger."""
+        """Log final experiment data to the new unified logger."""
         if not self.logger:
             return
             
-        # Log consensus result
-        self.logger.log_consensus_result(consensus_result)
+        # Log final consensus data for each agent
+        for agent in self.agents:
+            agent_satisfaction = None
+            # Try to find satisfaction rating from evaluation responses
+            for eval_response in self.evaluation_responses:
+                if eval_response.agent_id == agent.agent_id:
+                    # Get satisfaction with agreed principle
+                    if consensus_result.unanimous and consensus_result.agreed_principle:
+                        for evaluation in eval_response.principle_evaluations:
+                            if evaluation.principle_id == consensus_result.agreed_principle.principle_id:
+                                agent_satisfaction = evaluation.satisfaction_rating.value
+                                break
+                    break
+            
+            self.logger.log_final_consensus(
+                agent_id=agent.agent_id,
+                agreement_reached=consensus_result.unanimous,
+                agreement_choice=consensus_result.agreed_principle.principle_name if consensus_result.unanimous else None,
+                num_rounds=consensus_result.rounds_to_consensus,
+                satisfaction=agent_satisfaction
+            )
         
-        # Log performance metrics
-        end_time = datetime.now()
-        total_duration = (end_time - self.start_time).total_seconds()
-        self.logger.log_performance_metrics(
-            total_duration_seconds=total_duration,
-            average_round_duration=total_duration / max(1, self.current_round),
-            total_agent_interactions=len(self.transcript),
-            total_memory_generations=len([m for agent_memory in results.agent_memories for m in agent_memory.memory_entries]),
-            errors_encountered=self.performance_metrics.errors_encountered
+        # Log experiment completion
+        self.logger.log_experiment_completion(
+            consensus_result=consensus_result,
+            total_rounds=consensus_result.rounds_to_consensus
         )
-        
-        # Log initial evaluations (if not already logged)
-        for eval_response in self.initial_evaluation_responses:
-            principle_ratings = []
-            for evaluation in eval_response.principle_evaluations:
-                principle_ratings.append({
-                    "principle_id": evaluation.principle_id,
-                    "rating": evaluation.satisfaction_rating.value,
-                    "reasoning": evaluation.reasoning
-                })
-            self.logger.log_evaluation(
-                evaluation_type="initial",
-                agent_id=eval_response.agent_id,
-                agent_name=eval_response.agent_name,
-                principle_ratings=principle_ratings,
-                evaluation_duration_ms=eval_response.evaluation_duration * 1000 if eval_response.evaluation_duration else None,
-                overall_reasoning=eval_response.overall_reasoning
-            )
-        
-        # Log final evaluations (if not already logged)
-        for eval_response in self.evaluation_responses:
-            principle_ratings = []
-            for evaluation in eval_response.principle_evaluations:
-                principle_ratings.append({
-                    "principle_id": evaluation.principle_id,
-                    "rating": evaluation.satisfaction_rating.value,
-                    "reasoning": evaluation.reasoning
-                })
-            self.logger.log_evaluation(
-                evaluation_type="final",
-                agent_id=eval_response.agent_id,
-                agent_name=eval_response.agent_name,
-                principle_ratings=principle_ratings,
-                evaluation_duration_ms=eval_response.evaluation_duration * 1000 if eval_response.evaluation_duration else None,
-                overall_reasoning=eval_response.overall_reasoning
-            )
     
     def get_experiment_state(self) -> dict:
         """Get current experiment state for monitoring."""

@@ -1,6 +1,7 @@
 """
-Test suite for the new ExperimentLogger system.
-Tests single JSON file logging with all required data points.
+DEPRECATED: Legacy test suite for the old ExperimentLogger system.
+This test file is kept for backward compatibility but tests the deprecated system.
+Use test_unified_logging.py for testing the new agent-centric logging system.
 """
 
 import json

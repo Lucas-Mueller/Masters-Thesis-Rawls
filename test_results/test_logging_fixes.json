@@ -1,0 +1,164 @@
+{
+  "experiment_metadata": {
+    "experiment_id": "test_logging_fixes",
+    "start_time": "2025-07-17T16:32:05.408585",
+    "end_time": "2025-07-17T16:32:54.965408",
+    "total_duration_seconds": 49.556823,
+    "max_rounds": 2,
+    "decision_rule": "unanimity",
+    "final_consensus": {
+      "agreement_reached": true,
+      "agreed_principle": "Maximize the Average Income with a Range Constraint",
+      "num_rounds": 2,
+      "total_messages": 4
+    }
+  },
+  "agent_1": {
+    "overall": {
+      "model": "gpt-4.1-nano",
+      "persona": "You are an economist focused on efficiency.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.7
+    },
+    "round_0": {
+      "input": "[Initial Likert Assessment - details in principle_ratings]",
+      "output": "PRINCIPLE 1: Agree  \nREASONING 1: Prioritizing the welfare of the worst-off ensures fairness and social stability, especially since I could be in that position. It promotes social cohesion and reduces inequality, which benefits society as a whole.\n\nPRINCIPLE 2: Disagree  \nREASONING 2: Maximizing total income without regard for distribution might lead to significant inequality and neglect the needs of the most vulnerable. It risks creating a society where the rich prosper while the poor are left behind.\n\nPRINCIPLE 3: Agree  \nREASONING 3: Guaranteeing a minimum income provides a safety net, which I believe is fair and compassionate. After ensuring basic needs are met, maximizing the average income can promote overall prosperity without sacrificing fairness.\n\nPRINCIPLE 4: Disagree  \nREASONING 4: Limiting the income gap might restrict economic growth and innovation. While fairness is important, overly constraining income disparities could hinder incentives and efficiency, which are also vital for societal progress.\n\nOVERALL REASONING: I value principles that protect the vulnerable and promote fairness, such as Principles 1 and 3. While maximizing total income is appealing for growth, it must be balanced with safeguards to prevent extreme inequality. The hybrid principles seem promising, but I lean toward ensuring a safety net and fair distribution as foundational.",
+      "rating_likert": "Maximize the Minimum Income",
+      "rating_numeric": 1,
+      "principle_ratings": {
+        "1": {
+          "rating": 3,
+          "rating_text": "Agree",
+          "principle_name": "Maximize the Minimum Income",
+          "reasoning": "Prioritizing the welfare of the worst-off ensures fairness and social stability, especially since I could be in that position. It promotes social cohesion and reduces inequality, which benefits society as a whole."
+        },
+        "2": {
+          "rating": 2,
+          "rating_text": "Disagree",
+          "principle_name": "Maximize the Average Income",
+          "reasoning": "Maximizing total income without regard for distribution might lead to significant inequality and neglect the needs of the most vulnerable. It risks creating a society where the rich prosper while the poor are left behind."
+        },
+        "3": {
+          "rating": 3,
+          "rating_text": "Agree",
+          "principle_name": "Maximize the Average Income with a Floor Constraint",
+          "reasoning": "Guaranteeing a minimum income provides a safety net, which I believe is fair and compassionate. After ensuring basic needs are met, maximizing the average income can promote overall prosperity without sacrificing fairness."
+        },
+        "4": {
+          "rating": 2,
+          "rating_text": "Disagree",
+          "principle_name": "Maximize the Average Income with a Range Constraint",
+          "reasoning": "Limiting the income gap might restrict economic growth and innovation. While fairness is important, overly constraining income disparities could hinder incentives and efficiency, which are also vital for societal progress."
+        }
+      }
+    },
+    "round_1": {
+      "speaking_order": 1,
+      "public_history": "\nYour current choice: Principle 1",
+      "memory": "The group is likely divided between those favoring maximizing the minimum income (to protect the worst-off) and those leaning toward maximizing the average income (to increase overall wealth). Some may prefer hybrid approaches, like the range constraint, to balance fairness and efficiency. Disagreements stem from differing priorities: equity versus total wealth. No consensus has been reached yet, and the risk of deadlock remains if no compromise emerges.",
+      "strategy": "In this round, I should advocate for a hybrid principle—specifically, the \"Maximize the Average Income with a Range Constraint\"—to appeal to both fairness and efficiency concerns. I will emphasize that this approach can satisfy the worst-off (by limiting inequality) while promoting overall prosperity. Additionally, I should listen carefully to others’ concerns, identify common ground, and propose incremental steps toward consensus, framing my position as a balanced compromise that benefits everyone regardless of their future position.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: In this round, I should advocate for a hybrid principle—specifically, the \"Maximize the Average Income with a Range Constraint\"—to appeal to both fairness and efficiency concerns. I will emphasize that this approach can satisfy the worst-off (by limiting inequality) while promoting overall prosperity. Additionally, I should listen carefully to others’ concerns, identify common ground, and propose incremental steps toward consensus, framing my position as a balanced compromise that benefits everyone regardless of their future position.\n\n\nYour current choice: Principle 1\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Thank you all for considering these important principles. I believe that focusing solely on maximizing the minimum income (Principle 1) ensures that the worst-off are protected, which is a vital concern. However, I also recognize that to promote overall prosperity and fairness, we should aim for a balance that encourages growth while preventing extreme inequality. \n\nTherefore, I propose we consider a hybrid approach—specifically, the \"Maximize the Average Income with a Range Constraint\"—which limits the gap between the richest and poorest, fostering both fairness and efficiency. This way, we can ensure that everyone has a fair chance at prosperity, regardless of their starting point, and promote social cohesion.\n\nFor now, my current choice is: **Principle 1**."
+      },
+      "communication": "Thank you all for considering these important principles. I believe that focusing solely on maximizing the minimum income (Principle 1) ensures that the worst-off are protected, which is a vital concern. However, I also recognize that to promote overall prosperity and fairness, we should aim for a balance that encourages growth while preventing extreme inequality. \n\nTherefore, I propose we consider a hybrid approach—specifically, the \"Maximize the Average Income with a Range Constraint\"—which limits the gap between the richest and poorest, fostering both fairness and efficiency. This way, we can ensure that everyone has a fair chance at prosperity, regardless of their starting point, and promote social cohesion.\n\nFor now, my current choice is: **Principle 1**.",
+      "choice": "Maximize the Minimum Income"
+    },
+    "round_2": {
+      "speaking_order": 1,
+      "public_history": "\nYour current choice: Principle 1",
+      "memory": "The group is currently divided between two principles: Agent_1 favors prioritizing the protection of the worst-off (Principle 1), while Agent_2 prefers a balanced approach that limits inequality while promoting growth (Principle 4). Both see value in balancing fairness and efficiency, but they differ on which aspect should take precedence. No consensus has been reached yet, and the disagreement centers on whether to focus primarily on safeguarding the least advantaged or on limiting disparities alongside maximizing overall income.",
+      "strategy": "My approach should be to reinforce the appeal of the \"Maximize the Average Income with a Range Constraint\" (Principle 4) by emphasizing its capacity to balance fairness and efficiency. I will acknowledge the importance of protecting the worst-off, aligning this with the range constraint, which inherently limits extreme deprivation. To move toward consensus, I will propose that this hybrid principle can be a pragmatic compromise that satisfies both concerns: it ensures minimum standards while promoting overall prosperity and social stability. I will also invite others to consider incremental adjustments that could further align our shared goals, emphasizing that this approach benefits everyone regardless of future economic position.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 2.\n\nBased on your private analysis:\nSTRATEGY: My approach should be to reinforce the appeal of the \"Maximize the Average Income with a Range Constraint\" (Principle 4) by emphasizing its capacity to balance fairness and efficiency. I will acknowledge the importance of protecting the worst-off, aligning this with the range constraint, which inherently limits extreme deprivation. To move toward consensus, I will propose that this hybrid principle can be a pragmatic compromise that satisfies both concerns: it ensures minimum standards while promoting overall prosperity and social stability. I will also invite others to consider incremental adjustments that could further align our shared goals, emphasizing that this approach benefits everyone regardless of future economic position.\n\n\nYour current choice: Principle 1\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Thank you all for your thoughtful contributions. I believe that the \"Maximize the Average Income with a Range Constraint\" (Principle 4) offers a balanced approach that addresses both fairness and efficiency. By limiting the gap between the richest and poorest, it safeguards against extreme deprivation while still promoting overall economic growth. This hybrid approach seems pragmatic and fair, especially considering our \"veil of ignorance\"—since we could end up in any position, it's important to support a system that ensures minimum standards without sacrificing prosperity. I propose we consider adopting Principle 4, as it aligns with our shared goal of a just and stable society. \n\nMy current choice: 1"
+      },
+      "communication": "Thank you all for your thoughtful contributions. I believe that the \"Maximize the Average Income with a Range Constraint\" (Principle 4) offers a balanced approach that addresses both fairness and efficiency. By limiting the gap between the richest and poorest, it safeguards against extreme deprivation while still promoting overall economic growth. This hybrid approach seems pragmatic and fair, especially considering our \"veil of ignorance\"—since we could end up in any position, it's important to support a system that ensures minimum standards without sacrificing prosperity. I propose we consider adopting Principle 4, as it aligns with our shared goal of a just and stable society. \n\nMy current choice: 1",
+      "choice": "Maximize the Average Income with a Range Constraint"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "Maximize the Average Income with a Range Constraint",
+      "num_rounds": 2,
+      "satisfaction": "agree"
+    }
+  },
+  "agent_2": {
+    "overall": {
+      "model": "gpt-4.1-nano",
+      "persona": "You are a philosopher focused on fairness.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.7
+    },
+    "round_0": {
+      "input": "[Initial Likert Assessment - details in principle_ratings]",
+      "output": "PRINCIPLE 1: Agree  \nREASONING 1: Ensuring the worst-off members are as well-off as possible promotes fairness and social stability, especially since I might be among them. It prioritizes basic dignity and reduces extreme hardship.\n\nPRINCIPLE 2: Disagree  \nREASONING 2: Maximizing total income without regard for distribution could lead to significant inequality and neglect the needs of the most vulnerable, which I find unjust and potentially harmful to social cohesion.\n\nPRINCIPLE 3: Agree  \nREASONING 3: Guaranteeing a minimum income provides a safety net for everyone, which seems fair and compassionate. Combining this with efforts to increase overall income balances fairness with growth, aligning with a sense of social responsibility.\n\nPRINCIPLE 4: Disagree  \nREASONING 4: Limiting the gap between richest and poorest might restrict economic incentives and overall growth. While fairness is important, overly constraining wealth distribution could hinder societal progress and innovation.\n\nOVERALL REASONING: I believe that fairness involves protecting the most vulnerable and ensuring basic needs are met, which makes Principles 1 and 3 more appealing. While promoting growth is important, it should not come at the expense of fairness and social stability. Therefore, I lean toward principles that prioritize the well-being of the worst-off and guarantee a safety net.",
+      "rating_likert": "Maximize the Minimum Income",
+      "rating_numeric": 1,
+      "principle_ratings": {
+        "1": {
+          "rating": 3,
+          "rating_text": "Agree",
+          "principle_name": "Maximize the Minimum Income",
+          "reasoning": "Ensuring the worst-off members are as well-off as possible promotes fairness and social stability, especially since I might be among them. It prioritizes basic dignity and reduces extreme hardship."
+        },
+        "2": {
+          "rating": 2,
+          "rating_text": "Disagree",
+          "principle_name": "Maximize the Average Income",
+          "reasoning": "Maximizing total income without regard for distribution could lead to significant inequality and neglect the needs of the most vulnerable, which I find unjust and potentially harmful to social cohesion."
+        },
+        "3": {
+          "rating": 3,
+          "rating_text": "Agree",
+          "principle_name": "Maximize the Average Income with a Floor Constraint",
+          "reasoning": "Guaranteeing a minimum income provides a safety net for everyone, which seems fair and compassionate. Combining this with efforts to increase overall income balances fairness with growth, aligning with a sense of social responsibility."
+        },
+        "4": {
+          "rating": 2,
+          "rating_text": "Disagree",
+          "principle_name": "Maximize the Average Income with a Range Constraint",
+          "reasoning": "Limiting the gap between richest and poorest might restrict economic incentives and overall growth. While fairness is important, overly constraining wealth distribution could hinder societal progress and innovation."
+        }
+      }
+    },
+    "round_1": {
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent_1: Thank you all for considering these important principles. I believe that focusing solely on maximizing the minimum income (Principle 1) ensures that the worst-off are protected, which is a vital concern. However, I also recognize that to promote overall prosperity and fairness, we should aim for a balance that encourages growth while preventing extreme inequality. \n\nTherefore, I propose we consider a hybrid approach—specifically, the \"Maximize the Average Income with a Range Constraint\"—which limits the gap between the richest and poorest, fostering both fairness and efficiency. This way, we can ensure that everyone has a fair chance at prosperity, regardless of their starting point, and promote social cohesion.\n\nFor now, my current choice is: **Principle 1**.\n\nYour current choice: Principle 1",
+      "memory": "The group is currently discussing different principles of distributive justice. Agent_1 has expressed support for Principle 1 (maximize the minimum income) but also acknowledged the value of hybrid approaches, leaning toward the \"Maximize the Average Income with a Range Constraint\" as a balanced solution. There is some openness to hybrid principles, but no consensus yet. The debate seems to be centered around protecting the worst-off versus promoting overall prosperity.",
+      "strategy": "In this round, I should acknowledge the importance of protecting the worst-off to build trust, while subtly emphasizing that a fair society also benefits everyone, including the middle and upper classes. I will advocate for a principle that balances fairness and efficiency—perhaps the \"Maximize the Average Income with a Range Constraint\"—by highlighting its potential to foster social stability and long-term prosperity. This approach might appeal to agents open to compromise and help move the group toward consensus, aligning with my goal of fairness for all, regardless of their future position.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: In this round, I should acknowledge the importance of protecting the worst-off to build trust, while subtly emphasizing that a fair society also benefits everyone, including the middle and upper classes. I will advocate for a principle that balances fairness and efficiency—perhaps the \"Maximize the Average Income with a Range Constraint\"—by highlighting its potential to foster social stability and long-term prosperity. This approach might appeal to agents open to compromise and help move the group toward consensus, aligning with my goal of fairness for all, regardless of their future position.\n\nSPEAKERS IN THIS ROUND SO FAR:\nAgent_1: Thank you all for considering these important principles. I believe that focusing solely on maximizing the minimum income (Principle 1) ensures that the worst-off are protected, which is a vital concern. However, I also recognize that to promote overall prosperity and fairness, we should aim for a balance that encourages growth while preventing extreme inequality. \n\nTherefore, I propose we consider a hybrid approach—specifically, the \"Maximize the Average Income with a Range Constraint\"—which limits the gap between the richest and poorest, fostering both fairness and efficiency. This way, we can ensure that everyone has a fair chance at prosperity, regardless of their starting point, and promote social cohesion.\n\nFor now, my current choice is: **Principle 1**.\n\nYour current choice: Principle 1\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Thank you, Agent_1, for your thoughtful proposal. I agree that protecting the worst-off is crucial for fairness and social stability. At the same time, I believe that fostering overall prosperity benefits everyone in the long run. \n\nConsidering this, I lean toward the \"Maximize the Average Income with a Range Constraint\" (Principle 4). This principle aims to balance fairness by limiting extreme disparities, while still encouraging growth and efficiency. It seems to strike a fair compromise that can help us build trust and work toward a just society where no one is left behind.\n\nMy current choice is: **Principle 4**."
+      },
+      "communication": "Thank you, Agent_1, for your thoughtful proposal. I agree that protecting the worst-off is crucial for fairness and social stability. At the same time, I believe that fostering overall prosperity benefits everyone in the long run. \n\nConsidering this, I lean toward the \"Maximize the Average Income with a Range Constraint\" (Principle 4). This principle aims to balance fairness by limiting extreme disparities, while still encouraging growth and efficiency. It seems to strike a fair compromise that can help us build trust and work toward a just society where no one is left behind.\n\nMy current choice is: **Principle 4**.",
+      "choice": "Maximize the Average Income with a Range Constraint"
+    },
+    "round_2": {
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent_1: Thank you all for your thoughtful contributions. I believe that the \"Maximize the Average Income with a Range Constraint\" (Principle 4) offers a balanced approach that addresses both fairness and efficiency. By limiting the gap between the richest and poorest, it safeguards against extreme deprivation while still promoting overall economic growth. This hybrid approach seems pragmatic and fair, especially considering our \"veil of ignorance\"—since we could end up in any position, it's important to support a system that ensures minimum standards without sacrificing prosperity. I propose we consider adopting Principle 4, as it aligns with our shared goal of a just and stable society. \n\nMy current choice: 1\n\nYour current choice: Principle 4",
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 2.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\nSPEAKERS IN THIS ROUND SO FAR:\nAgent_1: Thank you all for your thoughtful contributions. I believe that the \"Maximize the Average Income with a Range Constraint\" (Principle 4) offers a balanced approach that addresses both fairness and efficiency. By limiting the gap between the richest and poorest, it safeguards against extreme deprivation while still promoting overall economic growth. This hybrid approach seems pragmatic and fair, especially considering our \"veil of ignorance\"—since we could end up in any position, it's important to support a system that ensures minimum standards without sacrificing prosperity. I propose we consider adopting Principle 4, as it aligns with our shared goal of a just and stable society. \n\nMy current choice: 1\n\nYour current choice: Principle 4\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Thank you, Agent_1, for your thoughtful proposal. I agree that balancing fairness and prosperity is crucial, especially under the veil of ignorance. Ensuring that the income gap remains within reasonable limits while still promoting overall growth seems like a fair compromise. It protects those who might be worst-off and maintains social stability. \n\nGiven these considerations, I also support Principle 4, as it aligns with the idea of fairness for all, regardless of our eventual position in society. \n\nMy current choice remains: 4."
+      },
+      "communication": "Thank you, Agent_1, for your thoughtful proposal. I agree that balancing fairness and prosperity is crucial, especially under the veil of ignorance. Ensuring that the income gap remains within reasonable limits while still promoting overall growth seems like a fair compromise. It protects those who might be worst-off and maintains social stability. \n\nGiven these considerations, I also support Principle 4, as it aligns with the idea of fairness for all, regardless of our eventual position in society. \n\nMy current choice remains: 4.",
+      "choice": "Maximize the Average Income with a Range Constraint"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "Maximize the Average Income with a Range Constraint",
+      "num_rounds": 2,
+      "satisfaction": "strongly_agree"
+    }
+  }
+}

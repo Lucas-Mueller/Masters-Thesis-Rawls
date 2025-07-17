@@ -20,6 +20,7 @@ class ProbabilisticConfigGenerator:
                  personality_probabilities: Dict[str, float], 
                  rounds_probabilities: Dict[int, float],
                  model_probabilities: Dict[str, float],
+                 temperature: Dict[float, float],
                  output_folder: str):
         """
         Initialize the probabilistic configuration generator.
@@ -29,12 +30,14 @@ class ProbabilisticConfigGenerator:
             personality_probabilities: Mapping of personality prompts to their probabilities
             rounds_probabilities: Mapping of round counts to their probabilities
             model_probabilities: Mapping of model identifiers to their probabilities
+            temperature: Mapping of temperature values to their probabilities
             output_folder: Folder where generated config files will be saved
         """
         self.agent_count_probabilities = agent_count_probabilities
         self.personality_probabilities = personality_probabilities
         self.rounds_probabilities = rounds_probabilities
         self.model_probabilities = model_probabilities
+        self.temperature = temperature
         self.output_folder = output_folder
         
         # Validate probabilities sum to 1.0 (with tolerance for floating point)
@@ -51,7 +54,8 @@ class ProbabilisticConfigGenerator:
             ("agent_count", self.agent_count_probabilities),
             ("personality", self.personality_probabilities),
             ("rounds", self.rounds_probabilities),
-            ("model", self.model_probabilities)
+            ("model", self.model_probabilities),
+            ("temperature", self.temperature)
         ]:
             prob_sum = sum(probs.values())
             if abs(prob_sum - 1.0) > tolerance:
@@ -107,6 +111,7 @@ class ProbabilisticConfigGenerator:
         # Select values based on probabilities
         num_agents = self._weighted_choice(self.agent_count_probabilities)
         max_rounds = self._weighted_choice(self.rounds_probabilities)
+        global_temperature = self._weighted_choice(self.temperature)
         
         # Generate agent configurations
         agents = self._generate_agent_configs(num_agents)
@@ -118,7 +123,7 @@ class ProbabilisticConfigGenerator:
         # Build configuration structure matching existing format
         config = {
             "experiment_id": experiment_id,
-            "global_temperature": 0.0,  # Default for reproducibility
+            "global_temperature": global_temperature,
             "experiment": {
                 "max_rounds": max_rounds,
                 "decision_rule": "unanimity",
@@ -197,49 +202,14 @@ class ProbabilisticConfigGenerator:
         return file_paths
 
 
-def create_test_generator() -> ProbabilisticConfigGenerator:
+def create_generator() -> ProbabilisticConfigGenerator:
     """
-    Create a test-focused probabilistic configuration generator for testing.
-    
-    Returns:
-        Configured ProbabilisticConfigGenerator instance for testing
-    """
-    # Test probability distributions (simpler for testing)
-    agent_count_probs = {
-        2: 0.7,
-        3: 0.3
-    }
-    
-    personality_probs = {
-        "You are an agent tasked to design a future society.": 1.0
-    }
-    
-    rounds_probs = {
-        2: 0.7,
-        3: 0.3
-    }
-    
-    model_probs = {
-        "gpt-4.1-nano": 1.0
-    }
-    
-    return ProbabilisticConfigGenerator(
-        agent_count_probabilities=agent_count_probs,
-        personality_probabilities=personality_probs,
-        rounds_probabilities=rounds_probs,
-        model_probabilities=model_probs,
-        output_folder="configs"
-    )
-
-
-def create_example_generator() -> ProbabilisticConfigGenerator:
-    """
-    Create an example probabilistic configuration generator with diverse inputs.
+    Create a probabilistic configuration generator with diverse inputs.
     
     Returns:
         Configured ProbabilisticConfigGenerator instance
     """
-    # Example probability distributions
+    # Probability distributions
     agent_count_probs = {
         2: 0.1,
         3: 0.3,
@@ -268,40 +238,18 @@ def create_example_generator() -> ProbabilisticConfigGenerator:
         "claude-3-5-sonnet-20241022": 0.1
     }
     
+    temperature_probs = {
+        0.0: 0.6,    # Deterministic/reproducible (most common)
+        0.2: 0.2,    # Low creativity
+        0.5: 0.15,   # Moderate creativity  
+        0.7: 0.05    # High creativity
+    }
+    
     return ProbabilisticConfigGenerator(
         agent_count_probabilities=agent_count_probs,
         personality_probabilities=personality_probs,
         rounds_probabilities=rounds_probs,
         model_probabilities=model_probs,
+        temperature=temperature_probs,
         output_folder="configs"
     )
-
-
-if __name__ == "__main__":
-    # CLI interface for probabilistic configuration generation
-    import argparse
-    
-    parser = argparse.ArgumentParser(description="Generate probabilistic test configurations")
-    parser.add_argument("--count", type=int, default=3, help="Number of configurations to generate")
-    parser.add_argument("--output-dir", default="configs", help="Output directory")
-    parser.add_argument("--prefix", default="test", help="Configuration name prefix")
-    parser.add_argument("--example", action="store_true", help="Use example generator with diverse options")
-    
-    args = parser.parse_args()
-    
-    if args.example:
-        # Use example generator with diverse options
-        generator = create_example_generator()
-        generator.output_folder = args.output_dir
-        config_paths = generator.generate_batch_configs(args.count, args.prefix)
-        print(f"✅ Generated {len(config_paths)} diverse probabilistic configurations in {args.output_dir}")
-    else:
-        # Use test generator (simpler for testing)
-        generator = create_test_generator()
-        generator.output_folder = args.output_dir
-        config_paths = generator.generate_batch_configs(args.count, args.prefix)
-        print(f"✅ Generated {len(config_paths)} test configurations in {args.output_dir}")
-    
-    # List generated files
-    for i, path in enumerate(config_paths, 1):
-        print(f"   {i}. {path}")

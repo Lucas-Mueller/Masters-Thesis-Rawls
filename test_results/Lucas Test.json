@@ -1,0 +1,127 @@
+{
+  "experiment_metadata": {
+    "experiment_id": "Lucas Test",
+    "start_time": "2025-07-17T16:07:36.973611",
+    "end_time": "2025-07-17T16:08:37.904194",
+    "total_duration_seconds": 60.930583,
+    "max_rounds": 3,
+    "decision_rule": "unanimity",
+    "final_consensus": {
+      "agreement_reached": true,
+      "agreed_principle": "Maximize the Average Income with a Floor Constraint",
+      "num_rounds": 1,
+      "total_messages": 6
+    }
+  },
+  "Agent_1": {
+    "overall": {
+      "model": "gpt-4.1-nano",
+      "persona": "You are a women.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": null
+    }
+  },
+  "Boris": {
+    "overall": {
+      "model": "gpt-4.1-nano",
+      "persona": "You are a man",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": null
+    }
+  },
+  "Heidi": {
+    "overall": {
+      "model": "gpt-4.1-nano",
+      "persona": "You are a trasgender",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": null
+    }
+  },
+  "agent_1": {
+    "overall": {},
+    "round_0": {
+      "input": "\nThere are 4 principles of distributive justice:\n\n1. Maximize the Minimum Income: The principle that ensures the worst-off member of society is as well-off as possible.\n\n2. Maximize the Average Income: The principle that ensures the greatest possible total income for the group, without regard for its distribution.\n\n3. Maximize the Average Income with a Floor Constraint: A hybrid principle that establishes a minimum guaranteed income (a 'safety net') for everyone, and then maximizes the average income.\n\n4. Maximize the Average Income with a Range Constraint: A hybrid principle that limits the gap between the richest and poorest members, and then maximizes the average income.\n\n\n\nPlease carefully evaluate each of these four principles of distributive justice.\n\nConsider that:\n- You are behind a 'veil of ignorance' - you don't know your future economic position\n- Your position (wealthy, middle class, or poor) will be randomly assigned AFTER the group decides\n\nAfter your evaluation, please:\n1. State which principle you choose (1, 2, 3, or 4)\n2. Explain your reasoning clearly\n\nFormat your response clearly with your final choice at the end.\n",
+      "output": "Given the veil of ignorance, I want a principle that protects me regardless of my future position. \n\n- **Maximize the Minimum Income (1)** ensures that even the worst-off are as well-off as possible, which seems fair because I could end up in that position.\n- **Maximize the Average Income (2)** might benefit the majority but could leave the worst-off worse off, which I want to avoid.\n- **Maximize the Average Income with a Floor Constraint (3)** guarantees a safety net, reducing the risk of being very poor, which is appealing.\n- **Maximize the Average Income with a Range Constraint (4)** limits inequality, which I also value for fairness.\n\nConsidering fairness and risk aversion, I prefer a principle that guarantees a minimum standard of well-being while still promoting overall prosperity. Therefore, I choose:\n\n**3. Maximize the Average Income with a Floor Constraint.**\n\nThis principle offers a safety net for everyone, aligning with fairness and protecting me if I end up in a less fortunate position.",
+      "rating_likert": "Maximize the Average Income with a Floor Constraint",
+      "rating_numeric": 3
+    },
+    "round_1": {
+      "speaking_order": 3,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nHeidi: I believe that Principle 3 offers a fair and balanced approach for our society. By establishing a minimum guaranteed income, we protect those who are most vulnerable, ensuring they are not left behind. At the same time, maximizing the average income encourages overall prosperity and growth. This hybrid approach addresses concerns about inequality and security, providing stability for everyone regardless of future position. I think adopting Principle 3 aligns with our shared values of fairness and social stability. Therefore, I support Principle 3.\nBoris: I appreciate Heidi’s thoughtful support for Principle 3, as it indeed balances security with growth. I believe this principle offers a practical way to ensure that everyone’s basic needs are met, which fosters social stability and fairness. By guaranteeing a minimum income, we reduce the risk for those who might be most vulnerable, while still encouraging overall prosperity. I think this approach aligns well with our shared values of fairness and stability, and I support Principle 3.\n\nYour current choice: Principle 3",
+      "memory": "The discussion is currently centered around Principle 3, with Heidi and Boris both advocating strongly for it due to its balance of security and prosperity. They emphasize fairness, protection for the vulnerable, and social stability. There is a clear consensus forming around Principle 3, but no other principles have been explicitly discussed or opposed yet. The group seems to value safety nets and fairness highly, which aligns with their shared concern for social stability.",
+      "strategy": "Given the strong support for Principle 3, I should acknowledge its merits to build rapport and demonstrate understanding. However, I also need to consider the possibility of introducing a nuanced perspective—perhaps emphasizing the importance of limiting inequality further or discussing potential trade-offs. My goal is to work toward consensus by validating the shared values of fairness and security, while subtly suggesting that we might also consider how to balance these with efficiency or inequality constraints. I will aim to propose a slight modification or ask clarifying questions to keep the discussion open and collaborative.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: Given the strong support for Principle 3, I should acknowledge its merits to build rapport and demonstrate understanding. However, I also need to consider the possibility of introducing a nuanced perspective—perhaps emphasizing the importance of limiting inequality further or discussing potential trade-offs. My goal is to work toward consensus by validating the shared values of fairness and security, while subtly suggesting that we might also consider how to balance these with efficiency or inequality constraints. I will aim to propose a slight modification or ask clarifying questions to keep the discussion open and collaborative.\n\nSPEAKERS IN THIS ROUND SO FAR:\nHeidi: I believe that Principle 3 offers a fair and balanced approach for our society. By establishing a minimum guaranteed income, we protect those who are most vulnerable, ensuring they are not left behind. At the same time, maximizing the average income encourages overall prosperity and growth. This hybrid approach addresses concerns about inequality and security, providing stability for everyone regardless of future position. I think adopting Principle 3 aligns with our shared values of fairness and social stability. Therefore, I support Principle 3.\nBoris: I appreciate Heidi’s thoughtful support for Principle 3, as it indeed balances security with growth. I believe this principle offers a practical way to ensure that everyone’s basic needs are met, which fosters social stability and fairness. By guaranteeing a minimum income, we reduce the risk for those who might be most vulnerable, while still encouraging overall prosperity. I think this approach aligns well with our shared values of fairness and stability, and I support Principle 3.\n\nYour current choice: Principle 3\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Thank you, Heidi and Boris, for highlighting the strengths of Principle 3. I agree that establishing a minimum guaranteed income is crucial for protecting the most vulnerable and promoting social stability. It strikes a good balance between fairness and growth. \n\nHowever, I wonder if we might also consider how to further limit inequality, perhaps by incorporating some constraints on the range between the richest and poorest. This could help ensure that while we promote overall prosperity, we also prevent disparities from becoming too extreme, which might threaten social cohesion in the long run.\n\nOverall, I support Principle 3, but I am open to discussing how we might refine it to better address inequality concerns while maintaining fairness and security for all. \n\nMy current choice remains: Principle 3."
+      },
+      "communication": "Thank you, Heidi and Boris, for highlighting the strengths of Principle 3. I agree that establishing a minimum guaranteed income is crucial for protecting the most vulnerable and promoting social stability. It strikes a good balance between fairness and growth. \n\nHowever, I wonder if we might also consider how to further limit inequality, perhaps by incorporating some constraints on the range between the richest and poorest. This could help ensure that while we promote overall prosperity, we also prevent disparities from becoming too extreme, which might threaten social cohesion in the long run.\n\nOverall, I support Principle 3, but I am open to discussing how we might refine it to better address inequality concerns while maintaining fairness and security for all. \n\nMy current choice remains: Principle 3.",
+      "choice": "Maximize the Average Income with a Floor Constraint"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "Maximize the Average Income with a Floor Constraint",
+      "num_rounds": 1,
+      "satisfaction": "agree"
+    }
+  },
+  "agent_2": {
+    "overall": {},
+    "round_0": {
+      "input": "\nThere are 4 principles of distributive justice:\n\n1. Maximize the Minimum Income: The principle that ensures the worst-off member of society is as well-off as possible.\n\n2. Maximize the Average Income: The principle that ensures the greatest possible total income for the group, without regard for its distribution.\n\n3. Maximize the Average Income with a Floor Constraint: A hybrid principle that establishes a minimum guaranteed income (a 'safety net') for everyone, and then maximizes the average income.\n\n4. Maximize the Average Income with a Range Constraint: A hybrid principle that limits the gap between the richest and poorest members, and then maximizes the average income.\n\n\n\nPlease carefully evaluate each of these four principles of distributive justice.\n\nConsider that:\n- You are behind a 'veil of ignorance' - you don't know your future economic position\n- Your position (wealthy, middle class, or poor) will be randomly assigned AFTER the group decides\n\nAfter your evaluation, please:\n1. State which principle you choose (1, 2, 3, or 4)\n2. Explain your reasoning clearly\n\nFormat your response clearly with your final choice at the end.\n",
+      "output": "Given the veil of ignorance, I want a principle that protects me regardless of my future position. \n\n- **Maximize the Minimum Income (1):** This ensures the worst-off are as well-off as possible, which I would prefer because I could end up in that position.\n- **Maximize the Average Income (2):** While beneficial for overall wealth, it might lead to significant inequality, which I would want to avoid if I end up poor.\n- **Maximize the Average Income with a Floor Constraint (3):** This guarantees a minimum income for everyone, providing security, and then improves overall wealth.\n- **Maximize the Average Income with a Range Constraint (4):** Limits inequality while still aiming for high average income, balancing fairness and efficiency.\n\nConsidering fairness and security for all, especially the worst-off, I favor principles that protect the vulnerable. \n\n**My choice is Principle 3** because it guarantees a safety net for everyone, reducing the risk of ending up in extreme poverty, while still promoting overall economic growth.\n\n**Final choice: 3**",
+      "rating_likert": "Maximize the Average Income with a Floor Constraint",
+      "rating_numeric": 3
+    },
+    "round_1": {
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nHeidi: I believe that Principle 3 offers a fair and balanced approach for our society. By establishing a minimum guaranteed income, we protect those who are most vulnerable, ensuring they are not left behind. At the same time, maximizing the average income encourages overall prosperity and growth. This hybrid approach addresses concerns about inequality and security, providing stability for everyone regardless of future position. I think adopting Principle 3 aligns with our shared values of fairness and social stability. Therefore, I support Principle 3.\n\nYour current choice: Principle 3",
+      "memory": "The group is largely converging around Principle 3—Maximize the Average Income with a Floor Constraint—based on shared concerns about fairness, security, and social stability. Heidi and Boris both support this principle, emphasizing its balance between protecting the vulnerable and promoting overall prosperity. Agent_1 initially favored this as well, and so far, there’s a consensus forming around it. No strong opposition has emerged, and the discussion seems to be moving toward collective agreement.",
+      "strategy": "Given the current consensus, my goal should be to reinforce support for Principle 3 by emphasizing its fairness and stability benefits. I will acknowledge the shared values of security and prosperity, and suggest that adopting this principle ensures everyone’s basic needs are met while still encouraging growth. To work toward consensus, I can propose minor adjustments or clarifications that highlight its advantages for all, including those who might be more risk-averse. This approach maintains alignment with the group’s emerging consensus while subtly advancing my goal of promoting a fair, balanced distribution.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: Given the current consensus, my goal should be to reinforce support for Principle 3 by emphasizing its fairness and stability benefits. I will acknowledge the shared values of security and prosperity, and suggest that adopting this principle ensures everyone’s basic needs are met while still encouraging growth. To work toward consensus, I can propose minor adjustments or clarifications that highlight its advantages for all, including those who might be more risk-averse. This approach maintains alignment with the group’s emerging consensus while subtly advancing my goal of promoting a fair, balanced distribution.\n\nSPEAKERS IN THIS ROUND SO FAR:\nHeidi: I believe that Principle 3 offers a fair and balanced approach for our society. By establishing a minimum guaranteed income, we protect those who are most vulnerable, ensuring they are not left behind. At the same time, maximizing the average income encourages overall prosperity and growth. This hybrid approach addresses concerns about inequality and security, providing stability for everyone regardless of future position. I think adopting Principle 3 aligns with our shared values of fairness and social stability. Therefore, I support Principle 3.\n\nYour current choice: Principle 3\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "I appreciate Heidi’s thoughtful support for Principle 3, as it indeed balances security with growth. I believe this principle offers a practical way to ensure that everyone’s basic needs are met, which fosters social stability and fairness. By guaranteeing a minimum income, we reduce the risk for those who might be most vulnerable, while still encouraging overall prosperity. I think this approach aligns well with our shared values of fairness and stability, and I support Principle 3."
+      },
+      "communication": "I appreciate Heidi’s thoughtful support for Principle 3, as it indeed balances security with growth. I believe this principle offers a practical way to ensure that everyone’s basic needs are met, which fosters social stability and fairness. By guaranteeing a minimum income, we reduce the risk for those who might be most vulnerable, while still encouraging overall prosperity. I think this approach aligns well with our shared values of fairness and stability, and I support Principle 3.",
+      "choice": "Maximize the Average Income with a Floor Constraint"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "Maximize the Average Income with a Floor Constraint",
+      "num_rounds": 1,
+      "satisfaction": "agree"
+    }
+  },
+  "agent_3": {
+    "overall": {},
+    "round_0": {
+      "input": "\nThere are 4 principles of distributive justice:\n\n1. Maximize the Minimum Income: The principle that ensures the worst-off member of society is as well-off as possible.\n\n2. Maximize the Average Income: The principle that ensures the greatest possible total income for the group, without regard for its distribution.\n\n3. Maximize the Average Income with a Floor Constraint: A hybrid principle that establishes a minimum guaranteed income (a 'safety net') for everyone, and then maximizes the average income.\n\n4. Maximize the Average Income with a Range Constraint: A hybrid principle that limits the gap between the richest and poorest members, and then maximizes the average income.\n\n\n\nPlease carefully evaluate each of these four principles of distributive justice.\n\nConsider that:\n- You are behind a 'veil of ignorance' - you don't know your future economic position\n- Your position (wealthy, middle class, or poor) will be randomly assigned AFTER the group decides\n\nAfter your evaluation, please:\n1. State which principle you choose (1, 2, 3, or 4)\n2. Explain your reasoning clearly\n\nFormat your response clearly with your final choice at the end.\n",
+      "output": "Given the veil of ignorance, I want a principle that protects me regardless of my future position. \n\n- **Maximize the Minimum Income (1):** Ensures the worst-off are as well-off as possible, which I would prefer if I end up poor.\n- **Maximize the Average Income (2):** Focuses on total wealth but could lead to significant inequality, risking being in the worst-off group.\n- **Maximize the Average Income with a Floor Constraint (3):** Guarantees a safety net, reducing the risk of ending up in extreme poverty, which is appealing.\n- **Maximize the Average Income with a Range Constraint (4):** Limits inequality while still promoting overall wealth, balancing fairness and efficiency.\n\nConsidering fairness and my uncertainty about my future position, I favor a principle that provides security and fairness for all, especially the worst-off. Therefore, I choose:\n\n**Principle 3: Maximize the Average Income with a Floor Constraint.**\n\nThis approach offers a safety net, reducing the risk of being in extreme poverty, while still promoting overall economic growth.",
+      "rating_likert": "Maximize the Average Income with a Floor Constraint",
+      "rating_numeric": 3
+    },
+    "round_1": {
+      "speaking_order": 1,
+      "public_history": "\nYour current choice: Principle 3",
+      "memory": "The group is largely aligned in favor of Principle 3—Maximize the Average Income with a Floor Constraint—based on the initial statements. Both Boris and Heidi emphasize the importance of security and fairness for the worst-off, especially given the veil of ignorance. Agent_1 also expressed a preference for this principle, citing fairness and risk mitigation. There appears to be a consensus forming around the idea that guaranteeing a safety net is crucial, though some may still consider other principles if persuaded.",
+      "strategy": "My goal is to reinforce the appeal of Principle 3 by emphasizing its fairness and risk mitigation benefits, which resonate with the others’ priorities. I should acknowledge their concerns about inequality and security, and suggest that Principle 3 strikes a balanced compromise—protecting the worst-off while still promoting overall prosperity. To work toward consensus, I will focus on common values and propose that adopting Principle 3 ensures fairness and stability for everyone, regardless of future position. This approach can help build trust and move the group toward unanimous agreement.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: My goal is to reinforce the appeal of Principle 3 by emphasizing its fairness and risk mitigation benefits, which resonate with the others’ priorities. I should acknowledge their concerns about inequality and security, and suggest that Principle 3 strikes a balanced compromise—protecting the worst-off while still promoting overall prosperity. To work toward consensus, I will focus on common values and propose that adopting Principle 3 ensures fairness and stability for everyone, regardless of future position. This approach can help build trust and move the group toward unanimous agreement.\n\n\nYour current choice: Principle 3\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "I believe that Principle 3 offers a fair and balanced approach for our society. By establishing a minimum guaranteed income, we protect those who are most vulnerable, ensuring they are not left behind. At the same time, maximizing the average income encourages overall prosperity and growth. This hybrid approach addresses concerns about inequality and security, providing stability for everyone regardless of future position. I think adopting Principle 3 aligns with our shared values of fairness and social stability. Therefore, I support Principle 3."
+      },
+      "communication": "I believe that Principle 3 offers a fair and balanced approach for our society. By establishing a minimum guaranteed income, we protect those who are most vulnerable, ensuring they are not left behind. At the same time, maximizing the average income encourages overall prosperity and growth. This hybrid approach addresses concerns about inequality and security, providing stability for everyone regardless of future position. I think adopting Principle 3 aligns with our shared values of fairness and social stability. Therefore, I support Principle 3.",
+      "choice": "Maximize the Average Income with a Floor Constraint"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "Maximize the Average Income with a Floor Constraint",
+      "num_rounds": 1,
+      "satisfaction": "agree"
+    }
+  }
+}
