@@ -199,7 +199,7 @@ def create_deliberation_agents(agent_configs: List, defaults, global_temperature
         
         # OpenAI models - explicit handling to ensure they're not caught by other conditions
         elif any(openai_pattern in model_name.lower() for openai_pattern in [
-            "gpt-4", "gpt-3.5", "o1", "o3", "o4", "gpt-image", "sora"
+            "gpt-4", "gpt-3.5", "o1", "o3", "o4","o3-mini", "gpt-image", "sora"
         ]):
             # OpenAI models use the model name directly (no LitellmModel wrapper needed)
             model = model_name

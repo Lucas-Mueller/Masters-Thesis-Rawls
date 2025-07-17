@@ -1,0 +1,30 @@
+{
+  "generation_timestamp": "20250715_145207",
+  "num_configs": 3,
+  "output_directory": "test_fixes_batch",
+  "experiment_prefix": "test_fix",
+  "parameter_distributions": {
+    "memory_strategies": {
+      "full": 0.6,
+      "recent": 0.3,
+      "decomposed": 0.1
+    },
+    "models": {
+      "gpt-4.1-mini": 0.5,
+      "gpt-4o-mini": 0.3,
+      "claude-sonnet-4": 0.2
+    },
+    "agent_counts": {
+      "3": 1.0
+    },
+    "round_counts": {
+      "2": 1.0
+    },
+    "temperature_config": "(0.0, 1.0)"
+  },
+  "generated_files": [
+    "test_fix_001.yaml",
+    "test_fix_002.yaml",
+    "test_fix_003.yaml"
+  ]
+}

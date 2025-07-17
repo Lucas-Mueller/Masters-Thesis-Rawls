@@ -1,0 +1,45 @@
+experiment:
+  decision_rule: unanimity
+  timeout_seconds: 300
+  max_rounds: 5
+defaults:
+  personality: You are an agent tasked to design a future society.
+  model: gpt-4.1-mini
+  temperature: 0.5
+memory_strategy: decomposed
+output:
+  directory: hypothesis_experiments/hypothesis_test_batch_20250715_130557/results
+  formats:
+  - json
+  include_feedback: false
+  include_transcript: false
+performance:
+  parallel_feedback: false
+  trace_enabled: true
+  debug_mode: false
+logging:
+  enabled: true
+  capture_raw_inputs: true
+  capture_raw_outputs: true
+  capture_memory_context: true
+  capture_memory_steps: true
+  include_processing_times: true
+experiment_id: hyp_random_001
+individual_temperatures:
+- 0.15601864044243652
+- 0.15599452033620265
+- 0.05808361216819946
+- 0.8661761457749352
+agents:
+- name: Agent_1
+  model: Llama-4
+  temperature: 0.15601864044243652
+- name: Agent_2
+  model: grok-4
+  temperature: 0.15599452033620265
+- name: Agent_3
+  model: gpt-4.1-mini
+  temperature: 0.05808361216819946
+- name: Agent_4
+  model: gemini-flash
+  temperature: 0.8661761457749352

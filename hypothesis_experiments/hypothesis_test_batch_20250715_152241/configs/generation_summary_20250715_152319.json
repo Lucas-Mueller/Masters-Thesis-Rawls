@@ -1,0 +1,45 @@
+{
+  "generation_timestamp": "20250715_152319",
+  "num_configs": 6,
+  "output_directory": "hypothesis_experiments/hypothesis_test_batch_20250715_152241/configs",
+  "experiment_prefix": "test_tuesday-2",
+  "parameter_distributions": {
+    "memory_strategies": {
+      "full": 1,
+      "recent": 0,
+      "decomposed": 0
+    },
+    "models": {
+      "gpt-4.1-mini": 0.1,
+      "gpt-4.1-nano": 0.1,
+      "gpt-4.1": 0.1,
+      "claude-sonnet-4": 0.1,
+      "deepseek-chat": 0.1,
+      "deepseek-reasoner": 0.1,
+      "Llama-4": 0.1,
+      "grok-4": 0.1,
+      "gemini-pro": 0.1,
+      "gemini-flash": 0.1
+    },
+    "agent_counts": {
+      "3": 0.2,
+      "4": 0.3,
+      "5": 0.3,
+      "6": 0.2
+    },
+    "round_counts": {
+      "2": 0.4,
+      "3": 0.4,
+      "4": 0.2
+    },
+    "temperature_config": "0.0"
+  },
+  "generated_files": [
+    "test_tuesday-2_001.yaml",
+    "test_tuesday-2_002.yaml",
+    "test_tuesday-2_003.yaml",
+    "test_tuesday-2_004.yaml",
+    "test_tuesday-2_005.yaml",
+    "test_tuesday-2_006.yaml"
+  ]
+}

@@ -133,16 +133,18 @@ class RoundContext:
 class ConversationService:
     """Service for managing agent communication flow and patterns."""
     
-    def __init__(self, communication_pattern: CommunicationPattern = None):
+    def __init__(self, communication_pattern: CommunicationPattern = None, logger=None):
         """
         Initialize conversation service.
         
         Args:
             communication_pattern: Pattern for generating speaking orders.
                                   Defaults to RandomCommunicationPattern.
+            logger: ExperimentLogger instance for logging agent interactions
         """
         self.pattern = communication_pattern or RandomCommunicationPattern()
         self.speaking_orders: List[List[str]] = []
+        self.logger = logger
     
     def generate_speaking_order(self, agents: List[DeliberationAgent], round_num: int) -> List[str]:
         """
@@ -202,9 +204,52 @@ Format your response clearly with your final choice at the end.
 """
             
             # Get agent's response
+            import time
+            start_time = time.time()
+            
+            # Log input prompt
+            if self.logger:
+                self.logger.log_agent_interaction(
+                    agent_id=agent.agent_id,
+                    agent_name=agent.name,
+                    round_num=0,
+                    speaking_position=position,
+                    input_prompt=evaluation_prompt,
+                    model_used=getattr(agent, 'model', 'unknown'),
+                    temperature=getattr(agent, 'temperature', None)
+                )
+            
             result = await Runner.run(agent, evaluation_prompt)
             response_text = ItemHelpers.text_message_outputs(result.new_items)
+            processing_time_ms = (time.time() - start_time) * 1000
+            
+            # Log raw response
+            if self.logger:
+                self.logger.log_agent_interaction(
+                    agent_id=agent.agent_id,
+                    agent_name=agent.name,
+                    round_num=0,
+                    speaking_position=position,
+                    raw_llm_response=response_text,
+                    processing_time_ms=processing_time_ms
+                )
+            
             choice = await self._extract_principle_choice(response_text, agent.agent_id, agent.name)
+            
+            # Log parsed response
+            if self.logger:
+                self.logger.log_agent_interaction(
+                    agent_id=agent.agent_id,
+                    agent_name=agent.name,
+                    round_num=0,
+                    speaking_position=position,
+                    parsed_response={
+                        "principle_id": choice.principle_id,
+                        "principle_name": choice.principle_name,
+                        "reasoning": choice.reasoning,
+                        "public_message": response_text
+                    }
+                )
             
             agent.current_choice = choice
             print(f"    Chose Principle {choice.principle_id}")
@@ -345,8 +390,37 @@ What do you want to say to the group? End with your current principle choice (1,
 """
         
         # Get public communication
+        import time
+        start_time = time.time()
+        
+        # Log input prompt
+        if self.logger:
+            self.logger.log_agent_interaction(
+                agent_id=agent.agent_id,
+                agent_name=agent.name,
+                round_num=round_context.round_number,
+                speaking_position=getattr(agent, '_current_speaking_position', 0),
+                input_prompt=communication_prompt,
+                model_used=getattr(agent, 'model', 'unknown'),
+                temperature=getattr(agent, 'temperature', None)
+            )
+        
         comm_result = await Runner.run(agent, communication_prompt)
-        return ItemHelpers.text_message_outputs(comm_result.new_items)
+        response_text = ItemHelpers.text_message_outputs(comm_result.new_items)
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        # Log raw response
+        if self.logger:
+            self.logger.log_agent_interaction(
+                agent_id=agent.agent_id,
+                agent_name=agent.name,
+                round_num=round_context.round_number,
+                speaking_position=getattr(agent, '_current_speaking_position', 0),
+                raw_llm_response=response_text,
+                processing_time_ms=processing_time_ms
+            )
+        
+        return response_text
     
     def _build_public_context(self, agent_id: str, round_context: RoundContext) -> str:
         """Build context for public communication."""

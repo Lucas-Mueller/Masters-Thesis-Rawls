@@ -1,0 +1,49 @@
+{
+  "batch_id": "hypothesis_test_batch_20250715_152336",
+  "created_at": "2025-07-15T15:25:46.920952",
+  "total_configs": 6,
+  "config_files": [
+    "test_tuesday-2_001",
+    "test_tuesday-2_002",
+    "test_tuesday-2_003",
+    "test_tuesday-2_004",
+    "test_tuesday-2_005",
+    "test_tuesday-2_006"
+  ],
+  "generation_type": "randomized_distributions",
+  "hypothesis": "The initial and final assessment of the 4 different principles differs",
+  "statistical_approach": "Non-parametric (Wilcoxon, permutation tests)",
+  "design_principle": "Randomized parameter selection with specified distributions",
+  "parameter_distributions": {
+    "memory_strategies": {
+      "full": 1,
+      "recent": 0,
+      "decomposed": 0
+    },
+    "models": {
+      "gpt-4.1-mini": 0.1,
+      "gpt-4.1-nano": 0.1,
+      "gpt-4.1": 0.1,
+      "claude-sonnet-4": 0.1,
+      "deepseek-chat": 0.1,
+      "deepseek-reasoner": 0.1,
+      "Llama-4": 0.1,
+      "grok-4": 0.1,
+      "gemini-pro": 0.1,
+      "gemini-flash": 0.1
+    },
+    "agent_counts": {
+      "3": 0.4,
+      "4": 0.4,
+      "5": 0.2,
+      "6": 0.0
+    },
+    "round_counts": {
+      "2": 0.2,
+      "3": 0.4,
+      "4": 0.4,
+      "5": 0.0
+    },
+    "temperature_config": "Range (0.0, 1.0) - uniform distribution, random global/individual strategy"
+  }
+}

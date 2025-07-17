@@ -58,6 +58,16 @@ class DefaultConfig(BaseModel):
     temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Default temperature for agents (0.0-2.0)")
 
 
+class LoggingConfig(BaseModel):
+    """Configuration for experiment logging."""
+    enabled: bool = Field(default=True, description="Enable comprehensive logging")
+    capture_raw_inputs: bool = Field(default=True, description="Log full prompts sent to agents")
+    capture_raw_outputs: bool = Field(default=True, description="Log complete LLM responses")
+    capture_memory_context: bool = Field(default=True, description="Log memory contexts provided to agents")
+    capture_memory_steps: bool = Field(default=True, description="Log decomposed memory steps (if using decomposed strategy)")
+    include_processing_times: bool = Field(default=True, description="Include timing information for all operations")
+
+
 class PrincipleChoice(BaseModel):
     """Represents an agent's choice of distributive justice principle."""
     principle_id: int = Field(..., ge=1, le=4, description="Principle ID (1-4)")
@@ -124,6 +134,7 @@ class ExperimentConfig(BaseModel):
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
     memory_strategy: str = Field(default="full", description="Memory strategy: full|recent|decomposed")
+    logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
     
     @property
     def num_agents(self) -> int:

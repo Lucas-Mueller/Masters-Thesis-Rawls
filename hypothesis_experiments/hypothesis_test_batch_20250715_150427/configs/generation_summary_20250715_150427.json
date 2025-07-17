@@ -1,0 +1,32 @@
+{
+  "generation_timestamp": "20250715_150427",
+  "num_configs": 5,
+  "output_directory": "hypothesis_experiments/hypothesis_test_batch_20250715_150427/configs",
+  "experiment_prefix": "test_clean",
+  "parameter_distributions": {
+    "memory_strategies": {
+      "full": 0.6,
+      "recent": 0.3,
+      "decomposed": 0.1
+    },
+    "models": {
+      "gpt-4.1-mini": 0.4,
+      "gpt-4o-mini": 0.4,
+      "claude-sonnet-4": 0.2
+    },
+    "agent_counts": {
+      "3": 1.0
+    },
+    "round_counts": {
+      "2": 1.0
+    },
+    "temperature_config": "(0.0, 1.0)"
+  },
+  "generated_files": [
+    "test_clean_001.yaml",
+    "test_clean_002.yaml",
+    "test_clean_003.yaml",
+    "test_clean_004.yaml",
+    "test_clean_005.yaml"
+  ]
+}

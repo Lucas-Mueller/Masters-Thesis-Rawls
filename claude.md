@@ -30,6 +30,7 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - `ConversationService` (src/maai/services/conversation_service.py): Communication pattern management
 - `MemoryService` (src/maai/services/memory_service.py): Agent memory management strategies
 - `EvaluationService` (src/maai/services/evaluation_service.py): Likert scale evaluation processing
+- `ExperimentLogger` (src/maai/services/experiment_logger.py): Comprehensive single-file experiment data collection
 
 **Key Design Decisions**:
 - **No Confidence Scores**: LLMs cannot reliably assess confidence, so confidence scoring has been removed entirely
@@ -58,30 +59,47 @@ pip install -r requirements.txt
 
 **Quick Test (3 agents, 2 rounds)**:
 ```bash
-python run_quick_demo.py
+# Note: run_quick_demo.py file not found in current codebase
+# Use run_config.py with quick_test configuration instead
+python run_config.py  # Edit DEFAULT_CONFIG_NAME to "quick_test" first
 ```
 
 **Universal Configuration Runner**:
 ```bash
 python run_config.py
-# Edit CONFIG_NAME variable on line 27 to switch configurations
+# Edit DEFAULT_CONFIG_NAME variable on line 30 to switch configurations (currently set to "lucas")
+```
+
+**Parallel Experiment Execution**:
+```bash
+# Run experiments in parallel for faster execution
+python run_experiments_parallel.py --num-experiments 10 --max-concurrent 3
+
+# Jupyter notebook with parallel execution
+# experiment_runner.ipynb (includes parallel execution with semaphore-based rate limiting)
 ```
 
 **Available Configurations**:
-- `quick_test`: 3 agents, 2 rounds (1-2 minutes)
+- `lucas`: Custom configuration for specific research scenarios (default)
 - `decomposed_memory_test`: 3 agents with decomposed memory strategy (test new memory system)
-- `lucas`: Custom configuration for specific research scenarios
-- `smart`: Different AI models with custom personalities
+- `temperature_test`: Reproducible experiments with temperature=0.0 for deterministic results
 - `default`: Standard experimental setup
 - `test_custom`: Template for custom configurations
+- `comprehensive_example`: Full-featured configuration example
+- `hyp_random_XXX`: Generated configurations for hypothesis testing (001-010)
+- `test_clean_XXX`: Clean test configurations (001-005)
+- `test_fix_XXX`: Test configurations for bug fixes (001-003)
 
 ### Testing
 ```bash
 # Run all tests (consolidated)
 python run_tests.py
 
-# Run individual test directly
+# Run individual test files
 python tests/test_core.py
+python tests/test_decomposed_memory.py
+python tests/test_experiment_logger.py
+python tests/test_temperature_configuration.py
 ```
 
 ### Direct API Usage
@@ -95,16 +113,24 @@ config = load_config_from_file('quick_test')
 results = await run_single_experiment(config)
 ```
 
-### Demo System
+### Additional Development Tools
+
+**Random Configuration Generation**:
 ```bash
-# Phase 1: Core multi-agent deliberation
-python demos/demo_phase1.py
+python generate_random_configs.py
+```
 
-# Phase 2: Enhanced features (feedback, export, configuration)
-python demos/demo_phase2.py
+**Hypothesis Testing**:
+```bash
+# Use Jupyter notebooks for hypothesis testing
+jupyter notebook hypothesis_testing_experiment_refined.ipynb
+jupyter notebook hypothesis_analysis.ipynb
+jupyter notebook experiment_runner.ipynb
+```
 
-# Advanced service usage examples
-python example_service_usage.py
+**Test Fixes**:
+```bash
+python test_fixes.py
 ```
 
 ## Configuration System
@@ -119,6 +145,12 @@ python example_service_usage.py
 - If fewer agents are specified, remaining agents use the `defaults` configuration
 - Personalities can be full text descriptions or references to saved personality templates
 - Default personality: "You are an agent tasked to design a future society."
+
+**Temperature Configuration**:
+- `global_temperature`: Sets temperature for all agents (overrides individual and default settings)
+- Individual agents can specify their own `temperature` value
+- Default temperature can be set in the `defaults` section
+- Temperature precedence: `global_temperature` > agent-specific `temperature` > default `temperature`
 
 **Memory Strategy System**:
 - Configure how agents generate and manage private memories using `memory_strategy` field
@@ -135,6 +167,8 @@ python example_service_usage.py
 **Example Configuration Structure**:
 ```yaml
 experiment_id: my_experiment
+global_temperature: 0.0  # Global temperature for reproducible results
+
 experiment:
   max_rounds: 5
   decision_rule: unanimity
@@ -147,6 +181,7 @@ agents:
   - name: "Agent_1"
     model: "gpt-4.1-mini"
     personality: "You are an economist focused on efficiency and optimal resource allocation."
+    temperature: 0.0  # Agent-specific temperature override
   - name: "Agent_2"
     model: "gpt-4.1"
     personality: "You are a philosopher concerned with justice and fairness for all members of society."
@@ -157,6 +192,7 @@ agents:
 defaults:
   personality: "You are an agent tasked to design a future society."
   model: "gpt-4.1-mini"
+  temperature: 0.1  # Default temperature (overridden by global_temperature)
 
 output:
   directory: experiment_results
@@ -164,10 +200,41 @@ output:
   include_feedback: true
 ```
 
+## Parallel Execution System
+
+**Performance Benefits**:
+- **Speed**: ~3x faster execution with default settings (3 concurrent experiments)
+- **Scalability**: Adjustable concurrency based on API rate limits
+- **Efficiency**: Better resource utilization and API capacity usage
+- **Resilience**: Individual experiment failures don't block others
+
+**Key Features**:
+- **Semaphore-based Rate Limiting**: Prevents overwhelming API services
+- **Real-time Progress Reporting**: See results as experiments complete
+- **Robust Error Handling**: Graceful handling of individual experiment failures
+- **Performance Metrics**: Detailed speedup and efficiency analysis
+
+**Configuration Options**:
+```python
+MAX_CONCURRENT_EXPERIMENTS = 3  # Conservative default
+# Increase for faster execution (if API limits allow)
+# Decrease if encountering rate limiting issues
+```
+
+**Usage Examples**:
+```bash
+# Command line parallel execution
+python run_experiments_parallel.py --num-experiments 20 --max-concurrent 5
+
+# Jupyter notebook (experiment_runner.ipynb)
+# Uses asyncio.gather() with semaphore control for optimal performance
+```
+
 ## Data Export System
 
 **Experiment Results** are saved to `experiment_results/` with multiple formats:
-- `[ID]_complete.json`: Full structured experiment data
+- `[ID].json`: Full structured experiment data (single file format)
+- `[ID]_complete.json`: Full structured experiment data (legacy format)
 - `[ID]_data.csv`: Main conversation transcript data
 - `[ID]_initial_evaluation.csv`: Initial Likert scale assessments (before deliberation)
 - `[ID]_initial_evaluation.json`: Initial ratings with statistics
@@ -175,6 +242,13 @@ output:
 - `[ID]_evaluation.json`: Final ratings with statistics
 - `[ID]_comparison.csv`: Before/after rating comparison analysis
 - `[ID]_transcript.txt`: Human-readable conversation log
+
+**Batch Experiment Results** are organized into timestamped directories:
+- `hypothesis_test_batch_[TIMESTAMP]/`: Contains batch execution results
+- `execution_summary.json`: Summary of batch execution
+- `experiment_metadata.json`: Metadata for batch experiments
+- `consolidated_rating_data.csv`: Aggregated rating data across experiments
+- `statistical_results.json`: Statistical analysis results
 
 ## Environment Variables
 
@@ -184,6 +258,8 @@ output:
 **Optional**:
 - `ANTHROPIC_API_KEY`: For Claude models
 - `DEEPSEEK_API_KEY`: For DeepSeek models
+- `GROQ_API_KEY`: For Groq models
+- `GEMINI_API_KEY`: For Google Gemini models
 - `AGENT_OPS_API_KEY`: For AgentOps monitoring (session named with experiment ID)
 
 ## Key Architecture Notes
@@ -194,6 +270,7 @@ output:
 - `ExperimentConfig` (src/maai/core/models.py:115): Pydantic model for experiment configuration
 - `PrincipleChoice` (src/maai/core/models.py:59): Structured agent decision representation
 - `LikertScale` (src/maai/core/models.py:12): 4-point scale for principle evaluation
+- `ExperimentLogger` (src/maai/services/experiment_logger.py:15): In-memory data collector for comprehensive experiment logging
 
 **Data Flow**:
 1. Load YAML config via `load_config_from_file()` in `src/maai/config/manager.py`
@@ -244,6 +321,21 @@ results = await orchestrator.run_experiment(config)
 
 This allows researchers to A/B test different consensus mechanisms, communication patterns, and memory strategies without changing core code.
 
+## Batch Experiment System
+
+**Hypothesis Testing Framework**:
+- Use `hypothesis_experiments/` directory for organized batch testing
+- Each batch creates a timestamped directory with configs and results
+- Supports parallel execution of multiple experiment configurations
+- Automatic statistical analysis and data consolidation
+
+**Key Features**:
+- **Automated Config Generation**: Generate multiple test configurations with variations
+- **Parallel Execution**: Run multiple experiments concurrently with rate limiting
+- **Statistical Analysis**: Automatic calculation of statistical significance
+- **Data Consolidation**: Aggregate results across experiments for analysis
+- **Reproducible Results**: Timestamped directories maintain experiment provenance
+
 ## Development Guidelines
 
 ### Code Style
@@ -280,3 +372,12 @@ This allows researchers to A/B test different consensus mechanisms, communicatio
 - Configuration management in `src/maai/config/`
 - Export functionality in `src/maai/export/`
 - All modules have `__init__.py` files
+- Documentation in `docs/` directory with visualization tools
+- Feature planning in `feature_plan/` directory
+- Knowledge base in `knowledge_base/` with SDK documentation and best practices
+
+### Documentation and Analysis Tools
+- **Visualization**: Use `docs/visualization/generate_overview.py` for system overview generation
+- **Memory Analysis**: Reference `docs/memory_strategies_guide.md` for memory strategy documentation
+- **Feature Planning**: Use `feature_plan/` directory for development roadmaps and analysis
+- **Knowledge Base**: Complete OpenAI Agents SDK documentation and best practices in `knowledge_base/`

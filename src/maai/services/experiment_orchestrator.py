@@ -20,11 +20,11 @@ from ..core.models import (
     get_principle_by_id
 )
 from ..agents.enhanced import DeliberationAgent, create_deliberation_agents, create_discussion_moderator
-from ..export.data_export import export_experiment_data
 from .consensus_service import ConsensusService
 from .conversation_service import ConversationService, RoundContext
 from .memory_service import MemoryService
 from .evaluation_service import EvaluationService
+from .experiment_logger import ExperimentLogger
 
 
 class ExperimentOrchestrator:
@@ -64,6 +64,9 @@ class ExperimentOrchestrator:
             average_round_duration=0.0,
             errors_encountered=0
         )
+        
+        # Experiment logger (initialized when experiment starts)
+        self.logger: Optional[ExperimentLogger] = None
     
     async def run_experiment(self, config: ExperimentConfig) -> ExperimentResults:
         """
@@ -77,6 +80,13 @@ class ExperimentOrchestrator:
         """
         self.config = config
         self.start_time = datetime.now()
+        
+        # Initialize experiment logger
+        self.logger = ExperimentLogger(config.experiment_id, config)
+        
+        # Update services with logger
+        self.conversation_service.logger = self.logger
+        self.memory_service.logger = self.logger
         
         print(f"\n=== Starting Deliberation Experiment ===")
         print(f"Experiment ID: {config.experiment_id}")
@@ -114,11 +124,11 @@ class ExperimentOrchestrator:
                 print(f"Agreed principle: {principle['name']}")
             print(f"Total rounds: {consensus_result.rounds_to_consensus}")
             
-            # Phase 8: Export data in multiple formats
-            exported_files = export_experiment_data(results)
+            # Phase 8: Log final data and export single JSON file
+            self._log_final_data(consensus_result, results)
+            exported_file = self.logger.export_complete_json()
             print(f"\n--- Data Export Complete ---")
-            for format_name, filepath in exported_files.items():
-                print(f"  {format_name}: {filepath}")
+            print(f"  Comprehensive JSON: {exported_file}")
             
             return results
             
@@ -333,6 +343,61 @@ class ExperimentOrchestrator:
         )
         
         return results
+    
+    def _log_final_data(self, consensus_result: ConsensusResult, results: ExperimentResults):
+        """Log final experiment data to the logger."""
+        if not self.logger:
+            return
+            
+        # Log consensus result
+        self.logger.log_consensus_result(consensus_result)
+        
+        # Log performance metrics
+        end_time = datetime.now()
+        total_duration = (end_time - self.start_time).total_seconds()
+        self.logger.log_performance_metrics(
+            total_duration_seconds=total_duration,
+            average_round_duration=total_duration / max(1, self.current_round),
+            total_agent_interactions=len(self.transcript),
+            total_memory_generations=len([m for agent_memory in results.agent_memories for m in agent_memory.memory_entries]),
+            errors_encountered=self.performance_metrics.errors_encountered
+        )
+        
+        # Log initial evaluations (if not already logged)
+        for eval_response in self.initial_evaluation_responses:
+            principle_ratings = []
+            for evaluation in eval_response.principle_evaluations:
+                principle_ratings.append({
+                    "principle_id": evaluation.principle_id,
+                    "rating": evaluation.satisfaction_rating.value,
+                    "reasoning": evaluation.reasoning
+                })
+            self.logger.log_evaluation(
+                evaluation_type="initial",
+                agent_id=eval_response.agent_id,
+                agent_name=eval_response.agent_name,
+                principle_ratings=principle_ratings,
+                evaluation_duration_ms=eval_response.evaluation_duration * 1000 if eval_response.evaluation_duration else None,
+                overall_reasoning=eval_response.overall_reasoning
+            )
+        
+        # Log final evaluations (if not already logged)
+        for eval_response in self.evaluation_responses:
+            principle_ratings = []
+            for evaluation in eval_response.principle_evaluations:
+                principle_ratings.append({
+                    "principle_id": evaluation.principle_id,
+                    "rating": evaluation.satisfaction_rating.value,
+                    "reasoning": evaluation.reasoning
+                })
+            self.logger.log_evaluation(
+                evaluation_type="final",
+                agent_id=eval_response.agent_id,
+                agent_name=eval_response.agent_name,
+                principle_ratings=principle_ratings,
+                evaluation_duration_ms=eval_response.evaluation_duration * 1000 if eval_response.evaluation_duration else None,
+                overall_reasoning=eval_response.overall_reasoning
+            )
     
     def get_experiment_state(self) -> dict:
         """Get current experiment state for monitoring."""

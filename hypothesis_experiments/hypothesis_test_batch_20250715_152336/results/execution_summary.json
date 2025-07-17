@@ -1,0 +1,50 @@
+{
+  "batch_id": "hypothesis_test_batch_20250715_152336",
+  "completed_at": "2025-07-15T15:26:10.317783",
+  "execution_mode": "parallel",
+  "max_concurrent_experiments": 6,
+  "total_experiments": 6,
+  "successful_runs": 0,
+  "failed_runs": 6,
+  "success_rate": 0.0,
+  "total_duration_seconds": 1.7145321369171143,
+  "average_duration_per_experiment": 0.28575535615285236,
+  "execution_results": [
+    {
+      "config_path": "hypothesis_experiments/hypothesis_test_batch_20250715_152336/configs/test_tuesday-2_001.yaml",
+      "success": false,
+      "duration_seconds": 1.7126946449279785,
+      "error": "Configuration file not found: configs/test_tuesday-2_001.yaml\nAvailable configurations: ['hyp_random_008', 'test_clean_003', 'hyp_random_004', 'lucas', 'hyp_random_005', 'test_clean_002', 'decomposed_memory_test', 'temperature_test', 'hyp_random_009', 'test_clean_005', 'hyp_random_002', 'test_fix_001', 'hyp_random_003', 'test_clean_004', 'test_fix_002', 'test_fix_003', 'hyp_random_001', 'test_custom', 'hyp_random_010', 'hyp_random_006', 'test_clean_001', 'hyp_random_007', 'default', 'comprehensive_example']\nTo create a new config, use ConfigManager.create_config_template('test_tuesday-2_001')"
+    },
+    {
+      "config_path": "hypothesis_experiments/hypothesis_test_batch_20250715_152336/configs/test_tuesday-2_002.yaml",
+      "success": false,
+      "duration_seconds": 0.0003218650817871094,
+      "error": "Configuration file not found: configs/test_tuesday-2_002.yaml\nAvailable configurations: ['hyp_random_008', 'test_clean_003', 'hyp_random_004', 'lucas', 'hyp_random_005', 'test_clean_002', 'decomposed_memory_test', 'temperature_test', 'hyp_random_009', 'test_clean_005', 'hyp_random_002', 'test_fix_001', 'hyp_random_003', 'test_clean_004', 'test_fix_002', 'test_fix_003', 'hyp_random_001', 'test_custom', 'hyp_random_010', 'hyp_random_006', 'test_clean_001', 'hyp_random_007', 'default', 'comprehensive_example']\nTo create a new config, use ConfigManager.create_config_template('test_tuesday-2_002')"
+    },
+    {
+      "config_path": "hypothesis_experiments/hypothesis_test_batch_20250715_152336/configs/test_tuesday-2_003.yaml",
+      "success": false,
+      "duration_seconds": 0.00012493133544921875,
+      "error": "Configuration file not found: configs/test_tuesday-2_003.yaml\nAvailable configurations: ['hyp_random_008', 'test_clean_003', 'hyp_random_004', 'lucas', 'hyp_random_005', 'test_clean_002', 'decomposed_memory_test', 'temperature_test', 'hyp_random_009', 'test_clean_005', 'hyp_random_002', 'test_fix_001', 'hyp_random_003', 'test_clean_004', 'test_fix_002', 'test_fix_003', 'hyp_random_001', 'test_custom', 'hyp_random_010', 'hyp_random_006', 'test_clean_001', 'hyp_random_007', 'default', 'comprehensive_example']\nTo create a new config, use ConfigManager.create_config_template('test_tuesday-2_003')"
+    },
+    {
+      "config_path": "hypothesis_experiments/hypothesis_test_batch_20250715_152336/configs/test_tuesday-2_004.yaml",
+      "success": false,
+      "duration_seconds": 0.00011801719665527344,
+      "error": "Configuration file not found: configs/test_tuesday-2_004.yaml\nAvailable configurations: ['hyp_random_008', 'test_clean_003', 'hyp_random_004', 'lucas', 'hyp_random_005', 'test_clean_002', 'decomposed_memory_test', 'temperature_test', 'hyp_random_009', 'test_clean_005', 'hyp_random_002', 'test_fix_001', 'hyp_random_003', 'test_clean_004', 'test_fix_002', 'test_fix_003', 'hyp_random_001', 'test_custom', 'hyp_random_010', 'hyp_random_006', 'test_clean_001', 'hyp_random_007', 'default', 'comprehensive_example']\nTo create a new config, use ConfigManager.create_config_template('test_tuesday-2_004')"
+    },
+    {
+      "config_path": "hypothesis_experiments/hypothesis_test_batch_20250715_152336/configs/test_tuesday-2_005.yaml",
+      "success": false,
+      "duration_seconds": 0.00011706352233886719,
+      "error": "Configuration file not found: configs/test_tuesday-2_005.yaml\nAvailable configurations: ['hyp_random_008', 'test_clean_003', 'hyp_random_004', 'lucas', 'hyp_random_005', 'test_clean_002', 'decomposed_memory_test', 'temperature_test', 'hyp_random_009', 'test_clean_005', 'hyp_random_002', 'test_fix_001', 'hyp_random_003', 'test_clean_004', 'test_fix_002', 'test_fix_003', 'hyp_random_001', 'test_custom', 'hyp_random_010', 'hyp_random_006', 'test_clean_001', 'hyp_random_007', 'default', 'comprehensive_example']\nTo create a new config, use ConfigManager.create_config_template('test_tuesday-2_005')"
+    },
+    {
+      "config_path": "hypothesis_experiments/hypothesis_test_batch_20250715_152336/configs/test_tuesday-2_006.yaml",
+      "success": false,
+      "duration_seconds": 0.00011587142944335938,
+      "error": "Configuration file not found: configs/test_tuesday-2_006.yaml\nAvailable configurations: ['hyp_random_008', 'test_clean_003', 'hyp_random_004', 'lucas', 'hyp_random_005', 'test_clean_002', 'decomposed_memory_test', 'temperature_test', 'hyp_random_009', 'test_clean_005', 'hyp_random_002', 'test_fix_001', 'hyp_random_003', 'test_clean_004', 'test_fix_002', 'test_fix_003', 'hyp_random_001', 'test_custom', 'hyp_random_010', 'hyp_random_006', 'test_clean_001', 'hyp_random_007', 'default', 'comprehensive_example']\nTo create a new config, use ConfigManager.create_config_template('test_tuesday-2_006')"
+    }
+  ]
+}

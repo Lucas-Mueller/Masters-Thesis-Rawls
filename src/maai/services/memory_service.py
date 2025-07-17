@@ -146,16 +146,18 @@ class RecentMemoryStrategy(MemoryStrategy):
 class MemoryService:
     """Centralized service for managing agent memory."""
     
-    def __init__(self, memory_strategy: MemoryStrategy = None):
+    def __init__(self, memory_strategy: MemoryStrategy = None, logger=None):
         """
         Initialize memory service.
         
         Args:
             memory_strategy: Strategy for memory management. 
                            Defaults to FullMemoryStrategy for compatibility.
+            logger: ExperimentLogger instance for logging memory operations
         """
         self.memory_strategy = memory_strategy or FullMemoryStrategy()
         self.agent_memories: Dict[str, AgentMemory] = {}
+        self.logger = logger
     
     def initialize_agent_memory(self, agent_id: str):
         """Initialize memory for an agent."""
@@ -187,10 +189,38 @@ class MemoryService:
         # Build memory context
         memory_context = self._build_memory_context(agent.agent_id, round_number, transcript)
         
+        # Log memory context
+        if self.logger:
+            self.logger.log_memory_event(
+                agent_id=agent.agent_id,
+                round_num=round_number,
+                memory_context=memory_context,
+                memory_strategy=type(self.memory_strategy).__name__
+            )
+        
         # Use strategy to generate memory entry
-        memory_entry = await self.memory_strategy.generate_memory_entry(
-            agent, round_number, speaking_position, transcript, memory_context
-        )
+        if isinstance(self.memory_strategy, DecomposedMemoryStrategy):
+            # For decomposed strategy, we want to log each step
+            memory_entry = await self._generate_decomposed_memory_with_logging(
+                agent, round_number, speaking_position, transcript, memory_context
+            )
+        else:
+            memory_entry = await self.memory_strategy.generate_memory_entry(
+                agent, round_number, speaking_position, transcript, memory_context
+            )
+        
+        # Log final memory entry
+        if self.logger:
+            self.logger.log_memory_event(
+                agent_id=agent.agent_id,
+                round_num=round_number,
+                final_memory_entry={
+                    "situation_assessment": memory_entry.situation_assessment,
+                    "other_agents_analysis": memory_entry.other_agents_analysis,
+                    "strategy_update": memory_entry.strategy_update,
+                    "speaking_position": memory_entry.speaking_position
+                }
+            )
         
         # Add to agent's memory
         agent_memory.add_memory(memory_entry)
@@ -281,6 +311,71 @@ class MemoryService:
     def set_memory_strategy(self, strategy: MemoryStrategy):
         """Change the memory management strategy."""
         self.memory_strategy = strategy
+    
+    async def _generate_decomposed_memory_with_logging(self, agent: DeliberationAgent, 
+                                                     round_number: int, speaking_position: int,
+                                                     transcript: List[DeliberationResponse], 
+                                                     memory_context: str) -> MemoryEntry:
+        """Generate decomposed memory with step-by-step logging."""
+        import time
+        decomposed_steps = []
+        
+        # Step 1: Generate factual recap
+        start_time = time.time()
+        factual_recap = await self.memory_strategy._generate_factual_recap(agent, round_number, transcript)
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        step_1 = {
+            "step": "factual_recap",
+            "prompt": "Briefly summarize what just happened in the deliberation (factual events only)",
+            "response": factual_recap,
+            "processing_time_ms": processing_time_ms
+        }
+        decomposed_steps.append(step_1)
+        
+        # Step 2: Generate focused agent analysis
+        start_time = time.time()
+        agent_analysis = await self.memory_strategy._generate_agent_analysis(agent, round_number, transcript, factual_recap)
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        step_2 = {
+            "step": "agent_analysis",
+            "prompt": "Focus on specific agent behavior and statements",
+            "response": agent_analysis,
+            "processing_time_ms": processing_time_ms
+        }
+        decomposed_steps.append(step_2)
+        
+        # Step 3: Generate specific strategic action
+        start_time = time.time()
+        strategic_action = await self.memory_strategy._generate_strategic_action(agent, round_number, factual_recap, agent_analysis)
+        processing_time_ms = (time.time() - start_time) * 1000
+        
+        step_3 = {
+            "step": "strategic_action",
+            "prompt": "What is ONE specific action you could take next round?",
+            "response": strategic_action,
+            "processing_time_ms": processing_time_ms
+        }
+        decomposed_steps.append(step_3)
+        
+        # Log decomposed steps
+        if self.logger:
+            self.logger.log_memory_event(
+                agent_id=agent.agent_id,
+                round_num=round_number,
+                decomposed_steps=decomposed_steps
+            )
+        
+        # Create memory entry
+        return MemoryEntry(
+            round_number=round_number,
+            timestamp=datetime.now(),
+            situation_assessment=factual_recap,
+            other_agents_analysis=agent_analysis,
+            strategy_update=strategic_action,
+            speaking_position=speaking_position
+        )
 
 
 class DecomposedMemoryStrategy(MemoryStrategy):

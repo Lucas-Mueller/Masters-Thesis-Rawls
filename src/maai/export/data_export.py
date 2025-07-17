@@ -70,10 +70,13 @@ class DataExporter:
         # Convert to dict and handle datetime serialization
         results_dict = results.model_dump()
         
-        # Custom JSON encoder for datetime objects
+        # Custom JSON encoder for datetime objects and LitellmModel objects
         def json_serializer(obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
+            # Handle LitellmModel objects by converting to string representation
+            if hasattr(obj, '__class__') and 'LitellmModel' in str(type(obj)):
+                return str(obj)
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -187,10 +190,13 @@ class DataExporter:
             'summary_statistics': self._calculate_evaluation_statistics(results.evaluation_responses)
         }
         
-        # Custom JSON encoder for datetime objects
+        # Custom JSON encoder for datetime objects and LitellmModel objects
         def json_serializer(obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
+            # Handle LitellmModel objects by converting to string representation
+            if hasattr(obj, '__class__') and 'LitellmModel' in str(type(obj)):
+                return str(obj)
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
         with open(filepath, 'w', encoding='utf-8') as f:
@@ -310,10 +316,13 @@ class DataExporter:
             'summary_statistics': self._calculate_evaluation_statistics(results.initial_evaluation_responses)
         }
         
-        # Custom JSON encoder for datetime objects
+        # Custom JSON encoder for datetime objects and LitellmModel objects
         def json_serializer(obj):
             if isinstance(obj, datetime):
                 return obj.isoformat()
+            # Handle LitellmModel objects by converting to string representation
+            if hasattr(obj, '__class__') and 'LitellmModel' in str(type(obj)):
+                return str(obj)
             raise TypeError(f"Object of type {type(obj)} is not JSON serializable")
         
         with open(filepath, 'w', encoding='utf-8') as f:

@@ -5,3 +5,9 @@ pydantic
 pandas
 agentops
 PyYAML
+numpy
+matplotlib
+seaborn
+tqdm
+scipy
+statsmodels
