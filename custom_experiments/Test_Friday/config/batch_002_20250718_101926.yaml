@@ -1,0 +1,28 @@
+experiment_id: batch_002_20250718_101926
+global_temperature: 0.5
+experiment:
+  max_rounds: 2
+  decision_rule: unanimity
+  timeout_seconds: 300
+agents:
+- name: Agent_1
+  personality: You are a philosopher.
+  model: gpt-4.1-nano
+- name: Agent_2
+  personality: You are an economist.
+  model: gpt-4.1-nano
+defaults:
+  personality: You are an economist.
+  model: Llama-4
+output:
+  directory: experiment_results
+  formats:
+  - json
+  - csv
+  - txt
+  include_feedback: true
+  include_transcript: true
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true

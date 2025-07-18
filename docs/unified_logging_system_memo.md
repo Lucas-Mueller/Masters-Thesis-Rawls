@@ -130,12 +130,9 @@ json_file = logger.export_unified_json()
 - **Multi-file exports**: No longer generated
 - **Legacy methods**: Maintained for backward compatibility with deprecation warnings
 
-### **Backward Compatibility**
+### **Memory Generation Logging**
 ```python
-# Legacy method still works but shows deprecation warning
-logger.log_memory_event(agent_id, round_num, memory_context, memory_strategy)
-
-# New unified method (recommended)
+# Unified method for memory logging
 logger.log_memory_generation(agent_id, round_num, memory_content, strategy)
 ```
 

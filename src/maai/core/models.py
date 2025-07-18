@@ -141,7 +141,7 @@ class ExperimentConfig(BaseModel):
     agents: List[AgentConfig] = Field(..., description="List of agent configurations")
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
-    memory_strategy: str = Field(default="full", description="Memory strategy: full|recent|decomposed")
+    memory_strategy: str = Field(default="decomposed", description="Memory strategy: full|recent|decomposed")
     logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output configuration")
     
@@ -173,7 +173,6 @@ class AgentEvaluationResponse(BaseModel):
     agent_name: str = Field(..., description="Agent name")
     principle_evaluations: List[PrincipleEvaluation] = Field(..., description="Evaluations for all 4 principles")
     overall_reasoning: str = Field(..., description="Agent's overall reasoning for their ratings")
-    confidence_level: Optional[float] = Field(None, ge=0.0, le=1.0, description="Agent's confidence in evaluations")
     evaluation_duration: Optional[float] = Field(None, description="Time taken for evaluation in seconds")
     timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
 
@@ -187,7 +186,6 @@ class FeedbackResponse(BaseModel):
     would_choose_again: bool = Field(..., description="Whether agent would make same choice again")
     alternative_preference: Optional[int] = Field(None, ge=1, le=4, description="Alternative principle preference if any")
     reasoning: str = Field(..., description="Agent's reasoning for their feedback")
-    confidence_in_feedback: float = Field(default=0.7, description="Agent's confidence in their feedback (0.0-1.0)")
     timestamp: datetime = Field(default_factory=datetime.now, description="Feedback timestamp")
 
 

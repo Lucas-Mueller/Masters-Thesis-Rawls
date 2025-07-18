@@ -360,7 +360,7 @@ class TestConsensusService:
         
         consensus_result = ConsensusResult(
             unanimous=True,
-            agreed_principle=PrincipleChoice(1, "Principle 1", "Test"),
+            agreed_principle=PrincipleChoice(principle_id=1, principle_name="Principle 1", reasoning="Test"),
             dissenting_agents=[],
             rounds_to_consensus=2,
             total_messages=2
@@ -397,7 +397,7 @@ class TestConsensusService:
         
         consensus_result = ConsensusResult(
             unanimous=True,
-            agreed_principle=PrincipleChoice(1, "Principle 1", "Test"),
+            agreed_principle=PrincipleChoice(principle_id=1, principle_name="Principle 1", reasoning="Test"),
             dissenting_agents=[],
             rounds_to_consensus=0,
             total_messages=1
@@ -417,7 +417,7 @@ class TestConsensusService:
         
         consensus_result = ConsensusResult(
             unanimous=True,
-            agreed_principle=PrincipleChoice(1, "Principle 1", "Test"),
+            agreed_principle=PrincipleChoice(principle_id=1, principle_name="Principle 1", reasoning="Test"),
             dissenting_agents=[],
             rounds_to_consensus=1,
             total_messages=3
@@ -435,7 +435,7 @@ class TestConsensusService:
         
         consensus_result = ConsensusResult(
             unanimous=True,
-            agreed_principle=PrincipleChoice(1, "Principle 1", "Test"),
+            agreed_principle=PrincipleChoice(principle_id=1, principle_name="Principle 1", reasoning="Test"),
             dissenting_agents=[],
             rounds_to_consensus=1,
             total_messages=1

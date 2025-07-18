@@ -191,11 +191,11 @@ class MemoryService:
         
         # Log memory context
         if self.logger:
-            self.logger.log_memory_event(
-                agent_id=agent.agent_id,
+            self.logger.log_memory_generation(
+                agent_id=agent.name,
                 round_num=round_number,
-                memory_context=memory_context,
-                memory_strategy=type(self.memory_strategy).__name__
+                memory_content=memory_context,
+                strategy=type(self.memory_strategy).__name__
             )
         
         # Use strategy to generate memory entry
@@ -211,15 +211,12 @@ class MemoryService:
         
         # Log final memory entry
         if self.logger:
-            self.logger.log_memory_event(
-                agent_id=agent.agent_id,
+            memory_content = f"SITUATION: {memory_entry.situation_assessment}\nAGENTS: {memory_entry.other_agents_analysis}\nSTRATEGY: {memory_entry.strategy_update}"
+            self.logger.log_memory_generation(
+                agent_id=agent.name,
                 round_num=round_number,
-                final_memory_entry={
-                    "situation_assessment": memory_entry.situation_assessment,
-                    "other_agents_analysis": memory_entry.other_agents_analysis,
-                    "strategy_update": memory_entry.strategy_update,
-                    "speaking_position": memory_entry.speaking_position
-                }
+                memory_content=memory_content,
+                strategy=memory_entry.strategy_update
             )
         
         # Add to agent's memory
@@ -359,12 +356,14 @@ class MemoryService:
         }
         decomposed_steps.append(step_3)
         
-        # Log decomposed steps
+        # Log decomposed memory generation
         if self.logger:
-            self.logger.log_memory_event(
-                agent_id=agent.agent_id,
+            memory_content = f"DECOMPOSED MEMORY:\n1. RECAP: {factual_recap}\n2. ANALYSIS: {agent_analysis}\n3. STRATEGY: {strategic_action}"
+            self.logger.log_memory_generation(
+                agent_id=agent.name,
                 round_num=round_number,
-                decomposed_steps=decomposed_steps
+                memory_content=memory_content,
+                strategy="decomposed"
             )
         
         # Create memory entry

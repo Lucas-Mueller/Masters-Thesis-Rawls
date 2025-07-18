@@ -50,11 +50,11 @@ class ExperimentLogger:
         defaults = self.config.defaults
         
         for i, agent_config in enumerate(agent_configs):
-            # Use the same agent_id format as the actual DeliberationAgent objects
-            agent_id = f"agent_{i+1}"
+            # Use the agent's name from config as the key for JSON structure
+            agent_name = agent_config.name or f"Agent_{i+1}"
             
             # Initialize agent overall data
-            self.agent_data[agent_id] = {
+            self.agent_data[agent_name] = {
                 "overall": {
                     "model": agent_config.model or defaults.model,
                     "persona": agent_config.personality or defaults.personality,
@@ -250,26 +250,3 @@ class ExperimentLogger:
         """Legacy method name - delegates to new unified export."""
         return self.export_unified_json(output_dir)
     
-    def log_memory_event(self, agent_id: str, round_num: int, memory_context: str = None,
-                        memory_strategy: str = None, decomposed_steps: List[Dict] = None,
-                        final_memory_entry: Dict = None):
-        """Legacy method compatibility - delegates to new unified methods."""
-        import warnings
-        warnings.warn(
-            "log_memory_event is deprecated. Use log_memory_generation instead.",
-            DeprecationWarning,
-            stacklevel=2
-        )
-        
-        # Map to new method calls
-        if memory_context:
-            self.log_memory_generation(agent_id, round_num, memory_context, memory_strategy)
-        
-        if final_memory_entry:
-            # Extract the memory content from the final entry
-            memory_content = final_memory_entry.get("situation_assessment", "")
-            strategy = final_memory_entry.get("strategy_update", "")
-            self.log_memory_generation(agent_id, round_num, memory_content, strategy)
-        
-        # Note: decomposed_steps are not used in the new system
-        # as they're handled differently in the new agent-centric approach

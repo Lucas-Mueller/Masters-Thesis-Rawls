@@ -1,18 +1,18 @@
-experiment_id: batch_002_20250717_164035
+experiment_id: batch_001_20250718_103244
 global_temperature: 0.5
 experiment:
-  max_rounds: 3
+  max_rounds: 10
   decision_rule: unanimity
   timeout_seconds: 300
 agents:
 - name: Agent_1
-  personality: You are an economist.
+  personality: You are a Robert Nozick.
   model: gpt-4.1-nano
 - name: Agent_2
-  personality: You are a philosopher.
+  personality: You are a Robert Nozick.
   model: gpt-4.1-nano
 defaults:
-  personality: You are an economist.
+  personality: You are a communist.
   model: gpt-4.1-nano
 output:
   directory: experiment_results

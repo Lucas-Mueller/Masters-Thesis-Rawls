@@ -214,9 +214,12 @@ def create_deliberation_agents(agent_configs: List, defaults, global_temperature
         personality = agent_config.personality or defaults.personality
         
         # Determine temperature (priority: agent > default > global)
-        temperature = (agent_config.temperature or 
-                      defaults.temperature or 
-                      global_temperature)
+        if agent_config.temperature is not None:
+            temperature = agent_config.temperature
+        elif defaults.temperature is not None:
+            temperature = defaults.temperature
+        else:
+            temperature = global_temperature
         
         # Always create ModelSettings (never None to avoid SDK errors)
         if temperature is not None:

@@ -14,7 +14,7 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - **src/maai/core/**: Core experiment logic and data models (`deliberation_manager.py`, `models.py`)
 - **src/maai/agents/**: Enhanced agent classes with specialized roles (`enhanced.py`)
 - **src/maai/config/**: YAML-based configuration management (`manager.py`)
-- **src/maai/export/**: Multi-format data export system (`data_export.py`)
+- **src/maai/export/**: Legacy export system (deprecated)
 - **src/maai/services/**: Service layer for experiment orchestration
 - **configs/**: YAML configuration files for different experiment scenarios
 - **experiment_results/**: Output directory for all experiment data
@@ -318,7 +318,7 @@ python run_experiment.py
 1. Load YAML config via `load_config_from_file()` in `src/maai/config/manager.py`
 2. Create agents with personality configurations
 3. Run deliberation rounds through `DeliberationManager`
-4. Export results via `export_experiment_data()` in `src/maai/export/data_export.py`
+4. Export results via `ExperimentLogger.export_unified_json()` in `src/maai/services/experiment_logger.py`
 
 **Main Entry Points**:
 - `run_experiment.py`: Single experiment runner with detailed result reporting and custom output directory support

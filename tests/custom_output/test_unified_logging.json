@@ -1,14 +1,14 @@
 {
   "experiment_metadata": {
     "experiment_id": "test_unified_logging",
-    "start_time": "2025-07-17T17:27:59.621168",
+    "start_time": "2025-07-18T10:16:21.363625",
     "end_time": null,
     "total_duration_seconds": null,
     "max_rounds": 3,
     "decision_rule": "unanimity",
     "final_consensus": null
   },
-  "agent_1": {
+  "Agent_1": {
     "overall": {
       "model": "gpt-4.1-mini",
       "persona": "You are an economist.",
@@ -16,7 +16,7 @@
       "temperature": 0.0
     }
   },
-  "agent_2": {
+  "Agent_2": {
     "overall": {
       "model": "gpt-4.1",
       "persona": "You are a philosopher.",
@@ -24,7 +24,7 @@
       "temperature": 0.0
     }
   },
-  "agent_3": {
+  "Agent_3": {
     "overall": {
       "model": "gpt-4.1-mini",
       "persona": "You are a pragmatist.",

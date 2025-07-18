@@ -21,6 +21,7 @@ class ProbabilisticConfigGenerator:
                  rounds_probabilities: Dict[int, float],
                  model_probabilities: Dict[str, float],
                  temperature: Dict[float, float],
+                 memory_strategy_probabilities: Dict[str, float],
                  output_folder: str):
         """
         Initialize the probabilistic configuration generator.
@@ -31,6 +32,7 @@ class ProbabilisticConfigGenerator:
             rounds_probabilities: Mapping of round counts to their probabilities
             model_probabilities: Mapping of model identifiers to their probabilities
             temperature: Mapping of temperature values to their probabilities
+            memory_strategy_probabilities: Mapping of memory strategies to their probabilities
             output_folder: Folder where generated config files will be saved
         """
         self.agent_count_probabilities = agent_count_probabilities
@@ -38,6 +40,7 @@ class ProbabilisticConfigGenerator:
         self.rounds_probabilities = rounds_probabilities
         self.model_probabilities = model_probabilities
         self.temperature = temperature
+        self.memory_strategy_probabilities = memory_strategy_probabilities
         self.output_folder = output_folder
         
         # Validate probabilities sum to 1.0 (with tolerance for floating point)
@@ -55,7 +58,8 @@ class ProbabilisticConfigGenerator:
             ("personality", self.personality_probabilities),
             ("rounds", self.rounds_probabilities),
             ("model", self.model_probabilities),
-            ("temperature", self.temperature)
+            ("temperature", self.temperature),
+            ("memory_strategy", self.memory_strategy_probabilities)
         ]:
             prob_sum = sum(probs.values())
             if abs(prob_sum - 1.0) > tolerance:
@@ -112,6 +116,7 @@ class ProbabilisticConfigGenerator:
         num_agents = self._weighted_choice(self.agent_count_probabilities)
         max_rounds = self._weighted_choice(self.rounds_probabilities)
         global_temperature = self._weighted_choice(self.temperature)
+        memory_strategy = self._weighted_choice(self.memory_strategy_probabilities)
         
         # Generate agent configurations
         agents = self._generate_agent_configs(num_agents)
@@ -124,6 +129,7 @@ class ProbabilisticConfigGenerator:
         config = {
             "experiment_id": experiment_id,
             "global_temperature": global_temperature,
+            "memory_strategy": memory_strategy,
             "experiment": {
                 "max_rounds": max_rounds,
                 "decision_rule": "unanimity",
@@ -245,11 +251,18 @@ def create_generator() -> ProbabilisticConfigGenerator:
         0.7: 0.05    # High creativity
     }
     
+    memory_strategy_probs = {
+        "full": 0.3,        # Default strategy
+        "recent": 0.2,      # Recent memory only
+        "decomposed": 0.5   # Decomposed memory (preferred)
+    }
+    
     return ProbabilisticConfigGenerator(
         agent_count_probabilities=agent_count_probs,
         personality_probabilities=personality_probs,
         rounds_probabilities=rounds_probs,
         model_probabilities=model_probs,
         temperature=temperature_probs,
+        memory_strategy_probabilities=memory_strategy_probs,
         output_folder="configs"
     )

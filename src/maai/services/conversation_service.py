@@ -216,7 +216,7 @@ Format your response clearly with your final choice at the end.
             # Log initial evaluation (round_0) with new unified format
             if self.logger:
                 self.logger.log_initial_evaluation(
-                    agent_id=agent.agent_id,
+                    agent_id=agent.name,
                     input_prompt=evaluation_prompt,
                     raw_response=response_text,
                     rating_likert=choice.principle_name,
@@ -306,7 +306,7 @@ Format your response clearly with your final choice at the end.
                                          key=lambda x: x.satisfaction_rating.to_numeric())
                     
                     self.logger.log_initial_evaluation(
-                        agent_id=response.agent_id,
+                        agent_id=response.agent_name,
                         input_prompt="[Initial Likert Assessment - details in principle_ratings]",
                         raw_response=response.overall_reasoning,
                         rating_likert=chosen_principle.principle_name,
@@ -316,7 +316,7 @@ Format your response clearly with your final choice at the end.
                 else:
                     # Fallback if no principle evaluations
                     self.logger.log_initial_evaluation(
-                        agent_id=response.agent_id,
+                        agent_id=response.agent_name,
                         input_prompt="[Initial Likert Assessment - details in principle_ratings]",
                         raw_response=response.overall_reasoning,
                         rating_likert="Unknown",
@@ -386,7 +386,7 @@ Format your response clearly with your final choice at the end.
             if self.logger:
                 public_history = self._build_public_context(agent_id, round_context)
                 self.logger.log_round_start(
-                    agent_id=agent.agent_id,
+                    agent_id=agent.name,
                     round_num=round_context.round_number,
                     speaking_order=position,
                     public_history=public_history
@@ -400,7 +400,7 @@ Format your response clearly with your final choice at the end.
             # Log memory generation
             if self.logger:
                 self.logger.log_memory_generation(
-                    agent_id=agent.agent_id,
+                    agent_id=agent.name,
                     round_num=round_context.round_number,
                     memory_content=private_memory_entry.situation_assessment,
                     strategy=private_memory_entry.strategy_update
@@ -418,7 +418,7 @@ Format your response clearly with your final choice at the end.
             # Log communication and choice
             if self.logger:
                 self.logger.log_communication(
-                    agent_id=agent.agent_id,
+                    agent_id=agent.name,
                     round_num=round_context.round_number,
                     communication=public_message,
                     choice=updated_choice.principle_name
@@ -469,7 +469,7 @@ What do you want to say to the group? End with your current principle choice (1,
         # Log interaction with unified format
         if self.logger:
             self.logger.log_agent_interaction(
-                agent_id=agent.agent_id,
+                agent_id=agent.name,
                 round_num=round_context.round_number,
                 interaction_type="communication",
                 input_prompt=communication_prompt,
@@ -483,7 +483,7 @@ What do you want to say to the group? End with your current principle choice (1,
         # Log response with unified format
         if self.logger:
             self.logger.log_agent_interaction(
-                agent_id=agent.agent_id,
+                agent_id=agent.name,
                 round_num=round_context.round_number,
                 interaction_type="communication",
                 raw_response=response_text,

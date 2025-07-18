@@ -25,57 +25,7 @@ class ConfigManager:
         self.config_dir.mkdir(exist_ok=True)
         self.results_dir = Path(results_dir)
         self.results_dir.mkdir(exist_ok=True)
-        
-        # Create default config file if it doesn't exist
-        self.default_config_path = self.config_dir / "default.yaml"
-        if not self.default_config_path.exists():
-            self._create_default_config()
     
-    def _create_default_config(self):
-        """Create a default configuration file."""
-        default_config = {
-            "experiment_id": "default_experiment",
-            "experiment": {
-                "max_rounds": 5,
-                "decision_rule": "unanimity",
-                "timeout_seconds": 300
-            },
-            "agents": [
-                {"name": "Agent_1", "model": "gpt-4.1-mini"},
-                {"name": "Agent_2", "model": "gpt-4.1-mini"},
-                {"name": "Agent_3", "model": "gpt-4.1-mini"},
-                {"name": "Agent_4", "model": "gpt-4.1-mini"}
-            ],
-            "defaults": {
-                "personality": "You are an agent tasked to design a future society.",
-                "model": "gpt-4.1-mini"
-            },
-            # Example temperature configurations (uncomment to use)
-            # "global_temperature": 0.0,  # Global temperature for all agents (for reproducible results)
-            # "defaults": {
-            #     "personality": "You are an agent tasked to design a future society.",
-            #     "model": "gpt-4.1-mini",
-            #     "temperature": 0.2  # Default temperature for agents
-            # },
-            # "agents": [
-            #     {"name": "Agent_1", "model": "gpt-4.1-mini", "temperature": 0.0},  # Agent-specific temperature
-            #     {"name": "Agent_2", "model": "gpt-4.1-mini"},  # Uses default temperature
-            # ],
-            "output": {
-                "directory": "experiment_results",
-                "formats": ["json", "csv", "txt"],
-                "include_feedback": True,
-                "include_transcript": True
-            },
-            "performance": {
-                "parallel_feedback": True,
-                "trace_enabled": True,
-                "debug_mode": False
-            }
-        }
-        
-        with open(self.default_config_path, 'w') as f:
-            yaml.dump(default_config, f, indent=2, default_flow_style=False)
     
     def _generate_unique_experiment_id(self, base_id: str) -> str:
         """

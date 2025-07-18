@@ -1,4 +1,4 @@
-experiment_id: batch_002_20250717_164035
+experiment_id: batch_002_20250718_100018
 global_temperature: 0.5
 experiment:
   max_rounds: 3
@@ -9,10 +9,10 @@ agents:
   personality: You are an economist.
   model: gpt-4.1-nano
 - name: Agent_2
-  personality: You are a philosopher.
+  personality: You are an economist.
   model: gpt-4.1-nano
 defaults:
-  personality: You are an economist.
+  personality: You are a philosopher.
   model: gpt-4.1-nano
 output:
   directory: experiment_results

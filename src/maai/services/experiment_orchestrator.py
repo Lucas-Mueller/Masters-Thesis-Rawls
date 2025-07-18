@@ -310,7 +310,6 @@ class ExperimentOrchestrator:
                 would_choose_again=would_choose_again,
                 alternative_preference=None,
                 reasoning=f"Generated based on final choice: Principle {agent.current_choice.principle_id}",
-                confidence_in_feedback=0.7,
                 timestamp=datetime.now()
             )
             
@@ -371,7 +370,7 @@ class ExperimentOrchestrator:
                     break
             
             self.logger.log_final_consensus(
-                agent_id=agent.agent_id,
+                agent_id=agent.name,
                 agreement_reached=consensus_result.unanimous,
                 agreement_choice=consensus_result.agreed_principle.principle_name if consensus_result.unanimous else None,
                 num_rounds=consensus_result.rounds_to_consensus,
