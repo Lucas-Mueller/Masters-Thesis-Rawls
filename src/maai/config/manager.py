@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 import glob
 
-from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig
+from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig, OutputConfig
 
 
 class ConfigManager:
@@ -25,46 +25,7 @@ class ConfigManager:
         self.config_dir.mkdir(exist_ok=True)
         self.results_dir = Path(results_dir)
         self.results_dir.mkdir(exist_ok=True)
-        
-        # Create default config file if it doesn't exist
-        self.default_config_path = self.config_dir / "default.yaml"
-        if not self.default_config_path.exists():
-            self._create_default_config()
     
-    def _create_default_config(self):
-        """Create a default configuration file."""
-        default_config = {
-            "experiment_id": "default_experiment",
-            "experiment": {
-                "max_rounds": 5,
-                "decision_rule": "unanimity",
-                "timeout_seconds": 300
-            },
-            "agents": [
-                {"name": "Agent_1", "model": "gpt-4.1-mini"},
-                {"name": "Agent_2", "model": "gpt-4.1-mini"},
-                {"name": "Agent_3", "model": "gpt-4.1-mini"},
-                {"name": "Agent_4", "model": "gpt-4.1-mini"}
-            ],
-            "defaults": {
-                "personality": "You are an agent tasked to design a future society.",
-                "model": "gpt-4.1-mini"
-            },
-            "output": {
-                "directory": "experiment_results",
-                "formats": ["json", "csv", "txt"],
-                "include_feedback": True,
-                "include_transcript": True
-            },
-            "performance": {
-                "parallel_feedback": True,
-                "trace_enabled": True,
-                "debug_mode": False
-            }
-        }
-        
-        with open(self.default_config_path, 'w') as f:
-            yaml.dump(default_config, f, indent=2, default_flow_style=False)
     
     def _generate_unique_experiment_id(self, base_id: str) -> str:
         """
@@ -165,6 +126,10 @@ class ConfigManager:
         defaults_data = config_data.get("defaults", {})
         defaults = DefaultConfig(**defaults_data)
         
+        # Parse output configuration
+        output_data = config_data.get("output", {})
+        output = OutputConfig(**output_data)
+        
         # Parse agent configurations
         agents_data = config_data["agents"]
         if not agents_data:
@@ -191,13 +156,39 @@ class ConfigManager:
         
         # Create ExperimentConfig object with validation
         try:
+            from ..core.models import PublicHistoryMode, SummaryAgentConfig
+            
+            # Parse public history mode
+            public_history_mode = PublicHistoryMode.FULL  # Default
+            if "public_history_mode" in config_data:
+                mode_str = config_data["public_history_mode"]
+                if mode_str == "summarized":
+                    public_history_mode = PublicHistoryMode.SUMMARIZED
+                elif mode_str == "full":
+                    public_history_mode = PublicHistoryMode.FULL
+            
+            # Parse summary agent config
+            summary_agent = SummaryAgentConfig()  # Default
+            if "summary_agent" in config_data:
+                summary_agent_data = config_data["summary_agent"]
+                summary_agent = SummaryAgentConfig(
+                    model=summary_agent_data.get("model", "gpt-4.1-mini"),
+                    temperature=summary_agent_data.get("temperature", 0.1),
+                    max_tokens=summary_agent_data.get("max_tokens", 1000)
+                )
+            
             experiment_config = ExperimentConfig(
                 experiment_id=experiment_id,
                 max_rounds=config_data["experiment"]["max_rounds"],
                 decision_rule=config_data["experiment"].get("decision_rule", "unanimity"),
                 timeout_seconds=config_data["experiment"].get("timeout_seconds", 300),
                 agents=agents,
-                defaults=defaults
+                defaults=defaults,
+                global_temperature=config_data.get("global_temperature"),
+                memory_strategy=config_data.get("memory_strategy", "full"),
+                public_history_mode=public_history_mode,
+                summary_agent=summary_agent,
+                output=output
             )
         except Exception as e:
             raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")
@@ -250,18 +241,22 @@ class ConfigManager:
             },
             "agents": [agent.dict(exclude_none=True) for agent in config.agents],
             "defaults": config.defaults.dict(),
-            "output": {
-                "directory": "experiment_results",
-                "formats": ["json", "csv", "txt"],
-                "include_feedback": True,
-                "include_transcript": True
-            },
+        }
+        
+        # Include global_temperature if specified
+        if config.global_temperature is not None:
+            config_data["global_temperature"] = config.global_temperature
+        
+        # Include output configuration
+        config_data["output"] = config.output.dict()
+        
+        config_data.update({
             "performance": {
                 "parallel_feedback": True,
                 "trace_enabled": True,
                 "debug_mode": False
             }
-        }
+        })
         
         with open(config_path, 'w') as f:
             yaml.dump(config_data, f, indent=2, default_flow_style=False)
@@ -314,18 +309,19 @@ class ConfigManager:
 
 
 
-def load_config_from_file(config_file: str, results_dir: str = "experiment_results") -> ExperimentConfig:
+def load_config_from_file(config_file: str, results_dir: str = "experiment_results", config_dir: str = "configs") -> ExperimentConfig:
     """
     Convenience function to load configuration from a file.
     
     Args:
         config_file: Path to YAML config file or config name
         results_dir: Directory where experiment results are stored
+        config_dir: Directory where configuration files are stored
         
     Returns:
         ExperimentConfig object
     """
-    manager = ConfigManager(results_dir=results_dir)
+    manager = ConfigManager(config_dir=config_dir, results_dir=results_dir)
     
     # If it's a path, extract the name
     if "/" in config_file or "\\" in config_file:

@@ -1,0 +1,43 @@
+# Example configuration demonstrating public history modes
+experiment_id: example_public_history_test
+global_temperature: 0.1
+memory_strategy: "decomposed"
+public_history_mode: "summarized"
+
+# Summary agent configuration
+summary_agent:
+  model: "gpt-4.1-mini"
+  temperature: 0.1
+  max_tokens: 1000
+
+experiment:
+  max_rounds: 5
+  decision_rule: "unanimity"
+  timeout_seconds: 300
+
+agents:
+  - name: "Agent_1"
+    model: "gpt-4.1-mini"
+    personality: "You are an economist focused on efficiency and optimal resource allocation."
+  - name: "Agent_2"
+    model: "gpt-4.1-mini"
+    personality: "You are a philosopher concerned with justice and fairness for all members of society."
+  - name: "Agent_3"
+    model: "gpt-4.1-mini"
+    personality: "You are a pragmatist who focuses on what works in practice rather than theory."
+
+defaults:
+  personality: "You are an agent tasked to design a future society."
+  model: "gpt-4.1-mini"
+  temperature: 0.1
+
+output:
+  directory: experiment_results
+  formats: [json, csv, txt]
+  include_feedback: true
+  include_transcript: true
+
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true

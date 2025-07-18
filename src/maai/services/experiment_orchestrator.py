@@ -7,6 +7,7 @@ import time
 from datetime import datetime
 from typing import List, Optional
 # No longer need trace import - handled by main caller
+from agents.model_settings import ModelSettings
 from ..core.models import (
     ExperimentConfig,
     ExperimentResults,
@@ -19,11 +20,12 @@ from ..core.models import (
     get_principle_by_id
 )
 from ..agents.enhanced import DeliberationAgent, create_deliberation_agents, create_discussion_moderator
-from ..export.data_export import export_experiment_data
 from .consensus_service import ConsensusService
 from .conversation_service import ConversationService, RoundContext
 from .memory_service import MemoryService
 from .evaluation_service import EvaluationService
+from .experiment_logger import ExperimentLogger
+from .public_history_service import PublicHistoryService
 
 
 class ExperimentOrchestrator:
@@ -33,7 +35,8 @@ class ExperimentOrchestrator:
                  consensus_service: ConsensusService = None,
                  conversation_service: ConversationService = None,
                  memory_service: MemoryService = None,
-                 evaluation_service: EvaluationService = None):
+                 evaluation_service: EvaluationService = None,
+                 public_history_service: PublicHistoryService = None):
         """
         Initialize experiment orchestrator.
         
@@ -42,11 +45,13 @@ class ExperimentOrchestrator:
             conversation_service: Service for conversation management
             memory_service: Service for memory management
             evaluation_service: Service for post-consensus evaluation
+            public_history_service: Service for public history management
         """
         self.consensus_service = consensus_service or ConsensusService()
         self.conversation_service = conversation_service or ConversationService()
         self.memory_service = memory_service or MemoryService()
         self.evaluation_service = evaluation_service or EvaluationService()
+        self.public_history_service = public_history_service
         
         # Experiment state
         self.config: Optional[ExperimentConfig] = None
@@ -63,6 +68,9 @@ class ExperimentOrchestrator:
             average_round_duration=0.0,
             errors_encountered=0
         )
+        
+        # Experiment logger (initialized when experiment starts)
+        self.logger: Optional[ExperimentLogger] = None
     
     async def run_experiment(self, config: ExperimentConfig) -> ExperimentResults:
         """
@@ -76,6 +84,18 @@ class ExperimentOrchestrator:
         """
         self.config = config
         self.start_time = datetime.now()
+        
+        # Initialize experiment logger
+        self.logger = ExperimentLogger(config.experiment_id, config)
+        
+        # Initialize public history service if not provided
+        if self.public_history_service is None:
+            self.public_history_service = PublicHistoryService(config)
+        
+        # Update services with logger and public history service
+        self.conversation_service.logger = self.logger
+        self.conversation_service.public_history_service = self.public_history_service
+        self.memory_service.logger = self.logger
         
         print(f"\n=== Starting Deliberation Experiment ===")
         print(f"Experiment ID: {config.experiment_id}")
@@ -91,8 +111,8 @@ class ExperimentOrchestrator:
             # Phase 2: Initial Likert scale assessment (NEW - data collection only)
             await self._initial_likert_assessment()
             
-            # Phase 3: Initial individual evaluation (existing - principle choice)
-            await self._initial_evaluation()
+            # Phase 3: Initial individual evaluation (REMOVED - redundant, now handled by Phase 2)
+            # await self._initial_evaluation()
             
             # Phase 4: Multi-round deliberation
             consensus_result = await self._run_deliberation_rounds()
@@ -113,11 +133,11 @@ class ExperimentOrchestrator:
                 print(f"Agreed principle: {principle['name']}")
             print(f"Total rounds: {consensus_result.rounds_to_consensus}")
             
-            # Phase 8: Export data in multiple formats
-            exported_files = export_experiment_data(results)
+            # Phase 8: Log final data and export unified JSON file
+            self._log_final_data(consensus_result, results)
+            exported_file = self.logger.export_unified_json()
             print(f"\n--- Data Export Complete ---")
-            for format_name, filepath in exported_files.items():
-                print(f"  {format_name}: {filepath}")
+            print(f"  Unified Agent-Centric JSON: {exported_file}")
             
             return results
             
@@ -132,10 +152,17 @@ class ExperimentOrchestrator:
         
         self.agents = create_deliberation_agents(
             agent_configs=self.config.agents,
-            defaults=self.config.defaults
+            defaults=self.config.defaults,
+            global_temperature=self.config.global_temperature
         )
         
-        self.moderator = create_discussion_moderator()
+        # Create ModelSettings for moderator (always create, never None)
+        if self.config.global_temperature is not None:
+            moderator_model_settings = ModelSettings(temperature=self.config.global_temperature)
+        else:
+            moderator_model_settings = ModelSettings()  # Empty but valid ModelSettings
+        
+        self.moderator = create_discussion_moderator(model_settings=moderator_model_settings)
         
         print(f"Created {len(self.agents)} deliberation agents")
         for agent in self.agents:
@@ -154,15 +181,22 @@ class ExperimentOrchestrator:
         )
         
         print(f"  ✓ Initial assessment complete - {len(self.initial_evaluation_responses)} responses collected")
+        
+        # Check if already unanimous after initial evaluation
+        initial_consensus = await self.consensus_service.detect_consensus(self.transcript)
+        if initial_consensus.unanimous:
+            print(f"  ✓ Unanimous agreement reached in initial evaluation!")
+        else:
+            print(f"  Initial choices: {[agent.current_choice.principle_id for agent in self.agents]}")
     
     async def _initial_evaluation(self):
         """Have each agent individually evaluate the principles."""
         print("\n--- Initial Individual Evaluation ---")
         
         # No trace here - part of the main experiment trace
-        # Use conversation service to conduct initial evaluation
-        await self.conversation_service.conduct_initial_evaluation(
-            self.agents, self.transcript
+        # Use conversation service to conduct initial Likert assessment
+        await self.conversation_service.conduct_initial_likert_assessment(
+            self.agents, self.evaluation_service
         )
         
         # Check if already unanimous after initial evaluation
@@ -203,6 +237,19 @@ class ExperimentOrchestrator:
             await self.conversation_service.conduct_round(
                 round_context, self.memory_service, self.moderator
             )
+            
+            # Generate round summary if using summarized public history mode
+            if self.public_history_service and self.public_history_service.should_generate_summaries():
+                print(f"  Generating summary for round {round_num}...")
+                round_responses = [r for r in self.transcript if r.round_number == round_num]
+                if round_responses:
+                    try:
+                        summary = await self.public_history_service.generate_round_summary(
+                            round_num, round_responses
+                        )
+                        print(f"    ✓ Round summary generated ({len(summary.summary_text)} chars)")
+                    except Exception as e:
+                        print(f"    ⚠️  Summary generation failed: {e}")
             
             # Check for consensus after round
             consensus_result = await self.consensus_service.detect_consensus(self.transcript)
@@ -285,7 +332,6 @@ class ExperimentOrchestrator:
                 would_choose_again=would_choose_again,
                 alternative_preference=None,
                 reasoning=f"Generated based on final choice: Principle {agent.current_choice.principle_id}",
-                confidence_in_feedback=0.7,
                 timestamp=datetime.now()
             )
             
@@ -309,12 +355,18 @@ class ExperimentOrchestrator:
         # Get speaking orders from conversation service
         speaking_orders = self.conversation_service.get_speaking_orders()
         
+        # Get round summaries from public history service
+        round_summaries = []
+        if self.public_history_service:
+            round_summaries = self.public_history_service.get_round_summaries()
+        
         results = ExperimentResults(
             experiment_id=self.config.experiment_id,
             configuration=self.config,
             deliberation_transcript=self.transcript,
             agent_memories=agent_memories,
             speaking_orders=speaking_orders,
+            round_summaries=round_summaries,
             consensus_result=consensus_result,
             initial_evaluation_responses=self.initial_evaluation_responses,
             evaluation_responses=self.evaluation_responses,
@@ -325,6 +377,39 @@ class ExperimentOrchestrator:
         )
         
         return results
+    
+    def _log_final_data(self, consensus_result: ConsensusResult, results: ExperimentResults):
+        """Log final experiment data to the new unified logger."""
+        if not self.logger:
+            return
+            
+        # Log final consensus data for each agent
+        for agent in self.agents:
+            agent_satisfaction = None
+            # Try to find satisfaction rating from evaluation responses
+            for eval_response in self.evaluation_responses:
+                if eval_response.agent_id == agent.agent_id:
+                    # Get satisfaction with agreed principle
+                    if consensus_result.unanimous and consensus_result.agreed_principle:
+                        for evaluation in eval_response.principle_evaluations:
+                            if evaluation.principle_id == consensus_result.agreed_principle.principle_id:
+                                agent_satisfaction = evaluation.satisfaction_rating.value
+                                break
+                    break
+            
+            self.logger.log_final_consensus(
+                agent_id=agent.name,
+                agreement_reached=consensus_result.unanimous,
+                agreement_choice=consensus_result.agreed_principle.principle_name if consensus_result.unanimous else None,
+                num_rounds=consensus_result.rounds_to_consensus,
+                satisfaction=agent_satisfaction
+            )
+        
+        # Log experiment completion
+        self.logger.log_experiment_completion(
+            consensus_result=consensus_result,
+            total_rounds=consensus_result.rounds_to_consensus
+        )
     
     def get_experiment_state(self) -> dict:
         """Get current experiment state for monitoring."""

@@ -1,0 +1,20 @@
+experiment_id: real_test
+global_temperature: 0.0
+experiment:
+  max_rounds: 2
+  decision_rule: unanimity
+  timeout_seconds: 120
+agents:
+- name: Agent_1
+  model: gpt-4.1-nano
+- name: Agent_2
+  model: gpt-4.1-nano
+defaults:
+  personality: You are an agent tasked to design a future society.
+  model: gpt-4.1-nano
+output:
+  directory: experiment_results
+  formats:
+  - json
+  include_feedback: false
+  include_transcript: false

@@ -106,7 +106,6 @@ To customize this default setup, to send traces to alternative or additional bac
 -   [MLflow (Databricks hosted](https://docs.databricks.com/aws/en/mlflow/mlflow-tracing#-automatic-tracing)
 -   [Braintrust](https://braintrust.dev/docs/guides/traces/integrations#openai-agents-sdk)
 -   [Pydantic Logfire](https://logfire.pydantic.dev/docs/integrations/llms/openai/#openai-agents)
--   [AgentOps](https://docs.agentops.ai/v1/integrations/agentssdk)
 -   [Scorecard](https://docs.scorecard.io/docs/documentation/features/tracing#openai-agents-sdk-integration)
 -   [Keywords AI](https://docs.keywordsai.co/integration/development-frameworks/openai-agent)
 -   [LangSmith](https://docs.smith.langchain.com/observability/how_to_guides/trace_with_openai_agents_sdk)

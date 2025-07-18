@@ -1,0 +1,35 @@
+# Temperature Test Configuration
+# Demonstrates reproducible experiments with temperature=0.0
+
+experiment_id: temperature_test
+global_temperature: 0.0  # Global temperature for reproducible results
+
+experiment:
+  max_rounds: 2
+  decision_rule: unanimity
+  timeout_seconds: 300
+
+agents:
+  - name: "Deterministic_Agent_1"
+    model: "gpt-4.1-mini"
+    personality: "You prefer principle 1 (Maximize the Minimum Income). You believe ensuring the worst-off are as well-off as possible is most important."
+    temperature: 0.0  # Agent-specific temperature override
+
+  - name: "Deterministic_Agent_2"
+    model: "gpt-4.1-mini"
+    personality: "You prefer principle 2 (Maximize the Average Income). You believe maximizing total wealth is most important."
+    # This agent will use the global temperature (0.0)
+
+  - name: "Default_Agent_3"
+    model: "gpt-4.1-mini"
+    # This agent will use default personality and global temperature
+
+defaults:
+  personality: "You are an agent tasked to design a future society."
+  model: "gpt-4.1-mini"
+  temperature: 0.1  # Default temperature (overridden by global_temperature)
+
+output:
+  directory: experiment_results
+  formats: [json, csv]
+  include_feedback: true  

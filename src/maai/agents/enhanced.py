@@ -7,6 +7,7 @@ import os
 from typing import Optional, List
 from agents import Agent, trace
 from agents.extensions.models.litellm_model import LitellmModel
+from agents.model_settings import ModelSettings
 from ..core.models import PrincipleChoice, DeliberationResponse, ConsensusResult, FeedbackResponse, get_all_principles_text, get_default_personality
 from datetime import datetime
 
@@ -21,7 +22,8 @@ class DeliberationAgent(Agent):
                  agent_id: str,
                  name: str,
                  model: str = "gpt-4.1-mini",
-                 personality: str = "You are an agent tasked to design a future society."):
+                 personality: str = "You are an agent tasked to design a future society.",
+                 model_settings: Optional[ModelSettings] = None):
         
         base_instructions = f"""
 {personality}
@@ -30,12 +32,9 @@ You are participating in a deliberation about distributive justice principles.
 
 {get_all_principles_text()}
 
+IMPORTANT: 
 Your task is to:
-1. Carefully consider each principle and its implications
-2. Engage in thoughtful discussion with other agents
-3. Provide clear reasoning for your choices
-4. Be open to changing your mind based on compelling arguments
-5. Work toward reaching unanimous agreement with the group
+To agree with the best principle for your society 
 
 Important context:
 - You are behind a "veil of ignorance" - you don't know what economic position you'll have
@@ -54,7 +53,8 @@ Communication guidelines:
         super().__init__(
             name=name,
             instructions=base_instructions,
-            model=model
+            model=model,
+            model_settings=model_settings
         )
         self.agent_id = agent_id
         self.current_choice: Optional[PrincipleChoice] = None
@@ -67,7 +67,7 @@ class DiscussionModerator(Agent):
     Moderator agent for managing deliberation rounds and keeping discussions focused.
     """
     
-    def __init__(self, model: str = "gpt-4.1-mini"):
+    def __init__(self, model: str = "gpt-4.1-mini", model_settings: Optional[ModelSettings] = None):
         instructions = f"""
 You are a discussion moderator for a distributive justice deliberation.
 
@@ -98,17 +98,19 @@ Communication style:
         super().__init__(
             name="Discussion Moderator",
             instructions=instructions,
-            model=model
+            model=model,
+            model_settings=model_settings
         )
 
 
-def create_deliberation_agents(agent_configs: List, defaults) -> List[DeliberationAgent]:
+def create_deliberation_agents(agent_configs: List, defaults, global_temperature: Optional[float] = None) -> List[DeliberationAgent]:
     """
     Create a list of deliberation agents from AgentConfig specifications.
     
     Args:
         agent_configs: List of AgentConfig instances
         defaults: DefaultConfig with fallback values
+        global_temperature: Global temperature setting for all agents
     
     Returns:
         List of DeliberationAgent instances
@@ -197,7 +199,7 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
         
         # OpenAI models - explicit handling to ensure they're not caught by other conditions
         elif any(openai_pattern in model_name.lower() for openai_pattern in [
-            "gpt-4", "gpt-3.5", "o1", "o3", "o4", "gpt-image", "sora"
+            "gpt-4", "gpt-3.5", "o1", "o3", "o4","o3-mini", "gpt-image", "sora"
         ]):
             # OpenAI models use the model name directly (no LitellmModel wrapper needed)
             model = model_name
@@ -211,11 +213,26 @@ def create_deliberation_agents(agent_configs: List, defaults) -> List[Deliberati
         # Resolve personality (use agent's personality or default)
         personality = agent_config.personality or defaults.personality
         
+        # Determine temperature (priority: agent > default > global)
+        if agent_config.temperature is not None:
+            temperature = agent_config.temperature
+        elif defaults.temperature is not None:
+            temperature = defaults.temperature
+        else:
+            temperature = global_temperature
+        
+        # Always create ModelSettings (never None to avoid SDK errors)
+        if temperature is not None:
+            model_settings = ModelSettings(temperature=temperature)
+        else:
+            model_settings = ModelSettings()  # Empty but valid ModelSettings
+        
         agent = DeliberationAgent(
             agent_id=agent_id,
             name=agent_name,
             model=model,
-            personality=personality
+            personality=personality,
+            model_settings=model_settings
         )
         
         agents.append(agent)
@@ -232,7 +249,7 @@ class FeedbackCollector(Agent):
     Specialized agent for collecting post-experiment feedback from participants.
     """
     
-    def __init__(self, model: str = "gpt-4.1-mini"):
+    def __init__(self, model: str = "gpt-4.1-mini", model_settings: Optional[ModelSettings] = None):
         instructions = f"""
 You are a neutral interviewer collecting feedback from agents who just completed a distributive justice deliberation.
 
@@ -265,15 +282,22 @@ Be empathetic and professional in your approach.
         super().__init__(
             name="Feedback Collector",
             instructions=instructions,
-            model=model
+            model=model,
+            model_settings=model_settings
         )
 
 
-def create_discussion_moderator() -> DiscussionModerator:
+def create_discussion_moderator(model_settings: Optional[ModelSettings] = None) -> DiscussionModerator:
     """Create a discussion moderator agent."""
-    return DiscussionModerator()
+    # Ensure model_settings is never None to avoid SDK errors
+    if model_settings is None:
+        model_settings = ModelSettings()
+    return DiscussionModerator(model_settings=model_settings)
 
 
-def create_feedback_collector() -> FeedbackCollector:
+def create_feedback_collector(model_settings: Optional[ModelSettings] = None) -> FeedbackCollector:
     """Create a feedback collector agent."""
-    return FeedbackCollector()
+    # Ensure model_settings is never None to avoid SDK errors
+    if model_settings is None:
+        model_settings = ModelSettings()
+    return FeedbackCollector(model_settings=model_settings)

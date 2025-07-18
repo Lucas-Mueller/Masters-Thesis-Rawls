@@ -3,5 +3,10 @@ openai-agents[litellm]
 python-dotenv
 pydantic
 pandas
-agentops
 PyYAML
+numpy
+matplotlib
+seaborn
+tqdm
+scipy
+statsmodels

@@ -1,0 +1,293 @@
+# Comprehensive YAML Configuration Example
+# This file demonstrates ALL possible configuration options for the Multi-Agent Distributive Justice Experiment
+
+# ========================================
+# EXPERIMENT IDENTIFICATION
+# ========================================
+
+# Unique identifier for this experiment (will be made unique automatically if conflicts exist)
+experiment_id: comprehensive_example_experiment
+
+# ========================================
+# CORE EXPERIMENT SETTINGS
+# ========================================
+
+experiment:
+  # Maximum number of deliberation rounds before timeout (required)
+  max_rounds: 10
+  
+  # Decision rule for reaching consensus (default: "unanimity")
+  # Options: "unanimity", "majority"
+  decision_rule: unanimity
+  
+  # Timeout per round in seconds (default: 300)
+  # Minimum: 30 seconds
+  timeout_seconds: 300
+
+# ========================================
+# GLOBAL TEMPERATURE SETTING (OPTIONAL)
+# ========================================
+
+# Global temperature setting that applies to ALL agents (0.0-2.0)
+# When set, this overrides any individual agent temperature settings
+# Uncomment to use:
+# global_temperature: 0.0  # For deterministic/reproducible results
+
+# ========================================
+# AGENT CONFIGURATIONS
+# ========================================
+
+agents:
+  # Agent 1: Full configuration with all options
+  - name: "Economist_Agent"
+    personality: "You are an economist focused on efficiency and optimal resource allocation. You believe in market-based solutions and emphasize economic growth as the path to improving everyone's welfare."
+    model: "gpt-4.1"
+    temperature: 0.2  # Individual temperature (0.0-2.0)
+  
+  # Agent 2: Different model and personality
+  - name: "Philosopher_Agent"
+    personality: "You are a moral philosopher concerned with justice and fairness for all members of society. You prioritize the welfare of the least advantaged and believe in strong social safety nets."
+    model: "gpt-4.1-mini"
+    temperature: 0.7
+  
+  # Agent 3: Using Claude model (requires ANTHROPIC_API_KEY)
+  - name: "Pragmatist_Agent"
+    personality: "You are a pragmatist who focuses on what works in practice rather than theory. You seek balanced solutions that can be implemented effectively in real-world conditions."
+    model: "claude-3-sonnet"
+    temperature: 0.5
+  
+  # Agent 4: Using DeepSeek model (requires DEEPSEEK_API_KEY)
+  - name: "Data_Scientist_Agent"
+    personality: "You are a data scientist who bases decisions on empirical evidence and statistical analysis. You prefer solutions that can be measured and validated through data."
+    model: "deepseek-chat"
+    temperature: 0.3
+  
+  # Agent 5: Minimal configuration (will use defaults)
+  - name: "Default_Agent"
+    # Will use default personality and model from 'defaults' section below
+  
+  # Agent 6: Custom personality only
+  - name: "Sociologist_Agent"
+    personality: "You are a sociologist who studies social structures and their impact on different groups. You are particularly concerned with social cohesion and reducing inequality."
+    # Will use default model and temperature
+
+# ========================================
+# DEFAULT VALUES
+# ========================================
+
+defaults:
+  # Default personality for agents that don't specify one
+  personality: "You are an agent tasked to design a future society. You approach this responsibility thoughtfully, considering the welfare of all future members while being practical about implementation."
+  
+  # Default LLM model for agents that don't specify one
+  # Supported models: gpt-4.1, gpt-4.1-mini, gpt-4.1-nano, gpt-4o, gpt-4o-mini, 
+  #                  claude-3-sonnet, claude-3-haiku, deepseek-chat, etc.
+  model: "gpt-4.1-mini"
+  
+  # Default temperature for agents that don't specify one (0.0-2.0)
+  # Lower values = more deterministic, higher values = more creative/varied
+  temperature: 0.4
+
+# ========================================
+# OUTPUT CONFIGURATION
+# ========================================
+
+output:
+  # Directory where experiment results will be saved
+  directory: experiment_results
+  
+  # Export formats for experiment data
+  # Available formats: json, csv, txt
+  formats:
+    - json      # Complete structured data
+    - csv       # Tabular data for analysis
+    - txt       # Human-readable transcript
+  
+  # Whether to include post-experiment feedback collection
+  include_feedback: true
+  
+  # Whether to include human-readable conversation transcript
+  include_transcript: true
+  
+  # Additional output options (uncomment to use):
+  # export_agent_memories: true      # Export private agent memories
+  # export_speaking_orders: true     # Export round-by-round speaking orders
+  # compress_outputs: false          # Whether to compress large JSON files
+
+# ========================================
+# PERFORMANCE & DEBUGGING
+# ========================================
+
+performance:
+  # Whether to run feedback collection in parallel (faster but uses more API calls)
+  parallel_feedback: true
+  
+  # Tracing functionality has been removed
+  
+  # Enable debug mode for verbose logging
+  debug_mode: false
+  
+  # Additional performance options (uncomment to use):
+  # api_retry_attempts: 3            # Number of API retry attempts on failure
+  # api_timeout_seconds: 60          # Individual API call timeout
+  # concurrent_agent_limit: 4        # Max concurrent agent operations
+
+# ========================================
+# SERVICE LAYER CONFIGURATION (ADVANCED)
+# ========================================
+
+# Advanced service configurations for research experimentation
+# These allow A/B testing of different experimental conditions
+
+services:
+  # Consensus detection strategy
+  consensus:
+    # Strategy for detecting when agents agree
+    # Options: "id_match" (simple ID comparison), "threshold" (majority), "semantic" (LLM-based)
+    strategy: "id_match"
+    
+    # Threshold for consensus (used with "threshold" strategy)
+    threshold: 0.8  # 80% agreement required
+    
+    # Whether to validate consensus with follow-up questions
+    validate_consensus: false
+
+  # Conversation management strategy  
+  conversation:
+    # Speaking order pattern for deliberation rounds
+    # Options: "sequential" (round-robin), "random", "hierarchical"
+    pattern: "sequential"
+    
+    # Whether to randomize initial speaking order
+    randomize_initial_order: true
+    
+    # Maximum messages per agent per round
+    max_messages_per_agent: 1
+
+  # Memory management strategy
+  memory:
+    # How agents maintain memory across rounds
+    # Options: "recent" (last N rounds), "full" (all rounds), "selective" (key moments)
+    strategy: "recent"
+    
+    # Number of rounds to remember (for "recent" strategy)
+    memory_window: 3
+    
+    # Whether to include emotional/sentiment analysis in memory
+    include_sentiment: false
+
+  # Evaluation service configuration
+  evaluation:
+    # Likert scale range (currently fixed at 4-point scale)
+    scale_points: 4
+    
+    # Whether to collect confidence ratings with evaluations
+    collect_confidence: false
+    
+    # Whether to randomize principle presentation order
+    randomize_principle_order: true
+
+# ========================================
+# ENVIRONMENT VARIABLE OVERRIDES
+# ========================================
+
+# The following environment variables can override config values:
+# MAAI_MAX_ROUNDS          - Override experiment.max_rounds
+# MAAI_DECISION_RULE       - Override experiment.decision_rule  
+# MAAI_TIMEOUT             - Override experiment.timeout_seconds
+# MAAI_DEFAULT_MODEL       - Override defaults.model
+# MAAI_OUTPUT_DIR          - Override output.directory
+# MAAI_DEBUG               - Override performance.debug_mode (true/false)
+# MAAI_EXPERIMENT_ID       - Override experiment_id
+
+# ========================================
+# MODEL-SPECIFIC SETTINGS
+# ========================================
+
+model_settings:
+  # OpenAI-specific settings
+  openai:
+    # Organization ID (optional)
+    # organization: "org-xxxxxxxxx"
+    
+    # Custom base URL (for Azure OpenAI or other providers)
+    # base_url: "https://your-azure-endpoint.openai.azure.com/"
+    
+    # API version (for Azure)
+    # api_version: "2024-02-15-preview"
+  
+  # Anthropic-specific settings
+  anthropic:
+    # Custom base URL (if using proxy)
+    # base_url: "https://api.anthropic.com"
+    
+    # Max tokens for responses
+    # max_tokens: 4096
+  
+  # DeepSeek-specific settings  
+  deepseek:
+    # Custom base URL
+    # base_url: "https://api.deepseek.com"
+
+# ========================================
+# EXPERIMENTAL FEATURES (BETA)
+# ========================================
+
+experimental:
+  # Enable experimental consensus mechanisms
+  enable_advanced_consensus: false
+  
+  # Use reinforcement learning for agent memory
+  enable_rl_memory: false
+  
+  # Enable multi-modal inputs (when supported)
+  enable_multimodal: false
+  
+  # Experimental personality evolution during deliberation
+  enable_personality_evolution: false
+
+# ========================================
+# RESEARCH METADATA (OPTIONAL)
+# ========================================
+
+metadata:
+  # Research study information
+  study_name: "Distributive Justice Under Uncertainty"
+  researcher: "Research Team"
+  institution: "University"
+  
+  # Experiment condition labels for analysis
+  condition: "control"
+  batch_id: "batch_001"
+  
+  # Custom tags for analysis
+  tags:
+    - "rawls_experiment"
+    - "veil_of_ignorance" 
+    - "distributive_justice"
+  
+  # Additional notes
+  notes: "Comprehensive configuration example demonstrating all available options"
+
+# ========================================
+# VALIDATION RULES (OPTIONAL)
+# ========================================
+
+validation:
+  # Require minimum number of agents
+  min_agents: 2
+  
+  # Require maximum number of agents
+  max_agents: 10
+  
+  # Require all agents to have unique names
+  unique_agent_names: true
+  
+  # Validate that specified models are available
+  validate_models: true
+  
+  # Require specific environment variables to be set
+  required_env_vars:
+    - "OPENAI_API_KEY"
+    # - "ANTHROPIC_API_KEY"  # Uncomment if using Claude models
+    # - "DEEPSEEK_API_KEY"   # Uncomment if using DeepSeek models

@@ -1,0 +1,29 @@
+agents:
+- model: gpt-4.1-mini
+  name: Agent_1
+- model: gpt-4.1-mini
+  name: Agent_2
+- model: gpt-4.1-mini
+  name: Agent_3
+- model: gpt-4.1-mini
+  name: Agent_4
+defaults:
+  model: gpt-4.1-mini
+  personality: You are an agent tasked to design a future society.
+experiment:
+  decision_rule: unanimity
+  max_rounds: 5
+  timeout_seconds: 300
+experiment_id: default_experiment
+output:
+  directory: experiment_results
+  formats:
+  - json
+  - csv
+  - txt
+  include_feedback: true
+  include_transcript: true
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: true

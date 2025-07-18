@@ -45,9 +45,6 @@ GROQ_API_KEY="your api key"
 GEMINI_API_KEY="your gemini api key"
 
 ```
-If you want to use monitoring when not using OpenAI models you can use AgentOps by setting 
-this API key 
-AGENT_OPS_API_KEY="your-agentops-key"
 
 ### Run Your First Experiment
 
@@ -210,7 +207,6 @@ python tests/test_core.py
 - **Configurable Personalities** - Each agent can have custom personality defined in YAML
 - **Neutral Descriptions** - Principle descriptions avoid references to philosophical authorities
 - **Multi-Provider Support** - Works with OpenAI, Anthropic Claude, and DeepSeek models
-- **AgentOps Integration** - Optional experiment tracing and monitoring
 
 
 
