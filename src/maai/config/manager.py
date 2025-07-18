@@ -156,6 +156,27 @@ class ConfigManager:
         
         # Create ExperimentConfig object with validation
         try:
+            from ..core.models import PublicHistoryMode, SummaryAgentConfig
+            
+            # Parse public history mode
+            public_history_mode = PublicHistoryMode.FULL  # Default
+            if "public_history_mode" in config_data:
+                mode_str = config_data["public_history_mode"]
+                if mode_str == "summarized":
+                    public_history_mode = PublicHistoryMode.SUMMARIZED
+                elif mode_str == "full":
+                    public_history_mode = PublicHistoryMode.FULL
+            
+            # Parse summary agent config
+            summary_agent = SummaryAgentConfig()  # Default
+            if "summary_agent" in config_data:
+                summary_agent_data = config_data["summary_agent"]
+                summary_agent = SummaryAgentConfig(
+                    model=summary_agent_data.get("model", "gpt-4.1-mini"),
+                    temperature=summary_agent_data.get("temperature", 0.1),
+                    max_tokens=summary_agent_data.get("max_tokens", 1000)
+                )
+            
             experiment_config = ExperimentConfig(
                 experiment_id=experiment_id,
                 max_rounds=config_data["experiment"]["max_rounds"],
@@ -165,6 +186,8 @@ class ConfigManager:
                 defaults=defaults,
                 global_temperature=config_data.get("global_temperature"),
                 memory_strategy=config_data.get("memory_strategy", "full"),
+                public_history_mode=public_history_mode,
+                summary_agent=summary_agent,
                 output=output
             )
         except Exception as e:

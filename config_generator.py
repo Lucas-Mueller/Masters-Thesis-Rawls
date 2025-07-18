@@ -22,6 +22,7 @@ class ProbabilisticConfigGenerator:
                  model_probabilities: Dict[str, float],
                  temperature: Dict[float, float],
                  memory_strategy_probabilities: Dict[str, float],
+                 public_history_mode_probabilities: Dict[str, float],
                  output_folder: str):
         """
         Initialize the probabilistic configuration generator.
@@ -33,6 +34,7 @@ class ProbabilisticConfigGenerator:
             model_probabilities: Mapping of model identifiers to their probabilities
             temperature: Mapping of temperature values to their probabilities
             memory_strategy_probabilities: Mapping of memory strategies to their probabilities
+            public_history_mode_probabilities: Mapping of public history modes to their probabilities
             output_folder: Folder where generated config files will be saved
         """
         self.agent_count_probabilities = agent_count_probabilities
@@ -41,6 +43,7 @@ class ProbabilisticConfigGenerator:
         self.model_probabilities = model_probabilities
         self.temperature = temperature
         self.memory_strategy_probabilities = memory_strategy_probabilities
+        self.public_history_mode_probabilities = public_history_mode_probabilities
         self.output_folder = output_folder
         
         # Validate probabilities sum to 1.0 (with tolerance for floating point)
@@ -59,7 +62,8 @@ class ProbabilisticConfigGenerator:
             ("rounds", self.rounds_probabilities),
             ("model", self.model_probabilities),
             ("temperature", self.temperature),
-            ("memory_strategy", self.memory_strategy_probabilities)
+            ("memory_strategy", self.memory_strategy_probabilities),
+            ("public_history_mode", self.public_history_mode_probabilities)
         ]:
             prob_sum = sum(probs.values())
             if abs(prob_sum - 1.0) > tolerance:
@@ -117,6 +121,7 @@ class ProbabilisticConfigGenerator:
         max_rounds = self._weighted_choice(self.rounds_probabilities)
         global_temperature = self._weighted_choice(self.temperature)
         memory_strategy = self._weighted_choice(self.memory_strategy_probabilities)
+        public_history_mode = self._weighted_choice(self.public_history_mode_probabilities)
         
         # Generate agent configurations
         agents = self._generate_agent_configs(num_agents)
@@ -130,6 +135,7 @@ class ProbabilisticConfigGenerator:
             "experiment_id": experiment_id,
             "global_temperature": global_temperature,
             "memory_strategy": memory_strategy,
+            "public_history_mode": public_history_mode,
             "experiment": {
                 "max_rounds": max_rounds,
                 "decision_rule": "unanimity",
@@ -257,6 +263,11 @@ def create_generator() -> ProbabilisticConfigGenerator:
         "decomposed": 0.5   # Decomposed memory (preferred)
     }
     
+    public_history_mode_probs = {
+        "full": 0.4,        # Full public history
+        "summarized": 0.6   # Summarized public history (preferred for efficiency)
+    }
+    
     return ProbabilisticConfigGenerator(
         agent_count_probabilities=agent_count_probs,
         personality_probabilities=personality_probs,
@@ -264,5 +275,6 @@ def create_generator() -> ProbabilisticConfigGenerator:
         model_probabilities=model_probs,
         temperature=temperature_probs,
         memory_strategy_probabilities=memory_strategy_probs,
+        public_history_mode_probabilities=public_history_mode_probs,
         output_folder="configs"
     )

@@ -10,6 +10,7 @@ from typing import List, Dict, Optional, Tuple
 from agents import Runner, ItemHelpers
 from ..core.models import DeliberationResponse, PrincipleChoice, MemoryEntry, get_all_principles_text
 from ..agents.enhanced import DeliberationAgent
+from .public_history_service import PublicHistoryService
 
 
 class CommunicationPattern(ABC):
@@ -133,7 +134,7 @@ class RoundContext:
 class ConversationService:
     """Service for managing agent communication flow and patterns."""
     
-    def __init__(self, communication_pattern: CommunicationPattern = None, logger=None):
+    def __init__(self, communication_pattern: CommunicationPattern = None, logger=None, public_history_service: PublicHistoryService = None):
         """
         Initialize conversation service.
         
@@ -141,10 +142,12 @@ class ConversationService:
             communication_pattern: Pattern for generating speaking orders.
                                   Defaults to RandomCommunicationPattern.
             logger: ExperimentLogger instance for logging agent interactions
+            public_history_service: Service for managing public history
         """
         self.pattern = communication_pattern or RandomCommunicationPattern()
         self.speaking_orders: List[List[str]] = []
         self.logger = logger
+        self.public_history_service = public_history_service
     
     def generate_speaking_order(self, agents: List[DeliberationAgent], round_num: int) -> List[str]:
         """
@@ -449,7 +452,7 @@ Format your response clearly with your final choice at the end.
                                            memory_entry: MemoryEntry) -> str:
         """Generate agent's public communication based on their memory."""
         # Build context for public communication
-        public_context = self._build_public_context(agent.agent_id, round_context)
+        public_context = await self._build_public_context_async(agent.agent_id, round_context)
         
         communication_prompt = f"""Now it's your turn to speak publicly to the other agents in round {round_context.round_number}.
 
@@ -492,8 +495,34 @@ What do you want to say to the group? End with your current principle choice (1,
         
         return response_text
     
-    def _build_public_context(self, agent_id: str, round_context: RoundContext) -> str:
-        """Build context for public communication."""
+    async def _build_public_context_async(self, agent_id: str, round_context: RoundContext) -> str:
+        """Build context for public communication using PublicHistoryService if available."""
+        if self.public_history_service:
+            # Use PublicHistoryService for enhanced public history
+            current_round_responses = [r for r in round_context.transcript if r.round_number == round_context.round_number]
+            all_previous_responses = [r for r in round_context.transcript if r.round_number < round_context.round_number]
+            
+            # Get agent's current choice
+            agent = round_context.get_agent_by_id(agent_id)
+            agent_current_choice = f"Principle {agent.current_choice.principle_id}" if agent.current_choice else None
+            
+            try:
+                return await self.public_history_service.build_public_context(
+                    round_context.round_number, 
+                    current_round_responses, 
+                    all_previous_responses, 
+                    agent_current_choice
+                )
+            except Exception as e:
+                print(f"Warning: Public history service failed: {e}")
+                # Fall back to original implementation
+                pass
+        
+        # Fallback to original implementation
+        return self._build_public_context_fallback(agent_id, round_context)
+    
+    def _build_public_context_fallback(self, agent_id: str, round_context: RoundContext) -> str:
+        """Fallback implementation for building public context."""
         context_parts = []
         
         # Current round speakers so far
@@ -509,6 +538,10 @@ What do you want to say to the group? End with your current principle choice (1,
             context_parts.append(f"\nYour current choice: Principle {agent.current_choice.principle_id}")
         
         return "\n".join(context_parts)
+    
+    def _build_public_context(self, agent_id: str, round_context: RoundContext) -> str:
+        """Build context for public communication (sync version for compatibility)."""
+        return self._build_public_context_fallback(agent_id, round_context)
     
     async def _extract_principle_choice(self, response_text: str, agent_id: str, agent_name: str, moderator=None) -> PrincipleChoice:
         """Extract principle choice from agent response."""

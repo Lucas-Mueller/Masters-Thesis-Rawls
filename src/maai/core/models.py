@@ -4,7 +4,7 @@ All models use Pydantic for validation and structure.
 """
 
 from datetime import datetime
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 from enum import Enum
 
@@ -35,6 +35,30 @@ class LikertScale(str, Enum):
             "strongly_agree": "Strongly Agree"
         }
         return mapping[self.value]
+
+
+class PublicHistoryMode(str, Enum):
+    """Public history mode for experiments."""
+    FULL = "full"
+    SUMMARIZED = "summarized"
+
+
+class SummaryAgentConfig(BaseModel):
+    """Configuration for the summary agent."""
+    model: str = Field(default="gpt-4.1-mini", description="Model to use for summary generation")
+    temperature: float = Field(default=0.1, ge=0.0, le=2.0, description="Temperature for summary generation")
+    max_tokens: int = Field(default=1000, ge=100, le=4000, description="Maximum tokens for summaries")
+
+
+class RoundSummary(BaseModel):
+    """Summary of a completed deliberation round."""
+    round_number: int = Field(..., ge=1, description="Round number")
+    summary_text: str = Field(..., description="Generated summary text")
+    key_arguments: Dict[str, str] = Field(default_factory=dict, description="agent_name -> main_argument")
+    principle_preferences: Dict[str, List[str]] = Field(default_factory=dict, description="principle -> supporting_agents")
+    consensus_status: str = Field(..., description="Consensus status description")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Summary generation timestamp")
+    summary_agent_model: str = Field(..., description="Model used for summary generation")
 
 
 class AgentConfig(BaseModel):
@@ -142,6 +166,8 @@ class ExperimentConfig(BaseModel):
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
     memory_strategy: str = Field(default="decomposed", description="Memory strategy: full|recent|decomposed")
+    public_history_mode: PublicHistoryMode = Field(default=PublicHistoryMode.FULL, description="Public history mode: full|summarized")
+    summary_agent: SummaryAgentConfig = Field(default_factory=SummaryAgentConfig, description="Summary agent configuration")
     logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output configuration")
     
@@ -196,6 +222,7 @@ class ExperimentResults(BaseModel):
     deliberation_transcript: List[DeliberationResponse] = Field(default_factory=list, description="Full conversation transcript")
     agent_memories: List[AgentMemory] = Field(default_factory=list, description="Private agent memories")
     speaking_orders: List[List[str]] = Field(default_factory=list, description="Speaking order for each round")
+    round_summaries: List[RoundSummary] = Field(default_factory=list, description="AI-generated summaries of each round")
     consensus_result: ConsensusResult = Field(..., description="Consensus outcome")
     initial_evaluation_responses: List[AgentEvaluationResponse] = Field(default_factory=list, description="Initial Likert scale assessments (before deliberation)")
     evaluation_responses: List[AgentEvaluationResponse] = Field(default_factory=list, description="Post-consensus principle evaluations")

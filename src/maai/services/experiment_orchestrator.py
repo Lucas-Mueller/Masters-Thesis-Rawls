@@ -25,6 +25,7 @@ from .conversation_service import ConversationService, RoundContext
 from .memory_service import MemoryService
 from .evaluation_service import EvaluationService
 from .experiment_logger import ExperimentLogger
+from .public_history_service import PublicHistoryService
 
 
 class ExperimentOrchestrator:
@@ -34,7 +35,8 @@ class ExperimentOrchestrator:
                  consensus_service: ConsensusService = None,
                  conversation_service: ConversationService = None,
                  memory_service: MemoryService = None,
-                 evaluation_service: EvaluationService = None):
+                 evaluation_service: EvaluationService = None,
+                 public_history_service: PublicHistoryService = None):
         """
         Initialize experiment orchestrator.
         
@@ -43,11 +45,13 @@ class ExperimentOrchestrator:
             conversation_service: Service for conversation management
             memory_service: Service for memory management
             evaluation_service: Service for post-consensus evaluation
+            public_history_service: Service for public history management
         """
         self.consensus_service = consensus_service or ConsensusService()
         self.conversation_service = conversation_service or ConversationService()
         self.memory_service = memory_service or MemoryService()
         self.evaluation_service = evaluation_service or EvaluationService()
+        self.public_history_service = public_history_service
         
         # Experiment state
         self.config: Optional[ExperimentConfig] = None
@@ -84,8 +88,13 @@ class ExperimentOrchestrator:
         # Initialize experiment logger
         self.logger = ExperimentLogger(config.experiment_id, config)
         
-        # Update services with logger
+        # Initialize public history service if not provided
+        if self.public_history_service is None:
+            self.public_history_service = PublicHistoryService(config)
+        
+        # Update services with logger and public history service
         self.conversation_service.logger = self.logger
+        self.conversation_service.public_history_service = self.public_history_service
         self.memory_service.logger = self.logger
         
         print(f"\n=== Starting Deliberation Experiment ===")
@@ -229,6 +238,19 @@ class ExperimentOrchestrator:
                 round_context, self.memory_service, self.moderator
             )
             
+            # Generate round summary if using summarized public history mode
+            if self.public_history_service and self.public_history_service.should_generate_summaries():
+                print(f"  Generating summary for round {round_num}...")
+                round_responses = [r for r in self.transcript if r.round_number == round_num]
+                if round_responses:
+                    try:
+                        summary = await self.public_history_service.generate_round_summary(
+                            round_num, round_responses
+                        )
+                        print(f"    ✓ Round summary generated ({len(summary.summary_text)} chars)")
+                    except Exception as e:
+                        print(f"    ⚠️  Summary generation failed: {e}")
+            
             # Check for consensus after round
             consensus_result = await self.consensus_service.detect_consensus(self.transcript)
             
@@ -333,12 +355,18 @@ class ExperimentOrchestrator:
         # Get speaking orders from conversation service
         speaking_orders = self.conversation_service.get_speaking_orders()
         
+        # Get round summaries from public history service
+        round_summaries = []
+        if self.public_history_service:
+            round_summaries = self.public_history_service.get_round_summaries()
+        
         results = ExperimentResults(
             experiment_id=self.config.experiment_id,
             configuration=self.config,
             deliberation_transcript=self.transcript,
             agent_memories=agent_memories,
             speaking_orders=speaking_orders,
+            round_summaries=round_summaries,
             consensus_result=consensus_result,
             initial_evaluation_responses=self.initial_evaluation_responses,
             evaluation_responses=self.evaluation_responses,
