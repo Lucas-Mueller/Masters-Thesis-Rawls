@@ -7,7 +7,12 @@ from .models import (
     ConsensusResult,
     FeedbackResponse,
     PrincipleChoice,
-    PerformanceMetrics
+    PerformanceMetrics,
+    IncomeDistribution,
+    EconomicOutcome,
+    PreferenceRanking,
+    IncomeClass,
+    CertaintyLevel
 )
 from .deliberation_manager import DeliberationManager, run_single_experiment
 
@@ -19,6 +24,11 @@ __all__ = [
     "FeedbackResponse",
     "PrincipleChoice",
     "PerformanceMetrics",
+    "IncomeDistribution",
+    "EconomicOutcome",
+    "PreferenceRanking",
+    "IncomeClass",
+    "CertaintyLevel",
     "DeliberationManager",
     "run_single_experiment"
 ]

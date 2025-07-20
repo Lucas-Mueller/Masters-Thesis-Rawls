@@ -14,7 +14,7 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - **src/maai/core/**: Core experiment logic and data models (`deliberation_manager.py`, `models.py`)
 - **src/maai/agents/**: Enhanced agent classes with specialized roles (`enhanced.py`)
 - **src/maai/config/**: YAML-based configuration management (`manager.py`)
-- **src/maai/export/**: DEPRECATED legacy data export system (`data_export.py`)
+- **src/maai/export/**: DEPRECATED legacy data export system.
 - **src/maai/services/**: Service layer for experiment orchestration (`experiment_orchestrator.py`, `consensus_service.py`, `conversation_service.py`, `memory_service.py`, `evaluation_service.py`, `experiment_logger.py`)
 - **configs/**: YAML configuration files for different experiment scenarios
 - **experiment_results/**: Output directory for all experiment data
@@ -43,7 +43,7 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 
 ### Distributive Justice Principles
 
-The four principles tested are defined in `src/maai/core/models.py:187-208`:
+The four principles tested are defined in `src/maai/core/models.py:208-229`:
 
 1. **Maximize the Minimum Income**: Ensures worst-off are as well-off as possible
 2. **Maximize the Average Income**: Focuses on greatest total income regardless of distribution  
@@ -59,10 +59,19 @@ pip install -r requirements.txt
 
 ### Running Experiments
 
-**Universal Configuration Runner**:
+**Single Experiment Runner**:
 ```bash
-python run_experiment.py
-# Edit CONFIG_NAME variable in run_experiment.py to switch configurations
+# Run with a specific configuration file
+python run_experiment.py --config default
+
+# Override the output directory
+python run_experiment.py --config default --output-dir custom_experiments/my_test
+```
+
+**Batch Experiment Runner**:
+```bash
+# Run multiple experiments defined in run_batch.py
+python run_batch.py
 ```
 
 **Available Configurations**:
@@ -173,10 +182,10 @@ The JSON structure includes:
 ## Key Architecture Notes
 
 **Core Classes**:
-- `DeliberationManager` (src/maai/core/deliberation_manager.py:25): Facade for running experiments, coordinating services.
+- `DeliberationManager` (src/maai/core/deliberation_manager.py:39): Facade for running experiments, coordinating services.
 - `ExperimentOrchestrator` (src/maai/services/experiment_orchestrator.py): High-level coordinator of all services.
 - `DeliberationAgent` (src/maai/agents/enhanced.py:14): Enhanced agents with structured outputs.
-- `ExperimentConfig` (src/maai/core/models.py:115): Pydantic model for experiment configuration.
+- `ExperimentConfig` (src/maai/core/models.py:133): Pydantic model for experiment configuration.
 - `ExperimentLogger` (src/maai/services/experiment_logger.py): Unified agent-centric JSON logging system.
 
 **Data Flow**:
@@ -203,8 +212,6 @@ The JSON structure includes:
 
 - Built on OpenAI Agents SDK with LitellmModel for multi-provider support.
 - Supports GPT-4.1, GPT-4.1 mini/nano, Claude, DeepSeek, Gemini, Grok, and Llama models.
-- All operations are async-first using asyncio.
-- Pydantic models ensure data validation throughout the system.
 - All operations are async-first using asyncio.
 - Pydantic models ensure data validation throughout the system.
 
@@ -245,7 +252,7 @@ This allows researchers to A/B test different consensus mechanisms, communicatio
 - Mock external API calls in tests.
 
 ### Configuration Management
-- All experiment parameters go in YAML files under `configs/`.
+- All experiment parameters go in `configs/` YAML files.
 - Use the `load_config_from_file()` function consistently.
 - Validate all configs with Pydantic models.
 - Default values defined in `DefaultConfig` class.
@@ -253,7 +260,6 @@ This allows researchers to A/B test different consensus mechanisms, communicatio
 ### Error Handling
 - All async operations wrapped in try/catch.
 - Graceful degradation when services fail.
-- Detailed logging for debugging.
 - Detailed logging for debugging.
 
 ### File Structure Conventions

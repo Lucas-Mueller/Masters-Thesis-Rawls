@@ -34,20 +34,16 @@ You are participating in a deliberation about distributive justice principles.
 
 IMPORTANT: 
 Your task is to:
-To agree with the best principle for your society 
+Choose the best principle for your society's income distribution system
 
 Important context:
-- You are behind a "veil of ignorance" - you don't know what economic position you'll have
-- Your position (rich, middle class, poor) will be randomly assigned AFTER the group decides
-- If the group cannot reach unanimous agreement, everyone gets a poor outcome
+- You will be participating in an economic scenario where your chosen principle determines income distributions
+- Your income class will be randomly assigned AFTER the group decides on a principle
+- Different principles result in different income distributions for all members of society
+- You will receive economic rewards based on the actual income assigned to your class
+- If the group cannot reach unanimous agreement, a random distribution will be used
 - Focus on what would be fair and just for society as a whole
 
-Communication guidelines:
-- Be respectful and constructive in your discussions
-- Present logical arguments with clear reasoning
-- Listen to others' perspectives carefully
-- Be willing to compromise when appropriate
-- Keep responses focused and concise
 """
         
         super().__init__(
@@ -91,7 +87,6 @@ Communication style:
 - Be clear and concise
 - Ask focused questions to clarify positions
 - Summarize complex discussions in simple terms
-- Encourage respectful dialogue
 - Remind agents of their shared goal of reaching agreement
 """
         

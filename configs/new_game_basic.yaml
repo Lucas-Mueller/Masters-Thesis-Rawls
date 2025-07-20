@@ -1,0 +1,78 @@
+experiment_id: "new_game_basic_test"
+
+# Basic experiment settings
+experiment:
+  max_rounds: 3
+  decision_rule: unanimity
+  timeout_seconds: 240
+
+# New game logic settings
+individual_rounds: 4
+payout_ratio: 0.0001  # $1 per $10,000 earned
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution 1"
+    income_by_class:
+      High: 32000
+      Medium high: 27000
+      Medium: 24000
+      Medium low: 13000
+      Low: 12000
+  - distribution_id: 2
+    name: "Distribution 2"
+    income_by_class:
+      High: 28000
+      Medium high: 22000
+      Medium: 20000
+      Medium low: 17000
+      Low: 13000
+  - distribution_id: 3
+    name: "Distribution 3"
+    income_by_class:
+      High: 31000
+      Medium high: 24000
+      Medium: 21000
+      Medium low: 16000
+      Low: 14000
+  - distribution_id: 4
+    name: "Distribution 4"
+    income_by_class:
+      High: 21000
+      Medium high: 20000
+      Medium: 19000
+      Medium low: 16000
+      Low: 15000
+
+# Agents configuration
+agents:
+  - name: "Agent_1"
+    personality: "You are an economist focused on efficiency and optimal resource allocation."
+    model: "gpt-4.1-nano"
+  - name: "Agent_2"
+    personality: "You are a philosopher concerned with justice and fairness for all members of society."
+    model: "gpt-4.1-nano"
+
+defaults:
+  personality: "You are participating in an economic decision-making experiment."
+  model: "gpt-4.1-nano"
+  temperature: 0.1
+
+# Output configuration
+output:
+  directory: experiment_results
+  formats:
+    - json
+    - csv
+    - txt
+  include_feedback: true
+  include_transcript: true
+
+# Performance settings
+performance:
+  debug_mode: false
+  parallel_feedback: true
+  trace_enabled: false

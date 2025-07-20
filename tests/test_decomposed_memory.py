@@ -15,7 +15,6 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 from maai.services.memory_service import (
     DecomposedMemoryStrategy, 
     create_memory_strategy,
-    FullMemoryStrategy,
     RecentMemoryStrategy
 )
 from maai.core.models import MemoryEntry, DeliberationResponse, PrincipleChoice
@@ -172,10 +171,6 @@ class TestDecomposedMemoryStrategy:
 class TestMemoryStrategyFactory:
     """Test suite for memory strategy factory function"""
     
-    def test_create_full_strategy(self):
-        """Test creating full memory strategy"""
-        strategy = create_memory_strategy("full")
-        assert isinstance(strategy, FullMemoryStrategy)
     
     def test_create_recent_strategy(self):
         """Test creating recent memory strategy"""

@@ -12,10 +12,10 @@ from unittest.mock import patch, MagicMock
 import sys
 import os
 
-# Add parent directory to path for imports
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+# Add src directory to path for imports
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from run_experiment import run_experiment, run_experiment_sync
+from maai.runners import run_experiment, run_experiment_sync
 from config_generator import create_test_generator
 
 

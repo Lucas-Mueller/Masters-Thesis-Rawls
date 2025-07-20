@@ -108,16 +108,6 @@ STRATEGY: [your updated strategy]
         return '\n'.join(section_lines).strip() or "No analysis provided"
 
 
-class FullMemoryStrategy(MemoryStrategy):
-    """Include all previous memory entries (current behavior)."""
-    
-    def should_include_memory(self, memory_entry: MemoryEntry, current_round: int) -> bool:
-        """Include all memory entries."""
-        return True
-    
-    def get_memory_context_limit(self) -> int:
-        """No limit on memory entries."""
-        return 1000  # Effectively unlimited
 
 
 class RecentMemoryStrategy(MemoryStrategy):
@@ -152,10 +142,10 @@ class MemoryService:
         
         Args:
             memory_strategy: Strategy for memory management. 
-                           Defaults to FullMemoryStrategy for compatibility.
+                           Defaults to RecentMemoryStrategy for compatibility.
             logger: ExperimentLogger instance for logging memory operations
         """
-        self.memory_strategy = memory_strategy or FullMemoryStrategy()
+        self.memory_strategy = memory_strategy or RecentMemoryStrategy()
         self.agent_memories: Dict[str, AgentMemory] = {}
         self.logger = logger
     
@@ -324,7 +314,7 @@ class MemoryService:
         
         step_1 = {
             "step": "factual_recap",
-            "prompt": "Briefly summarize what just happened in the deliberation (factual events only)",
+            "prompt": "Briefly summarize what just happened in the deliberation",
             "response": factual_recap,
             "processing_time_ms": processing_time_ms
         }
@@ -350,7 +340,7 @@ class MemoryService:
         
         step_3 = {
             "step": "strategic_action",
-            "prompt": "What is ONE specific action you could take next round?",
+            "prompt": "What specific action or actions you could take next round?",
             "response": strategic_action,
             "processing_time_ms": processing_time_ms
         }
@@ -538,7 +528,6 @@ def create_memory_strategy(strategy_name: str) -> MemoryStrategy:
         Configured memory strategy instance
     """
     strategy_map = {
-        "full": FullMemoryStrategy,
         "recent": RecentMemoryStrategy,
         "decomposed": DecomposedMemoryStrategy
     }

@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Master's thesis project implementing a Multi-Agent Distributive Justice Experiment framework. The system simulates Rawls' "veil of ignorance" scenario where autonomous AI agents must reach unanimous agreement on distributive justice principles without knowing their future economic position.
+This is a Master's thesis project implementing a Multi-Agent Distributive Justice Experiment framework. The system implements a **two-phase economic incentive-based game** where autonomous AI agents make decisions about distributive justice principles with real economic consequences. Unlike traditional "veil of ignorance" approaches, agents know they will receive actual monetary payouts based on their income class assignments after choosing principles.
 
 ## Architecture
 
@@ -25,29 +25,47 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - `FeedbackCollector`: Conducts post-experiment interviews
 
 **Service Architecture**:
-- `ExperimentOrchestrator` (src/maai/services/experiment_orchestrator.py): High-level coordination of all services
-- `ConsensusService` (src/maai/services/consensus_service.py): Multiple consensus detection strategies
+- `ExperimentOrchestrator` (src/maai/services/experiment_orchestrator.py): High-level coordination of two-phase experiment flow
+- `ConsensusService` (src/maai/services/consensus_service.py): Multiple consensus detection strategies with constraint handling
 - `ConversationService` (src/maai/services/conversation_service.py): Communication pattern management
 - `MemoryService` (src/maai/services/memory_service.py): Agent memory management strategies
-- `EvaluationService` (src/maai/services/evaluation_service.py): Likert scale evaluation processing
-- `ExperimentLogger` (src/maai/services/experiment_logger.py): Comprehensive single-file experiment data collection
+- `EconomicsService` (src/maai/services/economics_service.py): Income distribution management and economic outcome calculation
+- `PreferenceService` (src/maai/services/preference_service.py): Preference ranking collection and analysis
+- `ValidationService` (src/maai/services/validation_service.py): Principle choice validation and constraint requirement checking
+- `ExperimentLogger` (src/maai/services/experiment_logger.py): Comprehensive agent-centric experiment data collection
 
 **Key Design Decisions**:
-- **No Confidence Scores**: LLMs cannot reliably assess confidence, so confidence scoring has been removed entirely
-- **Code-Based Consensus**: Consensus detection uses simple ID matching rather than LLM assessment (src/maai/core/models.py:230)
+- **Economic Incentive-Based**: Agents receive real monetary payouts based on income assignments, not philosophical reasoning
+- **Two-Phase Structure**: Phase 1 (Individual Familiarization) + Phase 2 (Group Deliberation)
+- **Preference Rankings**: 1-4 rankings with certainty levels replace Likert scale evaluation
+- **Income Distributions**: Multiple distribution scenarios with 5 income classes each (HIGH, MEDIUM_HIGH, MEDIUM, MEDIUM_LOW, LOW)
+- **Constraint Handling**: Automatic default values for principle 3 (floor) and 4 (range) constraints when not specified
+- **Code-Based Consensus**: Consensus detection uses simple ID matching with constraint validation
 - **Configurable Personalities**: Each agent can have a custom personality defined in YAML
-- **Neutral Descriptions**: Principle descriptions avoid references to philosophical authorities
-- **Likert Scale Evaluation**: 4-point scale for principle assessment (strongly disagree to strongly agree)
 - **No Output Truncation**: All agent outputs, messages, and reasoning are stored in full without character limits or truncation
 
 ### Distributive Justice Principles
 
 The four principles tested are defined in `src/maai/core/models.py:187-208`:
 
-1. **Maximize the Minimum Income**: Ensures worst-off are as well-off as possible
-2. **Maximize the Average Income**: Focuses on greatest total income regardless of distribution  
-3. **Floor Constraint**: Hybrid with guaranteed minimum income plus maximizing average
-4. **Range Constraint**: Hybrid that limits inequality gap plus maximizing average
+1. **MAXIMIZING THE FLOOR INCOME**: The most just distribution maximizes the income received by the poorest member of society (Rawlsian difference principle)
+2. **MAXIMIZING THE AVERAGE INCOME**: The most just distribution maximizes the average income across all members, regardless of distribution inequality
+3. **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**: Maximize average income while guaranteeing a specified minimum income to everyone (requires floor constraint parameter)
+4. **MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT**: Maximize average income while limiting the income difference between richest and poorest (requires range constraint parameter)
+
+### Game Logic Structure
+
+**Phase 1: Individual Familiarization**
+1. **Initial Preference Ranking**: Agents rank all 4 principles (1-4) with certainty levels
+2. **Detailed Examples**: Agents review concrete income distribution examples for each principle
+3. **Individual Application Rounds**: Agents apply principles in economic scenarios (configurable rounds, default 4)
+4. **Post-Individual Ranking**: Agents re-rank principles after gaining experience
+
+**Phase 2: Group Experiment**  
+1. **Group Deliberation**: Multi-round discussion to reach unanimous agreement on one principle
+2. **Secret Ballot Voting**: Optional voting mechanism for consensus detection
+3. **Economic Outcomes**: Apply agreed principle to determine each agent's income class and payout
+4. **Final Preference Ranking**: Agents provide final rankings after seeing group outcomes
 
 ## Development Commands
 
@@ -61,7 +79,7 @@ pip install -r requirements.txt
 **Single Experiment Runner**:
 ```python
 # Import and run directly
-from run_experiment import run_experiment
+from maai.runners import run_experiment
 
 # Run with default output directory (experiment_results)
 result = await run_experiment('lucas')
@@ -73,7 +91,7 @@ result = await run_experiment('lucas', output_dir='custom_experiments/test_run')
 **Batch Experiment Runner**:
 ```python
 # Import and run directly
-from run_batch import run_batch
+from maai.runners import run_batch
 
 # Run multiple experiments with default settings
 results = await run_batch(['config1', 'config2', 'config3'])
@@ -93,15 +111,14 @@ python config_generator.py
 ```
 
 **Available Configurations**:
-- `lucas`: Custom configuration for specific research scenarios (default)
-- `decomposed_memory_test`: 3 agents with decomposed memory strategy (test new memory system)
+- `new_game_basic`: Basic configuration for new game logic system (recommended starting point)
+- `lucas`: Custom configuration for specific research scenarios 
+- `decomposed_memory_test`: 3 agents with decomposed memory strategy
 - `temperature_test`: Reproducible experiments with temperature=0.0 for deterministic results
-- `default`: Standard experimental setup
-- `test_custom`: Template for custom configurations
+- `default`: Legacy experimental setup (pre-new game logic)
 - `comprehensive_example`: Full-featured configuration example
 - `hyp_random_XXX`: Generated configurations for hypothesis testing (001-010)
 - `test_clean_XXX`: Clean test configurations (001-005)
-- `test_fix_XXX`: Test configurations for bug fixes (001-003)
 
 ### Testing
 ```bash
@@ -121,7 +138,7 @@ python tests/test_unified_logging.py
 **Single Experiment**:
 ```python
 import asyncio
-from run_experiment import run_experiment
+from maai.runners import run_experiment
 
 # Run with default output directory (experiment_results)
 results = await run_experiment('default')
@@ -136,7 +153,7 @@ print(f"Results saved to: {results['output_path']}")
 **Batch Experiments**:
 ```python
 import asyncio
-from run_batch import run_batch
+from maai.runners import run_batch
 
 # Run multiple experiments with default settings
 config_names = ['config1', 'config2', 'config3']
@@ -196,8 +213,7 @@ jupyter notebook analysis.ipynb
 **Memory Strategy System**:
 - Configure how agents generate and manage private memories using `memory_strategy` field
 - Available strategies:
-  - `"full"`: Include all previous memory entries (default)
-  - `"recent"`: Include only the most recent N memory entries
+  - `"recent"`: Include only the most recent N memory entries (default)
   - `"decomposed"`: Use focused, sequential prompts for improved memory quality
 - Decomposed strategy breaks memory generation into three focused steps:
   1. **Factual Recap**: "What actually happened?" (objective events only)
@@ -207,7 +223,7 @@ jupyter notebook analysis.ipynb
 
 **Example Configuration Structure**:
 ```yaml
-experiment_id: my_experiment
+experiment_id: new_game_example
 global_temperature: 0.0  # Global temperature for reproducible results
 
 experiment:
@@ -215,30 +231,49 @@ experiment:
   decision_rule: unanimity
   timeout_seconds: 300
 
-# Memory strategy configuration
+# New game logic configuration
+individual_rounds: 4  # Number of individual application rounds
+payout_ratio: 0.0001  # $0.0001 per $1 of income (e.g., $20,000 income = $2.00 payout)
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution A"
+    income_by_class:
+      HIGH: 50000
+      MEDIUM_HIGH: 40000
+      MEDIUM: 30000
+      MEDIUM_LOW: 20000
+      LOW: 10000
+  - distribution_id: 2
+    name: "Distribution B"
+    income_by_class:
+      HIGH: 45000
+      MEDIUM_HIGH: 35000
+      MEDIUM: 25000
+      MEDIUM_LOW: 18000
+      LOW: 12000
+
 memory_strategy: "decomposed"
 
 agents:
-  - name: "Agent_1"
+  - name: "Economist"
     model: "gpt-4.1-mini"
     personality: "You are an economist focused on efficiency and optimal resource allocation."
-    temperature: 0.0  # Agent-specific temperature override
-  - name: "Agent_2"
-    model: "gpt-4.1"
-    personality: "You are a philosopher concerned with justice and fairness for all members of society."
-  - name: "Agent_3"
+  - name: "Philosopher"
     model: "gpt-4.1-mini"
-    personality: "You are a pragmatist who focuses on what works in practice rather than theory."
+    personality: "You are a philosopher concerned with justice and fairness for all members of society."
 
 defaults:
-  personality: "You are an agent tasked to design a future society."
+  personality: "You are an agent participating in an economic experiment."
   model: "gpt-4.1-mini"
-  temperature: 0.1  # Default temperature (overridden by global_temperature)
+  temperature: 0.1
 
 output:
   directory: experiment_results
-  formats: [json, csv, txt]
-  include_feedback: true
+  formats: [json]
 ```
 
 ## Parallel Execution System
@@ -321,8 +356,12 @@ python run_experiment.py
 4. Export results via `ExperimentLogger.export_unified_json()` in `src/maai/services/experiment_logger.py`
 
 **Main Entry Points**:
-- `run_experiment.py`: Single experiment runner with detailed result reporting and custom output directory support
-- `run_batch.py`: Parallel batch execution with semaphore-based rate limiting and custom output directory support
+- `src/maai/runners/`: Experiment runner module with single and batch capabilities
+  - `single.py`: Single experiment runner with detailed result reporting and custom output directory support
+  - `batch.py`: Parallel batch execution with semaphore-based rate limiting and custom output directory support
+  - `common.py`: Shared utilities for experiment runners
+- `run_experiment.py`: Backward compatibility wrapper (DEPRECATED - use `from maai.runners import run_experiment`)
+- `run_batch.py`: Backward compatibility wrapper (DEPRECATED - use `from maai.runners import run_batch`)
 - `config_generator.py`: Generate multiple configuration variations for batch testing
 
 **Output Directory Control**:
@@ -336,12 +375,19 @@ python run_experiment.py
 
 ## Experimental Flow
 
-1. **Agent Initialization**: Create agents with "veil of ignorance" context
-2. **Initial Likert Evaluation**: Agents rate all 4 principles before deliberation
-3. **Multi-Round Deliberation**: Agents debate until unanimous agreement or timeout
-4. **Consensus Detection**: Validate group agreement on chosen principle
-5. **Final Likert Evaluation**: Agents re-rate all 4 principles after deliberation
-6. **Data Export**: Results saved in multiple formats for analysis
+**Phase 1: Individual Familiarization**
+1. **Agent Initialization**: Create agents with economic incentive context and income distribution scenarios
+2. **Initial Preference Ranking**: Agents rank all 4 principles (1-4) with certainty levels
+3. **Detailed Examples**: Agents review concrete income distribution examples for each principle
+4. **Individual Application Rounds**: Agents apply principles in multiple economic scenarios (default 4 rounds)
+5. **Post-Individual Ranking**: Agents re-rank principles after gaining hands-on experience
+
+**Phase 2: Group Experiment**
+1. **Group Deliberation**: Multi-round discussion to reach unanimous agreement on one principle
+2. **Consensus Detection**: Validate group agreement with constraint handling for principles 3 & 4
+3. **Economic Outcomes**: Apply agreed principle to assign income classes and calculate real payouts
+4. **Final Preference Ranking**: Agents provide final rankings after experiencing group outcomes
+5. **Data Export**: Comprehensive agent-centric data export with all interactions and outcomes
 
 ## Implementation Notes
 
@@ -361,7 +407,7 @@ from src.maai.services.experiment_orchestrator import ExperimentOrchestrator
 orchestrator = ExperimentOrchestrator(
     consensus_strategy="threshold",  # or "id_match", "semantic"
     conversation_pattern="sequential",  # or "random", "hierarchical"
-    memory_strategy="decomposed"  # or "full", "recent"
+    memory_strategy="decomposed"  # or "recent"
 )
 
 # Configure different experimental conditions

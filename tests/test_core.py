@@ -12,7 +12,10 @@ from datetime import datetime
 # Add src directory to path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
-from maai.core.models import ExperimentConfig, AgentMemory, MemoryEntry, PrincipleChoice, AgentConfig, DefaultConfig
+from maai.core.models import (
+    ExperimentConfig, AgentMemory, MemoryEntry, PrincipleChoice, AgentConfig, DefaultConfig,
+    IncomeDistribution, EconomicOutcome, PreferenceRanking, IncomeClass, CertaintyLevel
+)
 from maai.core.deliberation_manager import run_single_experiment, DeliberationManager
 from maai.config.manager import load_config_from_file
 
@@ -36,7 +39,19 @@ async def test_basic_functionality():
         memory.add_memory(memory_entry)
         print(f"   ✓ AgentMemory created with {len(memory.memory_entries)} entries")
         
-        # Test configuration with new format
+        # Test configuration with new format (including new game logic fields)
+        sample_distributions = [
+            IncomeDistribution(
+                distribution_id=1,
+                name="Test Distribution",
+                income_by_class={
+                    IncomeClass.HIGH: 30000,
+                    IncomeClass.MEDIUM: 20000,
+                    IncomeClass.LOW: 10000
+                }
+            )
+        ]
+        
         config = ExperimentConfig(
             experiment_id="test_basic",
             max_rounds=2,
@@ -45,7 +60,13 @@ async def test_basic_functionality():
                 AgentConfig(name="Agent_2", model="gpt-4.1-mini", personality="Test 2"),
                 AgentConfig(name="Agent_3", model="gpt-4.1-mini", personality="Test 3")
             ],
-            defaults=DefaultConfig()
+            defaults=DefaultConfig(),
+            # New game logic fields
+            income_distributions=sample_distributions,
+            payout_ratio=0.0001,
+            individual_rounds=2,
+            enable_detailed_examples=True,
+            enable_secret_ballot=True
         )
         print(f"   ✓ ExperimentConfig created: {config.experiment_id}")
         print(f"   ✓ Agent configuration - num_agents: {config.num_agents}")
@@ -70,8 +91,8 @@ async def test_configuration_loading():
     
     try:
         # Test loading default config
-        config = load_config_from_file("quick_test")
-        print(f"   ✓ Loaded quick_test config: {config.experiment_id}")
+        config = load_config_from_file("new_game_basic")
+        print(f"   ✓ Loaded new_game_basic config: {config.experiment_id}")
         print(f"     Agents: {config.num_agents}")
         print(f"     Max rounds: {config.max_rounds}")
         
@@ -89,7 +110,32 @@ async def test_small_experiment():
         print("⚠️  Skipping experiment test (no API key)")
         return None
     
-    # Create minimal config with new format
+    # Create minimal config with new format including required new game logic fields
+    sample_distributions = [
+        IncomeDistribution(
+            distribution_id=1,
+            name="Test Distribution 1",
+            income_by_class={
+                IncomeClass.HIGH: 30000,
+                IncomeClass.MEDIUM_HIGH: 25000,
+                IncomeClass.MEDIUM: 20000,
+                IncomeClass.MEDIUM_LOW: 15000,
+                IncomeClass.LOW: 10000
+            }
+        ),
+        IncomeDistribution(
+            distribution_id=2,
+            name="Test Distribution 2",
+            income_by_class={
+                IncomeClass.HIGH: 35000,
+                IncomeClass.MEDIUM_HIGH: 28000,
+                IncomeClass.MEDIUM: 22000,
+                IncomeClass.MEDIUM_LOW: 16000,
+                IncomeClass.LOW: 12000
+            }
+        )
+    ]
+    
     config = ExperimentConfig(
         experiment_id=f"test_{uuid.uuid4().hex[:8]}",
         max_rounds=2,
@@ -100,7 +146,13 @@ async def test_small_experiment():
             AgentConfig(name="Philosopher", model="gpt-4.1-mini", personality="You are a philosopher concerned with fairness."),
             AgentConfig(name="Pragmatist", model="gpt-4.1-mini", personality="You are a pragmatist focused on practical solutions.")
         ],
-        defaults=DefaultConfig()
+        defaults=DefaultConfig(),
+        # New game logic fields
+        income_distributions=sample_distributions,
+        payout_ratio=0.0001,
+        individual_rounds=2,
+        enable_detailed_examples=True,
+        enable_secret_ballot=True
     )
     
     print(f"Running experiment: {config.experiment_id}")
@@ -130,6 +182,89 @@ async def test_small_experiment():
         return False
 
 
+async def test_new_game_logic():
+    """Test new game logic components."""
+    print("=== Testing New Game Logic ===\n")
+    
+    print("1. Testing new data models...")
+    try:
+        # Test PreferenceRanking
+        ranking = PreferenceRanking(
+            agent_id="test_agent",
+            rankings=[1, 2, 3, 4],
+            certainty_level=CertaintyLevel.SURE,
+            reasoning="Test ranking reasoning",
+            phase="initial"
+        )
+        print(f"   ✓ PreferenceRanking created for phase: {ranking.phase}")
+        
+        # Test EconomicOutcome
+        outcome = EconomicOutcome(
+            agent_id="test_agent",
+            round_number=1,
+            chosen_principle=2,
+            assigned_income_class=IncomeClass.MEDIUM,
+            actual_income=20000,
+            payout_amount=2.0
+        )
+        print(f"   ✓ EconomicOutcome created: ${outcome.actual_income:,} -> ${outcome.payout_amount:.2f}")
+        
+        # Test enhanced PrincipleChoice
+        choice = PrincipleChoice(
+            principle_id=3,
+            principle_name="MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+            reasoning="Test choice with constraint",
+            floor_constraint=15000
+        )
+        print(f"   ✓ Enhanced PrincipleChoice with floor constraint: ${choice.floor_constraint:,}")
+        
+        print("\n2. Testing new services...")
+        
+        # Test economics service
+        from maai.services import EconomicsService
+        sample_dist = IncomeDistribution(
+            distribution_id=1,
+            name="Test Distribution",
+            income_by_class={
+                IncomeClass.HIGH: 30000,
+                IncomeClass.MEDIUM: 20000,
+                IncomeClass.LOW: 10000
+            }
+        )
+        
+        economics_service = EconomicsService([sample_dist], 0.0001)
+        payout = economics_service.calculate_payout(20000)
+        print(f"   ✓ EconomicsService: $20,000 -> ${payout:.2f} payout")
+        
+        # Test validation service
+        from maai.services import ValidationService
+        validation_service = ValidationService()
+        
+        valid_choice = PrincipleChoice(
+            principle_id=1,
+            principle_name="MAXIMIZING THE FLOOR INCOME",
+            reasoning="Valid choice"
+        )
+        result = validation_service.validate_principle_choice(valid_choice)
+        print(f"   ✓ ValidationService: Valid choice = {result['is_valid']}")
+        
+        invalid_choice = PrincipleChoice(
+            principle_id=3,
+            principle_name="MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT", 
+            reasoning="Missing constraint"
+        )
+        result = validation_service.validate_principle_choice(invalid_choice)
+        print(f"   ✓ ValidationService: Invalid choice detected = {not result['is_valid']}")
+        
+        return True
+        
+    except Exception as e:
+        print(f"❌ Error in new game logic test: {e}")
+        import traceback
+        traceback.print_exc()
+        return False
+
+
 async def main():
     """Run all tests."""
     print("MAAI Framework Test Suite")
@@ -150,9 +285,13 @@ async def main():
     result2 = await test_configuration_loading()
     test_results.append(("Configuration Loading", result2))
     
-    # Test 3: Small experiment (if API key available)
-    result3 = await test_small_experiment()
-    test_results.append(("Small Experiment", result3))
+    # Test 3: New game logic
+    result3 = await test_new_game_logic()
+    test_results.append(("New Game Logic", result3))
+    
+    # Test 4: Small experiment (if API key available)
+    result4 = await test_small_experiment()
+    test_results.append(("Small Experiment", result4))
     
     # Summary
     print("\n" + "=" * 50)

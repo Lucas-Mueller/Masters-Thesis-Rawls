@@ -43,6 +43,35 @@ class PublicHistoryMode(str, Enum):
     SUMMARIZED = "summarized"
 
 
+class IncomeClass(str, Enum):
+    """Income classes for economic simulation."""
+    HIGH = "High"
+    MEDIUM_HIGH = "Medium high"
+    MEDIUM = "Medium"
+    MEDIUM_LOW = "Medium low"
+    LOW = "Low"
+
+
+class CertaintyLevel(str, Enum):
+    """5-point certainty scale for preference rankings."""
+    VERY_UNSURE = "very_unsure"
+    UNSURE = "unsure"
+    NO_OPINION = "no_opinion"
+    SURE = "sure"
+    VERY_SURE = "very_sure"
+    
+    def to_display(self) -> str:
+        """Convert to human-readable display format."""
+        mapping = {
+            "very_unsure": "Very Unsure",
+            "unsure": "Unsure",
+            "no_opinion": "No Opinion",
+            "sure": "Sure",
+            "very_sure": "Very Sure"
+        }
+        return mapping[self.value]
+
+
 class SummaryAgentConfig(BaseModel):
     """Configuration for the summary agent."""
     model: str = Field(default="gpt-4.1-mini", description="Model to use for summary generation")
@@ -105,6 +134,36 @@ class PrincipleChoice(BaseModel):
     principle_id: int = Field(..., ge=1, le=4, description="Principle ID (1-4)")
     principle_name: str = Field(..., description="Name of the chosen principle")
     reasoning: str = Field(..., description="Agent's reasoning for this choice")
+    floor_constraint: Optional[int] = Field(None, description="Floor constraint amount for principle 3")
+    range_constraint: Optional[int] = Field(None, description="Range constraint amount for principle 4")
+
+
+class IncomeDistribution(BaseModel):
+    """Represents a single income distribution scenario."""
+    distribution_id: int = Field(..., description="Unique identifier for this distribution")
+    name: str = Field(..., description="Human-readable name for this distribution")
+    income_by_class: Dict[IncomeClass, int] = Field(..., description="Mapping of income classes to dollar amounts")
+
+
+class EconomicOutcome(BaseModel):
+    """Tracks economic outcome for an agent in a single round."""
+    agent_id: str = Field(..., description="Agent identifier")
+    round_number: int = Field(..., ge=1, description="Round number (1-4 for individual rounds)")
+    chosen_principle: int = Field(..., ge=1, le=4, description="Principle chosen by agent")
+    assigned_income_class: IncomeClass = Field(..., description="Randomly assigned income class")
+    actual_income: int = Field(..., description="Actual income earned based on distribution")
+    payout_amount: float = Field(..., description="Payout amount (actual_income * payout_ratio)")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Outcome timestamp")
+
+
+class PreferenceRanking(BaseModel):
+    """Agent's preference ranking of principles with certainty level."""
+    agent_id: str = Field(..., description="Agent identifier")
+    rankings: List[int] = Field(..., description="Principle rankings [1,2,3,4] where 1=best, 4=worst", min_length=4, max_length=4)
+    certainty_level: CertaintyLevel = Field(..., description="Agent's certainty about their ranking")
+    reasoning: str = Field(..., description="Agent's reasoning for their ranking")
+    phase: str = Field(..., description="Phase when ranking was collected (initial, post_individual, post_group)")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Ranking timestamp")
 
 
 class MemoryEntry(BaseModel):
@@ -165,11 +224,18 @@ class ExperimentConfig(BaseModel):
     agents: List[AgentConfig] = Field(..., description="List of agent configurations")
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
-    memory_strategy: str = Field(default="decomposed", description="Memory strategy: full|recent|decomposed")
+    memory_strategy: str = Field(default="decomposed", description="Memory strategy: recent|decomposed")
     public_history_mode: PublicHistoryMode = Field(default=PublicHistoryMode.FULL, description="Public history mode: full|summarized")
     summary_agent: SummaryAgentConfig = Field(default_factory=SummaryAgentConfig, description="Summary agent configuration")
     logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output configuration")
+    
+    # New game logic configuration
+    income_distributions: List[IncomeDistribution] = Field(default_factory=list, description="Available income distribution scenarios")
+    payout_ratio: float = Field(default=0.0001, description="Payout ratio: dollars earned per $1 of income (default: $1 per $10,000)")
+    individual_rounds: int = Field(default=4, ge=1, description="Number of individual application rounds in Phase 1")
+    enable_detailed_examples: bool = Field(default=True, description="Enable detailed income distribution examples")
+    enable_secret_ballot: bool = Field(default=True, description="Enable secret ballot voting in Phase 2")
     
     @property
     def num_agents(self) -> int:
@@ -235,24 +301,30 @@ class ExperimentResults(BaseModel):
 # Principle definitions for easy reference
 DISTRIBUTIVE_JUSTICE_PRINCIPLES = {
     1: {
-        "name": "Maximize the Minimum Income",
-        "description": "The principle that ensures the worst-off member of society is as well-off as possible.",
-        "short_name": "Minimum Focus"
+        "name": "MAXIMIZING THE FLOOR INCOME",
+        "description": "The most just distribution of income is that which maximizes the floor (or lowest) income in the society. This principle considers only the welfare of the worst-off individual in society. In judging among income distributions, the distribution which ensures the poorest person the highest income is the most just. No person's income can go up unless it increases the income of the people at the very bottom.",
+        "short_name": "Floor Income",
+        "requires_parameter": False
     },
     2: {
-        "name": "Maximize the Average Income", 
-        "description": "The principle that ensures the greatest possible total income for the group, without regard for its distribution.",
-        "short_name": "Average Focus"
+        "name": "MAXIMIZING THE AVERAGE INCOME", 
+        "description": "The most just distribution of income is that which maximizes the average income in the society. For any society maximizing the average income maximizes the total income in the society.",
+        "short_name": "Average Income",
+        "requires_parameter": False
     },
     3: {
-        "name": "Maximize the Average Income with a Floor Constraint",
-        "description": "A hybrid principle that establishes a minimum guaranteed income (a 'safety net') for everyone, and then maximizes the average income.",
-        "short_name": "Floor Constraint"
+        "name": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+        "description": "The most just distribution of income is that which maximizes the average income only after a certain specified minimum income is guaranteed to everyone. Such a principle ensures that the attempt to maximize the average is constrained so as to ensure that individuals \"at the bottom\" receive a specified minimum. To choose this principle one must specify the value of the floor (lowest income).",
+        "short_name": "Floor Constraint",
+        "requires_parameter": True,
+        "parameter_type": "floor_amount"
     },
     4: {
-        "name": "Maximize the Average Income with a Range Constraint",
-        "description": "A hybrid principle that limits the gap between the richest and poorest members, and then maximizes the average income.",
-        "short_name": "Range Constraint"
+        "name": "MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT",
+        "description": "The most just distribution of income is that which attempts to maximize the average income only after guaranteeing that the difference between the poorest and the richest individuals (i.e., the range of income) in the society is not greater than a specified amount. Such a principle ensures that the attempt to maximize the average does not allow income differences between rich and poor to exceed a specified amount. To choose this principle one must specify the dollar difference between the high and low incomes.",
+        "short_name": "Range Constraint",
+        "requires_parameter": True,
+        "parameter_type": "range_amount"
     }
 }
 

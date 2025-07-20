@@ -196,12 +196,16 @@ class ConversationService:
 Please carefully evaluate each of these four principles of distributive justice.
 
 Consider that:
-- You are behind a 'veil of ignorance' - you don't know your future economic position
-- Your position (wealthy, middle class, or poor) will be randomly assigned AFTER the group decides
+- You will be participating in an economic scenario where principles determine income distributions
+- Your income class will be randomly assigned AFTER you choose a principle
+- Different principles will result in different income distributions for society
+- You will receive economic rewards based on the income assigned to your class
 
 After your evaluation, please:
 1. State which principle you choose (1, 2, 3, or 4)
-2. Explain your reasoning clearly
+2. If choosing principle 3, specify your floor constraint amount (minimum income)
+3. If choosing principle 4, specify your range constraint amount (maximum income difference)
+4. Explain your reasoning clearly
 
 Format your response clearly with your final choice at the end.
 """

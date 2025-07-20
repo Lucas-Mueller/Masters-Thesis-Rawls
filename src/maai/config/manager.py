@@ -11,7 +11,7 @@ from typing import Dict, Any, Optional, List
 from datetime import datetime
 import glob
 
-from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig, OutputConfig
+from ..core.models import ExperimentConfig, AgentConfig, DefaultConfig, OutputConfig, IncomeDistribution, IncomeClass
 
 
 class ConfigManager:
@@ -177,6 +177,24 @@ class ConfigManager:
                     max_tokens=summary_agent_data.get("max_tokens", 1000)
                 )
             
+            # Parse income distributions
+            income_distributions = []
+            if "income_distributions" in config_data:
+                for dist_data in config_data["income_distributions"]:
+                    # Convert income_by_class dict to use IncomeClass enum
+                    income_by_class = {}
+                    for class_name, amount in dist_data["income_by_class"].items():
+                        # Convert string to IncomeClass enum
+                        income_class = IncomeClass(class_name)
+                        income_by_class[income_class] = amount
+                    
+                    income_dist = IncomeDistribution(
+                        distribution_id=dist_data["distribution_id"],
+                        name=dist_data["name"],
+                        income_by_class=income_by_class
+                    )
+                    income_distributions.append(income_dist)
+            
             experiment_config = ExperimentConfig(
                 experiment_id=experiment_id,
                 max_rounds=config_data["experiment"]["max_rounds"],
@@ -185,10 +203,16 @@ class ConfigManager:
                 agents=agents,
                 defaults=defaults,
                 global_temperature=config_data.get("global_temperature"),
-                memory_strategy=config_data.get("memory_strategy", "full"),
+                memory_strategy=config_data.get("memory_strategy", "recent"),
                 public_history_mode=public_history_mode,
                 summary_agent=summary_agent,
-                output=output
+                output=output,
+                # New game logic fields
+                income_distributions=income_distributions,
+                payout_ratio=config_data.get("payout_ratio", 0.0001),
+                individual_rounds=config_data.get("individual_rounds", 4),
+                enable_detailed_examples=config_data.get("enable_detailed_examples", True),
+                enable_secret_ballot=config_data.get("enable_secret_ballot", True)
             )
         except Exception as e:
             raise ValueError(f"Failed to create valid ExperimentConfig from {config_path}: {e}")

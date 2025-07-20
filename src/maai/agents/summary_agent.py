@@ -72,7 +72,7 @@ class SummaryAgent(Agent):
         prompt = f"""You are a summary agent for a multi-agent deliberation experiment about distributive justice principles.
 
 CONTEXT:
-The agents are deliberating on which distributive justice principle to adopt for a future society. They are behind a "veil of ignorance" and don't know their future economic position.
+The agents are deliberating on which distributive justice principle to adopt for a future society's income distribution system. They will participate in an economic scenario where their income class is randomly assigned after the principle is chosen.
 
 PRINCIPLES:
 {principles_context}

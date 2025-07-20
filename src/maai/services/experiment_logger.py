@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 
-from ..core.models import ExperimentConfig, ConsensusResult, PrincipleChoice
+from ..core.models import ExperimentConfig, ConsensusResult, PrincipleChoice, PreferenceRanking, EconomicOutcome
 
 
 class ExperimentLogger:
@@ -175,6 +175,49 @@ class ExperimentLogger:
                 "num_rounds": total_rounds or consensus_result.rounds_to_consensus,
                 "total_messages": getattr(consensus_result, 'total_messages', 0)
             }
+    
+    def log_preference_ranking(self, ranking: PreferenceRanking):
+        """Log a preference ranking from an agent."""
+        agent_id = ranking.agent_id
+        
+        if agent_id not in self.agent_data:
+            return  # Agent not initialized
+        
+        # Store preference ranking
+        if "preference_rankings" not in self.agent_data[agent_id]:
+            self.agent_data[agent_id]["preference_rankings"] = []
+        
+        ranking_data = {
+            "phase": ranking.phase,
+            "rankings": ranking.rankings,
+            "certainty_level": ranking.certainty_level.value,
+            "reasoning": ranking.reasoning,
+            "timestamp": ranking.timestamp.isoformat()
+        }
+        
+        self.agent_data[agent_id]["preference_rankings"].append(ranking_data)
+    
+    def log_economic_outcome(self, outcome: EconomicOutcome):
+        """Log an economic outcome for an agent."""
+        agent_id = outcome.agent_id
+        
+        if agent_id not in self.agent_data:
+            return  # Agent not initialized
+        
+        # Store economic outcome
+        if "economic_outcomes" not in self.agent_data[agent_id]:
+            self.agent_data[agent_id]["economic_outcomes"] = []
+        
+        outcome_data = {
+            "round_number": outcome.round_number,
+            "chosen_principle": outcome.chosen_principle,
+            "assigned_income_class": outcome.assigned_income_class.value,
+            "actual_income": outcome.actual_income,
+            "payout_amount": outcome.payout_amount,
+            "timestamp": outcome.timestamp.isoformat()
+        }
+        
+        self.agent_data[agent_id]["economic_outcomes"].append(outcome_data)
     
     def export_unified_json(self, output_dir: Optional[str] = None) -> str:
         """
