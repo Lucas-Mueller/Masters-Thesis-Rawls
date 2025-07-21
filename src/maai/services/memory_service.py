@@ -6,8 +6,14 @@ Handles memory strategies, updates, and retrieval for all agents.
 from abc import ABC, abstractmethod
 from datetime import datetime
 from typing import Dict, List, Optional
+from uuid import uuid4
 from agents import Runner, ItemHelpers
-from ..core.models import AgentMemory, MemoryEntry, DeliberationResponse
+from ..core.models import (
+    AgentMemory, MemoryEntry, DeliberationResponse,
+    EnhancedAgentMemory, IndividualMemoryEntry, IndividualMemoryType,
+    IndividualMemoryContent, IndividualReflectionContext, LearningContext,
+    Phase1ExperienceData, ConsolidatedMemory, PrincipleChoice, EconomicOutcome
+)
 from ..agents.enhanced import DeliberationAgent
 
 
@@ -136,7 +142,7 @@ class RecentMemoryStrategy(MemoryStrategy):
 class MemoryService:
     """Centralized service for managing agent memory."""
     
-    def __init__(self, memory_strategy: MemoryStrategy = None, logger=None):
+    def __init__(self, memory_strategy: MemoryStrategy = None, logger=None, enable_phase1_memory: bool = True):
         """
         Initialize memory service.
         
@@ -144,17 +150,19 @@ class MemoryService:
             memory_strategy: Strategy for memory management. 
                            Defaults to RecentMemoryStrategy for compatibility.
             logger: ExperimentLogger instance for logging memory operations
+            enable_phase1_memory: Whether to enable Phase 1 memory functionality
         """
         self.memory_strategy = memory_strategy or RecentMemoryStrategy()
-        self.agent_memories: Dict[str, AgentMemory] = {}
+        self.agent_memories: Dict[str, EnhancedAgentMemory] = {}
         self.logger = logger
+        self.enable_phase1_memory = enable_phase1_memory
     
     def initialize_agent_memory(self, agent_id: str):
         """Initialize memory for an agent."""
         if agent_id not in self.agent_memories:
-            self.agent_memories[agent_id] = AgentMemory(agent_id=agent_id)
+            self.agent_memories[agent_id] = EnhancedAgentMemory(agent_id=agent_id)
     
-    def get_agent_memory(self, agent_id: str) -> AgentMemory:
+    def get_agent_memory(self, agent_id: str) -> EnhancedAgentMemory:
         """Get agent memory, creating if necessary."""
         if agent_id not in self.agent_memories:
             self.initialize_agent_memory(agent_id)
@@ -216,8 +224,14 @@ class MemoryService:
     
     def _build_memory_context(self, agent_id: str, round_number: int, 
                              transcript: List[DeliberationResponse]) -> str:
-        """Build context for memory update including conversation history."""
+        """Build context for memory update including conversation history and Phase 1 memories."""
         context_parts = []
+        
+        # Add Phase 1 context if enabled (only for Phase 2 rounds)
+        if self.enable_phase1_memory and round_number >= 1:
+            phase1_context = self.get_phase1_context_for_phase2(agent_id)
+            if phase1_context:
+                context_parts.append(phase1_context)
         
         # Add previous rounds summary
         if transcript:
@@ -235,10 +249,10 @@ class MemoryService:
             for response in current_round_responses:
                 context_parts.append(f"{response.agent_name}: {response.public_message}")
         
-        # Add agent's own memory (filtered by strategy)
+        # Add agent's own Phase 2 memory (filtered by strategy)
         agent_memory = self.get_agent_memory(agent_id)
         if agent_memory.memory_entries:
-            context_parts.append(f"\nYOUR PREVIOUS MEMORY:")
+            context_parts.append(f"\nYOUR PREVIOUS DELIBERATION MEMORY:")
             
             # Filter memories based on strategy
             relevant_memories = []
@@ -255,24 +269,466 @@ class MemoryService:
         
         return "\n".join(context_parts)
     
-    def get_all_agent_memories(self) -> List[AgentMemory]:
+    def get_all_agent_memories(self) -> List[EnhancedAgentMemory]:
         """Get all agent memories for export."""
         return list(self.agent_memories.values())
+    
+    # Phase 1 Memory Methods
+    async def generate_individual_reflection(self, agent: DeliberationAgent, 
+                                           reflection_context: IndividualReflectionContext) -> IndividualMemoryEntry:
+        """
+        Generate an individual reflection memory for Phase 1 activities.
+        
+        Args:
+            agent: Agent to generate reflection for
+            reflection_context: Context for reflection generation
+            
+        Returns:
+            Generated individual memory entry
+        """
+        if not self.enable_phase1_memory:
+            return None
+        
+        memory_prompt = f"""You are reflecting on your individual experience in this distributive justice experiment.
+
+CURRENT ACTIVITY: {reflection_context.activity}
+
+{reflection_context.reasoning_prompt}
+
+Based on your experience so far, please provide:
+
+1. SITUATION ASSESSMENT: What is happening in your individual learning process?
+
+2. REASONING PROCESS: What thoughts and considerations are going through your mind?
+
+3. INSIGHTS GAINED: What new insights or understanding have you developed?
+
+4. CONFIDENCE LEVEL: How confident do you feel about your current understanding? (0.0 = very unsure, 1.0 = very confident)
+
+5. PREFERENCE EVOLUTION: How have your preferences or views changed, if at all?
+
+Please structure your response as:
+SITUATION: [your assessment]
+REASONING: [your thought process]
+INSIGHTS: [what you learned]
+CONFIDENCE: [0.0-1.0 number]
+PREFERENCES: [how your views evolved]
+"""
+        
+        result = await Runner.run(agent, memory_prompt)
+        response_text = ItemHelpers.text_message_outputs(result.new_items)
+        
+        # Parse the response
+        situation = self._extract_section(response_text, "SITUATION:")
+        reasoning = self._extract_section(response_text, "REASONING:")
+        insights = self._extract_section(response_text, "INSIGHTS:")
+        confidence_text = self._extract_section(response_text, "CONFIDENCE:")
+        preferences = self._extract_section(response_text, "PREFERENCES:")
+        
+        # Parse confidence level
+        try:
+            confidence_level = float(confidence_text.split()[0])
+            confidence_level = max(0.0, min(1.0, confidence_level))  # Clamp to 0-1 range
+        except (ValueError, IndexError):
+            confidence_level = 0.5  # Default middle value
+        
+        # Create memory content
+        content = IndividualMemoryContent(
+            situation_assessment=situation,
+            reasoning_process=reasoning,
+            insights_gained=insights,
+            confidence_level=confidence_level,
+            preference_evolution=preferences
+        )
+        
+        # Create memory entry
+        memory_entry = IndividualMemoryEntry(
+            memory_id=str(uuid4()),
+            agent_id=agent.agent_id,
+            memory_type=IndividualMemoryType.REFLECTION,
+            content=content,
+            activity_context=reflection_context.activity
+        )
+        
+        # Add to agent memory
+        agent_memory = self.get_agent_memory(agent.agent_id)
+        agent_memory.add_individual_memory(memory_entry)
+        
+        # Log if logger available
+        if self.logger:
+            self.logger.log_memory_generation(
+                agent_id=agent.name,
+                round_num=0,  # Phase 1
+                memory_content=f"Phase 1 Reflection - {reflection_context.activity}: {insights}",
+                strategy="individual_reflection"
+            )
+        
+        return memory_entry
+    
+    async def update_individual_learning(self, agent: DeliberationAgent, 
+                                       learning_context: LearningContext) -> IndividualMemoryEntry:
+        """
+        Update an agent's individual learning memory.
+        
+        Args:
+            agent: Agent to update learning for
+            learning_context: Context for learning update
+            
+        Returns:
+            Generated learning memory entry
+        """
+        if not self.enable_phase1_memory:
+            return None
+        
+        # Build learning prompt
+        previous_context = ""
+        if learning_context.previous_understanding:
+            previous_context = f"\nYOUR PREVIOUS UNDERSTANDING: {learning_context.previous_understanding}"
+        
+        memory_prompt = f"""You are building your understanding of distributive justice principles through examples and practice.
+
+LEARNING STAGE: {learning_context.learning_stage}
+NEW INFORMATION: {learning_context.new_information}{previous_context}
+
+Based on this new information, please reflect on:
+
+1. SITUATION ASSESSMENT: What are you learning about in this stage?
+
+2. REASONING PROCESS: How are you processing and integrating this new information?
+
+3. INSIGHTS GAINED: What patterns, connections, or insights are emerging?
+
+4. CONFIDENCE LEVEL: How confident are you becoming in your understanding? (0.0-1.0)
+
+5. STRATEGIC IMPLICATIONS: How might this learning affect your approach in group discussions?
+
+Please structure your response as:
+SITUATION: [learning context]
+REASONING: [integration process]
+INSIGHTS: [emerging understanding]
+CONFIDENCE: [0.0-1.0 number]
+STRATEGY: [implications for group phase]
+"""
+        
+        result = await Runner.run(agent, memory_prompt)
+        response_text = ItemHelpers.text_message_outputs(result.new_items)
+        
+        # Parse the response
+        situation = self._extract_section(response_text, "SITUATION:")
+        reasoning = self._extract_section(response_text, "REASONING:")
+        insights = self._extract_section(response_text, "INSIGHTS:")
+        confidence_text = self._extract_section(response_text, "CONFIDENCE:")
+        strategy = self._extract_section(response_text, "STRATEGY:")
+        
+        # Parse confidence level
+        try:
+            confidence_level = float(confidence_text.split()[0])
+            confidence_level = max(0.0, min(1.0, confidence_level))
+        except (ValueError, IndexError):
+            confidence_level = 0.5
+        
+        # Create memory content
+        content = IndividualMemoryContent(
+            situation_assessment=situation,
+            reasoning_process=reasoning,
+            insights_gained=insights,
+            confidence_level=confidence_level,
+            strategic_implications=strategy
+        )
+        
+        # Create memory entry
+        memory_entry = IndividualMemoryEntry(
+            memory_id=str(uuid4()),
+            agent_id=agent.agent_id,
+            memory_type=IndividualMemoryType.LEARNING,
+            content=content,
+            activity_context=learning_context.learning_stage
+        )
+        
+        # Add to agent memory
+        agent_memory = self.get_agent_memory(agent.agent_id)
+        agent_memory.add_individual_memory(memory_entry)
+        
+        # Log if logger available
+        if self.logger:
+            self.logger.log_memory_generation(
+                agent_id=agent.name,
+                round_num=0,  # Phase 1
+                memory_content=f"Phase 1 Learning - {learning_context.learning_stage}: {insights}",
+                strategy="individual_learning"
+            )
+        
+        return memory_entry
+    
+    async def integrate_phase1_experience(self, agent: DeliberationAgent, 
+                                        experience_data: Phase1ExperienceData) -> IndividualMemoryEntry:
+        """
+        Integrate a Phase 1 experience into memory.
+        
+        Args:
+            agent: Agent to generate integration memory for
+            experience_data: Experience data to integrate
+            
+        Returns:
+            Generated integration memory entry
+        """
+        if not self.enable_phase1_memory:
+            return None
+        
+        # Build experience context
+        experience_context = []
+        if experience_data.principle_choice:
+            experience_context.append(f"PRINCIPLE CHOSEN: {experience_data.principle_choice.principle_name}")
+            experience_context.append(f"REASONING: {experience_data.principle_choice.reasoning}")
+        
+        if experience_data.economic_outcome:
+            experience_context.append(f"ECONOMIC OUTCOME: Assigned {experience_data.economic_outcome.assigned_income_class.value} income class")
+            experience_context.append(f"ACTUAL INCOME: ${experience_data.economic_outcome.actual_income:,}")
+            experience_context.append(f"PAYOUT: ${experience_data.economic_outcome.payout_amount:.4f}")
+        
+        if experience_data.examples_shown:
+            experience_context.append(f"EXAMPLES SHOWN: {len(experience_data.examples_shown)} distribution examples")
+        
+        context_text = "\n".join(experience_context)
+        
+        memory_prompt = f"""You have just completed an individual experience in the distributive justice experiment.
+
+EXPERIENCE DETAILS:
+{context_text}
+
+REFLECTION QUESTION: {experience_data.reflection_prompt}
+
+Please reflect on this experience:
+
+1. SITUATION ASSESSMENT: What just happened and what was significant about it?
+
+2. REASONING PROCESS: What went through your mind during this experience?
+
+3. INSIGHTS GAINED: What did you learn from this specific experience?
+
+4. CONFIDENCE LEVEL: How has this experience affected your confidence? (0.0-1.0)
+
+5. STRATEGIC IMPLICATIONS: How might this experience influence your group strategy?
+
+Please structure your response as:
+SITUATION: [what happened]
+REASONING: [your thought process]
+INSIGHTS: [specific learnings]
+CONFIDENCE: [0.0-1.0 number]
+STRATEGY: [group phase implications]
+"""
+        
+        result = await Runner.run(agent, memory_prompt)
+        response_text = ItemHelpers.text_message_outputs(result.new_items)
+        
+        # Parse the response
+        situation = self._extract_section(response_text, "SITUATION:")
+        reasoning = self._extract_section(response_text, "REASONING:")
+        insights = self._extract_section(response_text, "INSIGHTS:")
+        confidence_text = self._extract_section(response_text, "CONFIDENCE:")
+        strategy = self._extract_section(response_text, "STRATEGY:")
+        
+        # Parse confidence level
+        try:
+            confidence_level = float(confidence_text.split()[0])
+            confidence_level = max(0.0, min(1.0, confidence_level))
+        except (ValueError, IndexError):
+            confidence_level = 0.5
+        
+        # Create memory content
+        content = IndividualMemoryContent(
+            situation_assessment=situation,
+            reasoning_process=reasoning,
+            insights_gained=insights,
+            confidence_level=confidence_level,
+            strategic_implications=strategy
+        )
+        
+        # Determine activity context
+        activity_context = f"individual_round_{experience_data.round_number}" if experience_data.round_number else "experience_integration"
+        
+        # Create memory entry
+        memory_entry = IndividualMemoryEntry(
+            memory_id=str(uuid4()),
+            agent_id=agent.agent_id,
+            memory_type=IndividualMemoryType.INTEGRATION,
+            content=content,
+            activity_context=activity_context,
+            round_context=experience_data.round_number
+        )
+        
+        # Add to agent memory
+        agent_memory = self.get_agent_memory(agent.agent_id)
+        agent_memory.add_individual_memory(memory_entry)
+        
+        # Log if logger available
+        if self.logger:
+            self.logger.log_memory_generation(
+                agent_id=agent.name,
+                round_num=experience_data.round_number or 0,
+                memory_content=f"Phase 1 Integration - {activity_context}: {insights}",
+                strategy="experience_integration"
+            )
+        
+        return memory_entry
+    
+    async def consolidate_phase1_memories(self, agent_id: str) -> ConsolidatedMemory:
+        """
+        Consolidate Phase 1 memories into a summary for Phase 2 context.
+        
+        Args:
+            agent_id: Agent to consolidate memories for
+            
+        Returns:
+            Consolidated memory summary
+        """
+        if not self.enable_phase1_memory:
+            return None
+        
+        agent_memory = self.get_agent_memory(agent_id)
+        
+        if not agent_memory.has_individual_memories():
+            # No individual memories to consolidate
+            return ConsolidatedMemory(
+                agent_id=agent_id,
+                consolidated_insights="No individual experiences to consolidate.",
+                strategic_preferences="No strategic preferences developed.",
+                economic_learnings="No economic learnings accumulated.",
+                confidence_summary="No confidence evolution tracked.",
+                principle_understanding="No principle understanding developed."
+            )
+        
+        # Prepare memory context for consolidation
+        memory_summaries = []
+        for memory in agent_memory.individual_memories:
+            summary = f"Activity: {memory.activity_context}\n"
+            summary += f"Insights: {memory.content.insights_gained}\n"
+            summary += f"Confidence: {memory.content.confidence_level}\n"
+            if memory.content.strategic_implications:
+                summary += f"Strategic Implications: {memory.content.strategic_implications}\n"
+            if memory.content.preference_evolution:
+                summary += f"Preference Evolution: {memory.content.preference_evolution}\n"
+            memory_summaries.append(summary)
+        
+        memories_text = "\n---\n".join(memory_summaries)
+        
+        consolidation_prompt = f"""You are consolidating your individual learning experiences before entering group deliberation.
+
+YOUR INDIVIDUAL PHASE 1 EXPERIENCES:
+{memories_text}
+
+Please create a consolidated summary that will help you in group discussions:
+
+1. CONSOLIDATED INSIGHTS: What are the key insights you gained across all individual experiences?
+
+2. STRATEGIC PREFERENCES: What strategic preferences or approaches have you developed?
+
+3. ECONOMIC LEARNINGS: What did you learn about economic outcomes and their impact?
+
+4. CONFIDENCE SUMMARY: How has your confidence evolved throughout these experiences?
+
+5. PRINCIPLE UNDERSTANDING: How has your understanding of the four distributive justice principles evolved?
+
+Please structure your response as:
+INSIGHTS: [key consolidated insights]
+PREFERENCES: [strategic approaches developed]
+ECONOMICS: [economic learnings]
+CONFIDENCE: [confidence evolution]
+PRINCIPLES: [principle understanding evolution]
+"""
+        
+        # Get agent for LLM call
+        from ..agents.enhanced import DeliberationAgent
+        # We need to create a temporary agent or find the agent object
+        # For now, let's assume we can access it through the memory system
+        # This is a design issue that might need refinement
+        
+        # Create temporary agent for consolidation (this might need to be refactored)
+        from agents.model_settings import ModelSettings
+        model_settings = ModelSettings(temperature=0.1)
+        
+        temp_agent = DeliberationAgent(
+            agent_id=f"temp_{agent_id}",
+            name=f"temp_{agent_id}",
+            model="gpt-4.1-mini",
+            personality="Consolidation agent",
+            model_settings=model_settings
+        )
+        
+        result = await Runner.run(temp_agent, consolidation_prompt)
+        response_text = ItemHelpers.text_message_outputs(result.new_items)
+        
+        # Parse the consolidated response
+        insights = self._extract_section(response_text, "INSIGHTS:")
+        preferences = self._extract_section(response_text, "PREFERENCES:")
+        economics = self._extract_section(response_text, "ECONOMICS:")
+        confidence = self._extract_section(response_text, "CONFIDENCE:")
+        principles = self._extract_section(response_text, "PRINCIPLES:")
+        
+        # Create consolidated memory
+        consolidated = ConsolidatedMemory(
+            agent_id=agent_id,
+            consolidated_insights=insights,
+            strategic_preferences=preferences,
+            economic_learnings=economics,
+            confidence_summary=confidence,
+            principle_understanding=principles
+        )
+        
+        # Store in agent memory
+        agent_memory.consolidated_memory = consolidated
+        
+        # Log if logger available
+        if self.logger:
+            self.logger.log_memory_generation(
+                agent_id=agent_id,
+                round_num=0,
+                memory_content=f"Phase 1 Consolidation: {insights}",
+                strategy="memory_consolidation"
+            )
+        
+        return consolidated
+    
+    def get_phase1_context_for_phase2(self, agent_id: str) -> str:
+        """
+        Get Phase 1 memory context to include in Phase 2 deliberation.
+        
+        Args:
+            agent_id: Agent to get context for
+            
+        Returns:
+            Formatted context string for Phase 2 use
+        """
+        if not self.enable_phase1_memory:
+            return ""
+        
+        agent_memory = self.get_agent_memory(agent_id)
+        context_parts = []
+        
+        # Add consolidated memory if available
+        if agent_memory.consolidated_memory:
+            context_parts.append("YOUR INDIVIDUAL PHASE INSIGHTS:")
+            context_parts.append(f"Key Insights: {agent_memory.consolidated_memory.consolidated_insights}")
+            context_parts.append(f"Strategic Preferences: {agent_memory.consolidated_memory.strategic_preferences}")
+            context_parts.append(f"Economic Learnings: {agent_memory.consolidated_memory.economic_learnings}")
+            context_parts.append("")
+        
+        # Add recent individual memories if no consolidation available
+        elif agent_memory.has_individual_memories():
+            context_parts.append("YOUR INDIVIDUAL PHASE INSIGHTS:")
+            recent_memories = agent_memory.individual_memories[-3:]  # Last 3 memories
+            for memory in recent_memories:
+                context_parts.append(f"{memory.activity_context}: {memory.content.insights_gained}")
+            context_parts.append("")
+        
+        return "\n".join(context_parts)
     
     def get_agent_memory_summary(self, agent_id: str) -> Dict[str, any]:
         """Get summary of agent's memory for analysis."""
         agent_memory = self.get_agent_memory(agent_id)
         
-        if not agent_memory.memory_entries:
-            return {
-                "agent_id": agent_id,
-                "total_memories": 0,
-                "strategy_evolution": [],
-                "memory_timeline": []
-            }
-        
-        return {
-            "agent_id": agent_id,
+        # Phase 2 memory summary
+        phase2_summary = {
             "total_memories": len(agent_memory.memory_entries),
             "strategy_evolution": agent_memory.get_strategy_evolution(),
             "memory_timeline": [
@@ -284,6 +740,26 @@ class MemoryService:
                 }
                 for entry in agent_memory.memory_entries
             ]
+        }
+        
+        # Phase 1 memory summary
+        phase1_summary = {
+            "total_individual_memories": len(agent_memory.individual_memories),
+            "memory_types": [memory.memory_type.value for memory in agent_memory.individual_memories],
+            "activities": [memory.activity_context for memory in agent_memory.individual_memories],
+            "insights": agent_memory.get_individual_insights(),
+            "has_consolidation": agent_memory.consolidated_memory is not None
+        }
+        
+        return {
+            "agent_id": agent_id,
+            "phase1": phase1_summary,
+            "phase2": phase2_summary,
+            "consolidated_memory": {
+                "available": agent_memory.consolidated_memory is not None,
+                "insights": agent_memory.consolidated_memory.consolidated_insights if agent_memory.consolidated_memory else None,
+                "confidence": agent_memory.consolidated_memory.confidence_summary if agent_memory.consolidated_memory else None
+            }
         }
     
     def clear_agent_memory(self, agent_id: str):
@@ -298,6 +774,23 @@ class MemoryService:
     def set_memory_strategy(self, strategy: MemoryStrategy):
         """Change the memory management strategy."""
         self.memory_strategy = strategy
+    
+    def _extract_section(self, text: str, section_header: str) -> str:
+        """Extract a section from structured text."""
+        lines = text.split('\n')
+        section_lines = []
+        in_section = False
+        
+        for line in lines:
+            if line.strip().startswith(section_header):
+                in_section = True
+                section_lines.append(line.replace(section_header, '').strip())
+            elif in_section and line.strip().startswith(('SITUATION:', 'REASONING:', 'INSIGHTS:', 'CONFIDENCE:', 'PREFERENCES:', 'STRATEGY:', 'ECONOMICS:', 'PRINCIPLES:')):
+                break
+            elif in_section:
+                section_lines.append(line.strip())
+        
+        return '\n'.join(section_lines).strip() or "No analysis provided"
     
     async def _generate_decomposed_memory_with_logging(self, agent: DeliberationAgent, 
                                                      round_number: int, speaking_position: int,
@@ -517,19 +1010,159 @@ Give ONE focused strategy, not multiple general ideas."""
         return recent_speakers[0] if recent_speakers else None
 
 
+class Phase1AwareDecomposedStrategy(DecomposedMemoryStrategy):
+    """
+    Enhanced decomposed memory strategy that's aware of Phase 1 experiences.
+    Provides more nuanced memory generation by considering individual phase learning.
+    """
+    
+    def __init__(self, max_entries: int = 5, phase1_weight: float = 0.3):
+        """
+        Initialize Phase 1 aware decomposed memory strategy.
+        
+        Args:
+            max_entries: Maximum number of recent memory entries to include in context
+            phase1_weight: Weight given to Phase 1 insights in memory generation (0.0-1.0)
+        """
+        super().__init__(max_entries)
+        self.phase1_weight = phase1_weight
+    
+    async def generate_memory_entry(self, agent: DeliberationAgent, round_number: int,
+                                   speaking_position: int, transcript: List[DeliberationResponse],
+                                   memory_context: str) -> MemoryEntry:
+        """
+        Generate memory using three focused sequential steps with Phase 1 awareness.
+        """
+        # Check if Phase 1 context is available in memory_context
+        has_phase1_context = "YOUR INDIVIDUAL PHASE INSIGHTS:" in memory_context
+        
+        # Step 1: Generate factual recap (same as parent)
+        factual_recap = await self._generate_factual_recap(agent, round_number, transcript)
+        
+        # Step 2: Generate Phase 1 aware agent analysis
+        if has_phase1_context:
+            agent_analysis = await self._generate_phase1_aware_agent_analysis(
+                agent, round_number, transcript, factual_recap, memory_context
+            )
+        else:
+            agent_analysis = await self._generate_agent_analysis(
+                agent, round_number, transcript, factual_recap
+            )
+        
+        # Step 3: Generate Phase 1 informed strategic action
+        if has_phase1_context:
+            strategic_action = await self._generate_phase1_informed_strategy(
+                agent, round_number, factual_recap, agent_analysis, memory_context
+            )
+        else:
+            strategic_action = await self._generate_strategic_action(
+                agent, round_number, factual_recap, agent_analysis
+            )
+        
+        # Create memory entry
+        return MemoryEntry(
+            round_number=round_number,
+            timestamp=datetime.now(),
+            situation_assessment=factual_recap,
+            other_agents_analysis=agent_analysis,
+            strategy_update=strategic_action,
+            speaking_position=speaking_position
+        )
+    
+    async def _generate_phase1_aware_agent_analysis(self, agent: DeliberationAgent, round_number: int,
+                                                   transcript: List[DeliberationResponse], factual_recap: str,
+                                                   memory_context: str) -> str:
+        """Generate agent analysis that considers Phase 1 experiences."""
+        
+        # Extract Phase 1 insights from context
+        phase1_insights = ""
+        if "YOUR INDIVIDUAL PHASE INSIGHTS:" in memory_context:
+            lines = memory_context.split('\n')
+            phase1_lines = []
+            in_phase1_section = False
+            for line in lines:
+                if "YOUR INDIVIDUAL PHASE INSIGHTS:" in line:
+                    in_phase1_section = True
+                    continue
+                elif in_phase1_section and line.strip() == "":
+                    break
+                elif in_phase1_section:
+                    phase1_lines.append(line)
+            phase1_insights = "\n".join(phase1_lines)
+        
+        # Select target agent for analysis
+        target_agent = self._select_analysis_target(agent, transcript, round_number)
+        
+        if not target_agent:
+            return "No other agents to analyze in recent conversation."
+        
+        prompt = f"""Based on these facts: {factual_recap}
+
+YOUR INDIVIDUAL PHASE INSIGHTS:
+{phase1_insights}
+
+Focus ONLY on {target_agent}'s behavior and statements, considering your individual learning:
+
+1. What specific statements did they make?
+2. What principle did they choose and what reasoning did they give?
+3. How does their approach compare to insights you gained in individual practice?
+4. Are they showing flexibility, consistency, or change in position?
+5. Based on your individual experience, what concerns might they have?
+
+Give concrete examples from their actual words.
+Consider how your individual learning helps you understand their perspective."""
+
+        result = await Runner.run(agent, prompt)
+        return ItemHelpers.text_message_outputs(result.new_items).strip()
+    
+    async def _generate_phase1_informed_strategy(self, agent: DeliberationAgent, round_number: int,
+                                               factual_recap: str, agent_analysis: str,
+                                               memory_context: str) -> str:
+        """Generate strategy informed by Phase 1 experiences."""
+        
+        # Extract Phase 1 strategic preferences from context
+        phase1_strategy = ""
+        if "Strategic Preferences:" in memory_context:
+            lines = memory_context.split('\n')
+            for line in lines:
+                if "Strategic Preferences:" in line:
+                    phase1_strategy = line.replace("Strategic Preferences:", "").strip()
+                    break
+        
+        prompt = f"""Given this situation:
+
+FACTS: {factual_recap}
+AGENT ANALYSIS: {agent_analysis}
+YOUR INDIVIDUAL STRATEGIC PREFERENCES: {phase1_strategy}
+
+What is ONE specific thing you could do in the next round to move toward consensus while staying true to your individual learning?
+
+Be concrete and actionable:
+- What exact argument could you make based on your individual experience?
+- How can your individual insights help persuade others?
+- Which specific agent would you focus on and why?
+- How would you bridge your individual learning with group consensus?
+
+Give ONE focused strategy that leverages your individual phase experience."""
+
+        result = await Runner.run(agent, prompt)
+        return ItemHelpers.text_message_outputs(result.new_items).strip()
+
+
 def create_memory_strategy(strategy_name: str) -> MemoryStrategy:
     """
     Factory function to create memory strategies based on configuration.
     
     Args:
-        strategy_name: Strategy name (full|recent|decomposed)
+        strategy_name: Strategy name (recent|decomposed|phase_aware_decomposed)
         
     Returns:
         Configured memory strategy instance
     """
     strategy_map = {
         "recent": RecentMemoryStrategy,
-        "decomposed": DecomposedMemoryStrategy
+        "decomposed": DecomposedMemoryStrategy,
+        "phase_aware_decomposed": Phase1AwareDecomposedStrategy
     }
     
     if strategy_name not in strategy_map:

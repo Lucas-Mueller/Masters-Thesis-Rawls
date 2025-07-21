@@ -33,10 +33,12 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - `PreferenceService` (src/maai/services/preference_service.py): Preference ranking collection and analysis
 - `ValidationService` (src/maai/services/validation_service.py): Principle choice validation and constraint requirement checking
 - `ExperimentLogger` (src/maai/services/experiment_logger.py): Comprehensive agent-centric experiment data collection
+- `DetailedExamplesService` (src/maai/services/detailed_examples_service.py): Concrete income distribution examples for principle understanding
 
 **Key Design Decisions**:
 - **Economic Incentive-Based**: Agents receive real monetary payouts based on income assignments, not philosophical reasoning
 - **Two-Phase Structure**: Phase 1 (Individual Familiarization) + Phase 2 (Group Deliberation)
+- **Phase 1 Memory System**: Agents generate and preserve memories during individual experiences, creating continuity between phases
 - **Preference Rankings**: 1-4 rankings with certainty levels replace Likert scale evaluation
 - **Income Distributions**: Multiple distribution scenarios with 5 income classes each (HIGH, MEDIUM_HIGH, MEDIUM, MEDIUM_LOW, LOW)
 - **Constraint Handling**: Automatic default values for principle 3 (floor) and 4 (range) constraints when not specified
@@ -113,6 +115,8 @@ python config_generator.py
 **Available Configurations**:
 - `new_game_basic`: Basic configuration for new game logic system (recommended starting point)
 - `lucas`: Custom configuration for specific research scenarios 
+- `lucas_new`: Updated custom configuration
+- `phase1_memory_example`: Example configuration with Phase 1 memory features enabled
 - `decomposed_memory_test`: 3 agents with decomposed memory strategy
 - `temperature_test`: Reproducible experiments with temperature=0.0 for deterministic results
 - `default`: Legacy experimental setup (pre-new game logic)
@@ -125,12 +129,28 @@ python config_generator.py
 # Run all tests (consolidated)
 python tests/run_all_tests.py
 
+# Run with pytest support
+python tests/run_all_tests.py --pytest
+
 # Run individual test files
 python tests/test_core.py
 python tests/test_decomposed_memory.py
 python tests/test_experiment_logger.py
 python tests/test_temperature_configuration.py
 python tests/test_unified_logging.py
+python tests/test_consensus_service.py
+python tests/test_conversation_service.py
+python tests/test_evaluation_service.py
+python tests/test_public_history_service.py
+python tests/test_integration.py
+python tests/test_detailed_examples_service.py
+python tests/test_phase1_memory.py
+
+# Run with pytest directly
+pytest tests/ -v --tb=short
+
+# Test Phase 1 memory integration
+python test_phase1_integration.py
 ```
 
 ### Direct API Usage
@@ -187,8 +207,8 @@ python config_generator.py
 # Main experiment analysis notebook
 jupyter notebook Experiment.ipynb
 
-# Additional analysis notebooks
-jupyter notebook analysis.ipynb
+# Systematic analysis across models and parameters
+jupyter notebook Systematic_Analysis.ipynb
 ```
 
 ## Configuration System
@@ -215,11 +235,15 @@ jupyter notebook analysis.ipynb
 - Available strategies:
   - `"recent"`: Include only the most recent N memory entries (default)
   - `"decomposed"`: Use focused, sequential prompts for improved memory quality
+  - `"phase_aware_decomposed"`: Enhanced decomposed strategy that leverages Phase 1 experiences in Phase 2 reasoning
 - Decomposed strategy breaks memory generation into three focused steps:
   1. **Factual Recap**: "What actually happened?" (objective events only)
   2. **Agent Analysis**: "Focus on ONE agent's behavior" (specific observations)
   3. **Strategic Action**: "What's ONE concrete thing you could do next?" (actionable strategy)
-- Decomposed strategy reduces cognitive overload and produces more specific, actionable memories
+- Phase-aware strategy enhances steps 2-3 with Phase 1 insights when available:
+  - Agent analysis considers individual learning experiences
+  - Strategic actions leverage consolidated Phase 1 preferences and economic learnings
+- Decomposed strategies reduce cognitive overload and produce more specific, actionable memories
 
 **Example Configuration Structure**:
 ```yaml
@@ -236,6 +260,13 @@ individual_rounds: 4  # Number of individual application rounds
 payout_ratio: 0.0001  # $0.0001 per $1 of income (e.g., $20,000 income = $2.00 payout)
 enable_detailed_examples: true
 enable_secret_ballot: true
+
+# Phase 1 Memory Configuration
+enable_phase1_memory: true  # Enable Phase 1 individual memory generation
+phase1_memory_frequency: "each_activity"  # Generate memories after each Phase 1 activity
+phase1_consolidation_strategy: "summary"  # Use summary consolidation before Phase 2
+phase1_memory_integration: true  # Include Phase 1 memories in Phase 2 context
+phase1_reflection_depth: "standard"  # Standard depth reflections
 
 # Income distribution scenarios
 income_distributions:
@@ -256,7 +287,8 @@ income_distributions:
       MEDIUM_LOW: 18000
       LOW: 12000
 
-memory_strategy: "decomposed"
+# Enhanced memory strategy that leverages Phase 1 experiences
+memory_strategy: "phase_aware_decomposed"
 
 agents:
   - name: "Economist"
@@ -275,6 +307,13 @@ output:
   directory: experiment_results
   formats: [json]
 ```
+
+**Phase 1 Memory Configuration Options**:
+- `enable_phase1_memory`: Enable/disable Phase 1 memory generation (default: true)
+- `phase1_memory_frequency`: When to generate memories - "each_activity"|"each_round"|"phase_end" (default: "each_activity")
+- `phase1_consolidation_strategy`: How to consolidate memories - "summary"|"detailed"|"key_insights" (default: "summary")
+- `phase1_memory_integration`: Include Phase 1 memories in Phase 2 context (default: true)
+- `phase1_reflection_depth`: Depth of reflections - "brief"|"standard"|"detailed" (default: "standard")
 
 ## Parallel Execution System
 
@@ -383,11 +422,40 @@ python run_experiment.py
 5. **Post-Individual Ranking**: Agents re-rank principles after gaining hands-on experience
 
 **Phase 2: Group Experiment**
-1. **Group Deliberation**: Multi-round discussion to reach unanimous agreement on one principle
-2. **Consensus Detection**: Validate group agreement with constraint handling for principles 3 & 4
-3. **Economic Outcomes**: Apply agreed principle to assign income classes and calculate real payouts
-4. **Final Preference Ranking**: Agents provide final rankings after experiencing group outcomes
-5. **Data Export**: Comprehensive agent-centric data export with all interactions and outcomes
+1. **Memory Consolidation**: Consolidate Phase 1 experiences into strategic insights for group discussions
+2. **Group Deliberation**: Multi-round discussion to reach unanimous agreement on one principle (with Phase 1 memory context)
+3. **Consensus Detection**: Validate group agreement with constraint handling for principles 3 & 4
+4. **Economic Outcomes**: Apply agreed principle to assign income classes and calculate real payouts
+5. **Final Preference Ranking**: Agents provide final rankings after experiencing group outcomes
+6. **Data Export**: Comprehensive agent-centric data export with all interactions and outcomes
+
+### Phase 1 Memory System
+
+The Phase 1 Memory System addresses a critical gap in agent continuity by preserving individual learning experiences for use in group deliberation.
+
+**Memory Types**:
+- **Individual Reflection Memory**: Captures reasoning behind preference changes and decisions
+- **Learning Accumulation Memory**: Builds understanding across examples and rounds
+- **Experience Integration Memory**: Connects economic outcomes with strategic insights
+- **Consolidated Memory**: Summary of Phase 1 experiences for Phase 2 context
+
+**Memory Generation Points**:
+- After initial preference ranking: Reflection on ranking reasoning
+- After detailed examples: Learning from concrete distribution examples
+- After each individual round: Integration of economic outcome experiences
+- After post-individual ranking: Final reflection on preference evolution
+- Before group deliberation: Consolidation of all Phase 1 memories
+
+**Phase Transition Bridge**:
+- Agents enter Phase 2 with consolidated Phase 1 insights
+- Memory context includes strategic preferences and economic learnings
+- Phase-aware memory strategies leverage individual experiences in group settings
+
+**Research Benefits**:
+- Complete learning trajectories across both phases
+- Enhanced preference evolution analysis
+- Realistic cognitive continuity between individual and group decision-making
+- Improved ecological validity of agent reasoning
 
 ## Implementation Notes
 

@@ -1,0 +1,78 @@
+agents:
+- model: gpt-4.1-nano
+  name: Agent_1_us_student
+  personality: You are a US college student participating in an economic experiment
+    about distributive justice principles. You will receive real monetary payouts
+    based on your income class assignment after the group chooses a principle.
+  temperature: 0
+- model: gpt-4.1-nano
+  name: Agent_2_us_student
+  personality: You are a US college student participating in an economic experiment
+    about distributive justice principles. You will receive real monetary payouts
+    based on your income class assignment after the group chooses a principle.
+  temperature: 0
+- model: gpt-4.1-nano
+  name: Agent_3_us_student
+  personality: You are a US college student participating in an economic experiment
+    about distributive justice principles. You will receive real monetary payouts
+    based on your income class assignment after the group chooses a principle.
+  temperature: 0
+defaults:
+  model: gpt-4.1-nano
+  personality: You are a US college student participating in an economic experiment
+    about distributive justice principles. You will receive real monetary payouts
+    based on your income class assignment after the group chooses a principle.
+  temperature: 0
+enable_detailed_examples: true
+enable_secret_ballot: true
+experiment:
+  decision_rule: unanimity
+  max_rounds: 6
+  timeout_seconds: 300
+experiment_id: systematic_019_gpt_4.1_nano_0_us_student
+global_temperature: 0
+income_distributions:
+- distribution_id: 1
+  income_by_class:
+    High: 32000
+    Low: 12000
+    Medium: 24000
+    Medium high: 27000
+    Medium low: 13000
+  name: Distribution 1
+- distribution_id: 2
+  income_by_class:
+    High: 28000
+    Low: 13000
+    Medium: 20000
+    Medium high: 22000
+    Medium low: 17000
+  name: Distribution 2
+- distribution_id: 3
+  income_by_class:
+    High: 31000
+    Low: 14000
+    Medium: 21000
+    Medium high: 24000
+    Medium low: 16000
+  name: Distribution 3
+- distribution_id: 4
+  income_by_class:
+    High: 21000
+    Low: 15000
+    Medium: 19000
+    Medium high: 20000
+    Medium low: 16000
+  name: Distribution 4
+individual_rounds: 4
+memory_strategy: decomposed
+output:
+  directory: systematic_analysis_results
+  formats:
+  - json
+payout_ratio: 0.0001
+systematic_analysis:
+  distribution_count: 4
+  model: gpt-4.1-nano
+  prompt_type: us_student
+  temperature: 0

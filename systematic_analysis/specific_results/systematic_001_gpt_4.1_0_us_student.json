@@ -1,0 +1,236 @@
+{
+  "experiment_metadata": {
+    "experiment_id": "systematic_001_gpt_4.1_0_us_student",
+    "start_time": "2025-07-21T09:08:02.769429",
+    "end_time": "2025-07-21T09:10:37.617924",
+    "total_duration_seconds": 154.848495,
+    "max_rounds": 6,
+    "decision_rule": "unanimity",
+    "final_consensus": {
+      "agreement_reached": true,
+      "agreed_principle": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "total_messages": 3
+    },
+    "detailed_examples": {
+      "timestamp": "2025-07-21T09:08:26.648505",
+      "principle_outcomes_analysis": {
+        "principle_1": {
+          "selected_distribution": {
+            "distribution_id": 4,
+            "name": "Distribution 4",
+            "income_by_class": {
+              "High": 21000,
+              "Low": 15000,
+              "Medium": 19000,
+              "Medium high": 20000,
+              "Medium low": 16000
+            }
+          },
+          "reasoning": "Maximizes minimum income across all classes"
+        },
+        "principle_2": {
+          "selected_distribution": {
+            "distribution_id": 1,
+            "name": "Distribution 1",
+            "income_by_class": {
+              "High": 32000,
+              "Low": 12000,
+              "Medium": 24000,
+              "Medium high": 27000,
+              "Medium low": 13000
+            }
+          },
+          "reasoning": "Maximizes average income across all classes"
+        },
+        "principle_3": {
+          "<=$12,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Distribution 1",
+              "income_by_class": {
+                "High": 32000,
+                "Low": 12000,
+                "Medium": 24000,
+                "Medium high": 27000,
+                "Medium low": 13000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $12,000"
+          },
+          "<=$13,000": {
+            "selected_distribution": {
+              "distribution_id": 3,
+              "name": "Distribution 3",
+              "income_by_class": {
+                "High": 31000,
+                "Low": 14000,
+                "Medium": 21000,
+                "Medium high": 24000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $13,000"
+          },
+          "<=$14,000": {
+            "selected_distribution": {
+              "distribution_id": 3,
+              "name": "Distribution 3",
+              "income_by_class": {
+                "High": 31000,
+                "Low": 14000,
+                "Medium": 21000,
+                "Medium high": 24000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $14,000"
+          },
+          "<=$15,000": {
+            "selected_distribution": {
+              "distribution_id": 4,
+              "name": "Distribution 4",
+              "income_by_class": {
+                "High": 21000,
+                "Low": 15000,
+                "Medium": 19000,
+                "Medium high": 20000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $15,000"
+          }
+        },
+        "principle_4": {
+          ">=$20,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Distribution 1",
+              "income_by_class": {
+                "High": 32000,
+                "Low": 12000,
+                "Medium": 24000,
+                "Medium high": 27000,
+                "Medium low": 13000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $20,000"
+          },
+          ">=$17,000": {
+            "selected_distribution": {
+              "distribution_id": 3,
+              "name": "Distribution 3",
+              "income_by_class": {
+                "High": 31000,
+                "Low": 14000,
+                "Medium": 21000,
+                "Medium high": 24000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $17,000"
+          },
+          ">=$15,000": {
+            "selected_distribution": {
+              "distribution_id": 2,
+              "name": "Distribution 2",
+              "income_by_class": {
+                "High": 28000,
+                "Low": 13000,
+                "Medium": 20000,
+                "Medium high": 22000,
+                "Medium low": 17000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $15,000"
+          }
+        }
+      },
+      "distributions_presented": 4,
+      "enabled": true
+    }
+  },
+  "Agent_1_us_student": {
+    "overall": {
+      "model": "gpt-4.1",
+      "persona": "You are a US college student participating in an economic experiment about distributive justice principles. You will receive real monetary payouts based on your income class assignment after the group chooses a principle.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.0
+    },
+    "round_1": {
+      "speaking_order": 3,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent_3_us_student: Here’s what I would say to the group:\n\n---\n\nI want to remind everyone that, since our income class will be assigned randomly after we choose the principle, none of us knows where we’ll end up. Any one of us could be in the lowest income class. If we pick a principle that only maximizes the average income, it’s possible that some of us could end up with very little, while others get a lot. That might seem fine if you think you’ll be lucky, but the reality is, it’s just as likely you’ll be at the bottom.\n\nThat’s why I think it’s really important to focus on fairness and security for everyone. If we choose a principle that guarantees a minimum income for all—like maximizing the floor or setting a floor constraint—we make sure that no one is left behind, no matter where they end up. This is especially important given the uncertainty we all face. We should build a system that we’d all feel okay about, even if we draw the short straw.\n\nFor that reason, my current choice is **Principle 3: Maximizing the average with a floor constraint**. This way, we can still aim for a high average income, but only after making sure everyone has a decent minimum to live on. I think that’s the fairest and most reasonable approach for our situation.\nAgent_2_us_student: Here’s what I would say to the group:\n\n---\n\nThank you, Agent_3_us_student, for raising the point about uncertainty and the need for a safety net. I completely agree that, since none of us knows which income class we’ll end up in, it’s important to make sure no one is left with too little. I think Principle 3—maximizing the average with a floor constraint—strikes a good balance between efficiency and fairness.\n\nTo move us closer to consensus, I’d like to propose that we discuss what a fair minimum income floor should be. For example, should the minimum be set at a level that covers basic needs, or a bit higher to ensure a decent standard of living? I’d love to hear everyone’s thoughts, especially from those who might be unsure about Principle 3. If we can agree on a specific number for the floor, I think we can all feel more secure about the outcome, no matter where we end up in the distribution.\n\nSo, my current choice is **Principle 3: Maximizing the average with a floor constraint**, and I invite everyone to suggest what they think would be a fair minimum income for our group. Let’s work together to find a value that we can all support!",
+      "memory": "Agent_3_us_student spoke first and chose Principle 3 (Maximizing the average with a floor constraint), emphasizing fairness and security due to random income assignment. Agent_2_us_student spoke second, also choosing Principle 3, and suggested discussing what the minimum income floor should be. Both agents highlighted the importance of ensuring a minimum income for all participants.",
+      "strategy": "**One specific thing I could do in the next round to move toward consensus:**\n\n**Strategy:**  \nDirectly address Agent_2_us_student’s call for group input by proposing a concrete minimum income floor value, and invite feedback to show responsiveness to their priority for inclusive decision-making.\n\n**How to do it:**  \nSay:  \n“I agree with Agent_2_us_student that it’s important to set a fair minimum income floor. I propose we set the floor at $X (choose a reasonable, concrete number—e.g., $30 if the range is $0–$100). Does this amount feel secure and fair to everyone? If not, what would you suggest? Let’s try to agree on a specific number so we can move forward together.”\n\n**Why this works:**  \n- **Focuses on Agent_2_us_student,** who wants group discussion and a specific floor value.\n- **Addresses their concern** for fairness and security by proposing a concrete number.\n- **Frames the message** as collaborative and solution-oriented, inviting others to adjust or agree, which helps build consensus.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: **One specific thing I could do in the next round to move toward consensus:**\n\n**Strategy:**  \nDirectly address Agent_2_us_student’s call for group input by proposing a concrete minimum income floor value, and invite feedback to show responsiveness to their priority for inclusive decision-making.\n\n**How to do it:**  \nSay:  \n“I agree with Agent_2_us_student that it’s important to set a fair minimum income floor. I propose we set the floor at $X (choose a reasonable, concrete number—e.g., $30 if the range is $0–$100). Does this amount feel secure and fair to everyone? If not, what would you suggest? Let’s try to agree on a specific number so we can move forward together.”\n\n**Why this works:**  \n- **Focuses on Agent_2_us_student,** who wants group discussion and a specific floor value.\n- **Addresses their concern** for fairness and security by proposing a concrete number.\n- **Frames the message** as collaborative and solution-oriented, inviting others to adjust or agree, which helps build consensus.\n\n\n--- Current Round 1 ---\nSPEAKERS IN THIS ROUND SO FAR:\nAgent_3_us_student: Here’s what I would say to the group:\n\n---\n\nI want to remind everyone that, since our income class will be assigned randomly after we choose the principle, none of us knows where we’ll end up. Any one of us could be in the lowest income class. If we pick a principle that only maximizes the average income, it’s possible that some of us could end up with very little, while others get a lot. That might seem fine if you think you’ll be lucky, but the reality is, it’s just as likely you’ll be at the bottom.\n\nThat’s why I think it’s really important to focus on fairness and security for everyone. If we choose a principle that guarantees a minimum income for all—like maximizing the floor or setting a floor constraint—we make sure that no one is left behind, no matter where they end up. This is especially important given the uncertainty we all face. We should build a system that we’d all feel okay about, even if we draw the short straw.\n\nFor that reason, my current choice is **Principle 3: Maximizing the average with a floor constraint**. This way, we can still aim for a high average income, but only after making sure everyone has a decent minimum to live on. I think that’s the fairest and most reasonable approach for our situation.\nAgent_2_us_student: Here’s what I would say to the group:\n\n---\n\nThank you, Agent_3_us_student, for raising the point about uncertainty and the need for a safety net. I completely agree that, since none of us knows which income class we’ll end up in, it’s important to make sure no one is left with too little. I think Principle 3—maximizing the average with a floor constraint—strikes a good balance between efficiency and fairness.\n\nTo move us closer to consensus, I’d like to propose that we discuss what a fair minimum income floor should be. For example, should the minimum be set at a level that covers basic needs, or a bit higher to ensure a decent standard of living? I’d love to hear everyone’s thoughts, especially from those who might be unsure about Principle 3. If we can agree on a specific number for the floor, I think we can all feel more secure about the outcome, no matter where we end up in the distribution.\n\nSo, my current choice is **Principle 3: Maximizing the average with a floor constraint**, and I invite everyone to suggest what they think would be a fair minimum income for our group. Let’s work together to find a value that we can all support!\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Here’s what I would say to the group:\n\n---\n\nI appreciate the thoughtful points made by both Agent_3_us_student and Agent_2_us_student. I agree that, given the random assignment of income classes, it’s in everyone’s best interest to ensure that no one ends up with an unacceptably low income. Principle 3—maximizing the average with a floor constraint—seems like the best way to balance overall prosperity with basic fairness and security.\n\nTo help us move forward, I want to directly address Agent_2_us_student’s suggestion that we agree on a specific minimum income floor. I propose we set the floor at **$30** (assuming our possible incomes range from $0 to $100). I think $30 is high enough to guarantee a basic level of security for everyone, but not so high that it would prevent us from maximizing the average income for the group as a whole.\n\nDoes $30 feel secure and fair to everyone? If not, what amount would you suggest? I’m open to adjusting this number if others have strong feelings. Let’s try to agree on a specific value so we can move forward together and make sure our system is both fair and efficient.\n\nMy current choice is **Principle 3: Maximizing the average with a floor constraint**."
+      },
+      "communication": "Here’s what I would say to the group:\n\n---\n\nI appreciate the thoughtful points made by both Agent_3_us_student and Agent_2_us_student. I agree that, given the random assignment of income classes, it’s in everyone’s best interest to ensure that no one ends up with an unacceptably low income. Principle 3—maximizing the average with a floor constraint—seems like the best way to balance overall prosperity with basic fairness and security.\n\nTo help us move forward, I want to directly address Agent_2_us_student’s suggestion that we agree on a specific minimum income floor. I propose we set the floor at **$30** (assuming our possible incomes range from $0 to $100). I think $30 is high enough to guarantee a basic level of security for everyone, but not so high that it would prevent us from maximizing the average income for the group as a whole.\n\nDoes $30 feel secure and fair to everyone? If not, what amount would you suggest? I’m open to adjusting this number if others have strong feelings. Let’s try to agree on a specific value so we can move forward together and make sure our system is both fair and efficient.\n\nMy current choice is **Principle 3: Maximizing the average with a floor constraint**.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "satisfaction": null
+    }
+  },
+  "Agent_2_us_student": {
+    "overall": {
+      "model": "gpt-4.1",
+      "persona": "You are a US college student participating in an economic experiment about distributive justice principles. You will receive real monetary payouts based on your income class assignment after the group chooses a principle.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.0
+    },
+    "round_1": {
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent_3_us_student: Here’s what I would say to the group:\n\n---\n\nI want to remind everyone that, since our income class will be assigned randomly after we choose the principle, none of us knows where we’ll end up. Any one of us could be in the lowest income class. If we pick a principle that only maximizes the average income, it’s possible that some of us could end up with very little, while others get a lot. That might seem fine if you think you’ll be lucky, but the reality is, it’s just as likely you’ll be at the bottom.\n\nThat’s why I think it’s really important to focus on fairness and security for everyone. If we choose a principle that guarantees a minimum income for all—like maximizing the floor or setting a floor constraint—we make sure that no one is left behind, no matter where they end up. This is especially important given the uncertainty we all face. We should build a system that we’d all feel okay about, even if we draw the short straw.\n\nFor that reason, my current choice is **Principle 3: Maximizing the average with a floor constraint**. This way, we can still aim for a high average income, but only after making sure everyone has a decent minimum to live on. I think that’s the fairest and most reasonable approach for our situation.",
+      "memory": "Agent_3_us_student spoke first and chose Principle 3: Maximizing the average with a floor constraint. The key topics mentioned were the uncertainty of future income class assignments and the importance of ensuring a guaranteed minimum income for everyone.",
+      "strategy": "**One specific thing I could do in the next round to move toward consensus:**\n\n**Strategy:**  \nDirectly address Agent_3_us_student’s concern about uncertainty and the need for a safety net by proposing a concrete, reasonable value for the minimum income floor in Principle 3, and invite their input on what that value should be.\n\n**How to do it:**  \nSay:  \n*\"Agent_3_us_student, since you emphasized the importance of a guaranteed minimum income because we don’t know our future income class, I agree that Principle 3 is a strong option. To move forward, could we discuss what a fair minimum income floor would be? If we can agree on a specific number, I think more of us could get on board with Principle 3 and reach consensus.\"*\n\n**Why this works:**  \n- It shows you are listening to and validating their main concern.\n- It moves the discussion from abstract agreement to concrete action.\n- It invites collaboration and signals willingness to compromise, which can help build consensus.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: **One specific thing I could do in the next round to move toward consensus:**\n\n**Strategy:**  \nDirectly address Agent_3_us_student’s concern about uncertainty and the need for a safety net by proposing a concrete, reasonable value for the minimum income floor in Principle 3, and invite their input on what that value should be.\n\n**How to do it:**  \nSay:  \n*\"Agent_3_us_student, since you emphasized the importance of a guaranteed minimum income because we don’t know our future income class, I agree that Principle 3 is a strong option. To move forward, could we discuss what a fair minimum income floor would be? If we can agree on a specific number, I think more of us could get on board with Principle 3 and reach consensus.\"*\n\n**Why this works:**  \n- It shows you are listening to and validating their main concern.\n- It moves the discussion from abstract agreement to concrete action.\n- It invites collaboration and signals willingness to compromise, which can help build consensus.\n\n\n--- Current Round 1 ---\nSPEAKERS IN THIS ROUND SO FAR:\nAgent_3_us_student: Here’s what I would say to the group:\n\n---\n\nI want to remind everyone that, since our income class will be assigned randomly after we choose the principle, none of us knows where we’ll end up. Any one of us could be in the lowest income class. If we pick a principle that only maximizes the average income, it’s possible that some of us could end up with very little, while others get a lot. That might seem fine if you think you’ll be lucky, but the reality is, it’s just as likely you’ll be at the bottom.\n\nThat’s why I think it’s really important to focus on fairness and security for everyone. If we choose a principle that guarantees a minimum income for all—like maximizing the floor or setting a floor constraint—we make sure that no one is left behind, no matter where they end up. This is especially important given the uncertainty we all face. We should build a system that we’d all feel okay about, even if we draw the short straw.\n\nFor that reason, my current choice is **Principle 3: Maximizing the average with a floor constraint**. This way, we can still aim for a high average income, but only after making sure everyone has a decent minimum to live on. I think that’s the fairest and most reasonable approach for our situation.\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Here’s what I would say to the group:\n\n---\n\nThank you, Agent_3_us_student, for raising the point about uncertainty and the need for a safety net. I completely agree that, since none of us knows which income class we’ll end up in, it’s important to make sure no one is left with too little. I think Principle 3—maximizing the average with a floor constraint—strikes a good balance between efficiency and fairness.\n\nTo move us closer to consensus, I’d like to propose that we discuss what a fair minimum income floor should be. For example, should the minimum be set at a level that covers basic needs, or a bit higher to ensure a decent standard of living? I’d love to hear everyone’s thoughts, especially from those who might be unsure about Principle 3. If we can agree on a specific number for the floor, I think we can all feel more secure about the outcome, no matter where we end up in the distribution.\n\nSo, my current choice is **Principle 3: Maximizing the average with a floor constraint**, and I invite everyone to suggest what they think would be a fair minimum income for our group. Let’s work together to find a value that we can all support!"
+      },
+      "communication": "Here’s what I would say to the group:\n\n---\n\nThank you, Agent_3_us_student, for raising the point about uncertainty and the need for a safety net. I completely agree that, since none of us knows which income class we’ll end up in, it’s important to make sure no one is left with too little. I think Principle 3—maximizing the average with a floor constraint—strikes a good balance between efficiency and fairness.\n\nTo move us closer to consensus, I’d like to propose that we discuss what a fair minimum income floor should be. For example, should the minimum be set at a level that covers basic needs, or a bit higher to ensure a decent standard of living? I’d love to hear everyone’s thoughts, especially from those who might be unsure about Principle 3. If we can agree on a specific number for the floor, I think we can all feel more secure about the outcome, no matter where we end up in the distribution.\n\nSo, my current choice is **Principle 3: Maximizing the average with a floor constraint**, and I invite everyone to suggest what they think would be a fair minimum income for our group. Let’s work together to find a value that we can all support!",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "satisfaction": null
+    }
+  },
+  "Agent_3_us_student": {
+    "overall": {
+      "model": "gpt-4.1",
+      "persona": "You are a US college student participating in an economic experiment about distributive justice principles. You will receive real monetary payouts based on your income class assignment after the group chooses a principle.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.0
+    },
+    "round_1": {
+      "speaking_order": 1,
+      "memory": "No recent conversation to summarize.",
+      "strategy": "One specific thing I could do in the next round to move toward consensus is:\n\n**Argument/Point:** Emphasize the uncertainty of our future income class and how that makes fairness especially important.\n\n**Target Agent:** Address the whole group, but especially anyone expressing concern about maximizing their own potential income (i.e., those leaning toward maximizing the average).\n\n**Concern Addressed:** The risk that any of us could end up in the lowest income class, and the need for a safety net.\n\n**Framing:**  \n\"I want to remind everyone that since our income class will be assigned randomly after we choose the principle, any of us could end up at the bottom. If we pick a principle that only maximizes the average, some of us could get stuck with very little. But if we choose a principle that guarantees a minimum income for everyone—like maximizing the floor or setting a floor constraint—we make sure no one is left behind, no matter where they end up. I think that's the fairest approach given our uncertainty.\"",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: One specific thing I could do in the next round to move toward consensus is:\n\n**Argument/Point:** Emphasize the uncertainty of our future income class and how that makes fairness especially important.\n\n**Target Agent:** Address the whole group, but especially anyone expressing concern about maximizing their own potential income (i.e., those leaning toward maximizing the average).\n\n**Concern Addressed:** The risk that any of us could end up in the lowest income class, and the need for a safety net.\n\n**Framing:**  \n\"I want to remind everyone that since our income class will be assigned randomly after we choose the principle, any of us could end up at the bottom. If we pick a principle that only maximizes the average, some of us could get stuck with very little. But if we choose a principle that guarantees a minimum income for everyone—like maximizing the floor or setting a floor constraint—we make sure no one is left behind, no matter where they end up. I think that's the fairest approach given our uncertainty.\"\n\n\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Here’s what I would say to the group:\n\n---\n\nI want to remind everyone that, since our income class will be assigned randomly after we choose the principle, none of us knows where we’ll end up. Any one of us could be in the lowest income class. If we pick a principle that only maximizes the average income, it’s possible that some of us could end up with very little, while others get a lot. That might seem fine if you think you’ll be lucky, but the reality is, it’s just as likely you’ll be at the bottom.\n\nThat’s why I think it’s really important to focus on fairness and security for everyone. If we choose a principle that guarantees a minimum income for all—like maximizing the floor or setting a floor constraint—we make sure that no one is left behind, no matter where they end up. This is especially important given the uncertainty we all face. We should build a system that we’d all feel okay about, even if we draw the short straw.\n\nFor that reason, my current choice is **Principle 3: Maximizing the average with a floor constraint**. This way, we can still aim for a high average income, but only after making sure everyone has a decent minimum to live on. I think that’s the fairest and most reasonable approach for our situation."
+      },
+      "communication": "Here’s what I would say to the group:\n\n---\n\nI want to remind everyone that, since our income class will be assigned randomly after we choose the principle, none of us knows where we’ll end up. Any one of us could be in the lowest income class. If we pick a principle that only maximizes the average income, it’s possible that some of us could end up with very little, while others get a lot. That might seem fine if you think you’ll be lucky, but the reality is, it’s just as likely you’ll be at the bottom.\n\nThat’s why I think it’s really important to focus on fairness and security for everyone. If we choose a principle that guarantees a minimum income for all—like maximizing the floor or setting a floor constraint—we make sure that no one is left behind, no matter where they end up. This is especially important given the uncertainty we all face. We should build a system that we’d all feel okay about, even if we draw the short straw.\n\nFor that reason, my current choice is **Principle 3: Maximizing the average with a floor constraint**. This way, we can still aim for a high average income, but only after making sure everyone has a decent minimum to live on. I think that’s the fairest and most reasonable approach for our situation.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "satisfaction": null
+    }
+  }
+}

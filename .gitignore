@@ -186,6 +186,3 @@ cython_debug/
 
 # Experiment results (archive important results separately)
 experiment_results/
-
-# Agent logs
-agentops.log

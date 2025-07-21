@@ -210,7 +210,7 @@ class ConfigManager:
                 # New game logic fields
                 income_distributions=income_distributions,
                 payout_ratio=config_data.get("payout_ratio", 0.0001),
-                individual_rounds=config_data.get("individual_rounds", 4),
+                # individual_rounds fixed at 4 per new_logic.md - parameter removed
                 enable_detailed_examples=config_data.get("enable_detailed_examples", True),
                 enable_secret_ballot=config_data.get("enable_secret_ballot", True)
             )

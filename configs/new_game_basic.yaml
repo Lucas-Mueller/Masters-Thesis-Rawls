@@ -7,7 +7,7 @@ experiment:
   timeout_seconds: 240
 
 # New game logic settings
-individual_rounds: 4
+individual_rounds: 4  # Configurable number of individual application rounds (default: 4)
 payout_ratio: 0.0001  # $1 per $10,000 earned
 enable_detailed_examples: true
 enable_secret_ballot: true

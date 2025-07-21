@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Dict, List, Optional, Any
 from pathlib import Path
 
-from ..core.models import ExperimentConfig, ConsensusResult, PrincipleChoice, PreferenceRanking, EconomicOutcome
+from ..core.models import ExperimentConfig, ConsensusResult, PrincipleChoice, PreferenceRanking, EconomicOutcome, AgentEarnings, EarningsUpdate
 
 
 class ExperimentLogger:
@@ -218,6 +218,114 @@ class ExperimentLogger:
         }
         
         self.agent_data[agent_id]["economic_outcomes"].append(outcome_data)
+    
+    def log_earnings_update(self, agent_id: str, earnings_update: EarningsUpdate):
+        """Log an earnings update for an agent."""
+        if agent_id not in self.agent_data:
+            return  # Agent not initialized
+        
+        # Ensure earnings_history exists
+        if "earnings_history" not in self.agent_data[agent_id]:
+            self.agent_data[agent_id]["earnings_history"] = []
+        
+        update_data = {
+            "round_type": earnings_update.round_type,
+            "round_number": earnings_update.round_number,
+            "payout_amount": earnings_update.payout_amount,
+            "cumulative_total": earnings_update.cumulative_total,
+            "timestamp": earnings_update.timestamp.isoformat(),
+            "context": earnings_update.context
+        }
+        
+        self.agent_data[agent_id]["earnings_history"].append(update_data)
+    
+    def log_agent_earnings_summary(self, earnings: AgentEarnings):
+        """Log complete earnings summary for an agent."""
+        agent_id = earnings.agent_id
+        
+        if agent_id not in self.agent_data:
+            return  # Agent not initialized
+        
+        # Create earnings summary
+        earnings_summary = {
+            "phase1_earnings": earnings.phase1_earnings,
+            "phase2_earnings": earnings.phase2_earnings,
+            "total_earnings": earnings.total_earnings,
+            "individual_round_payouts": earnings.individual_round_payouts,
+            "round_count": len(earnings.individual_round_payouts)
+        }
+        
+        self.agent_data[agent_id]["earnings_summary"] = earnings_summary
+        
+        # Also log all earnings history if not already present
+        if "earnings_history" not in self.agent_data[agent_id]:
+            self.agent_data[agent_id]["earnings_history"] = []
+            for update in earnings.earnings_history:
+                self.log_earnings_update(agent_id, update)
+    
+    def log_earnings_disclosure(self, agent_id: str, disclosure_point: str, disclosure_message: str):
+        """Log earnings disclosure sent to an agent."""
+        if agent_id not in self.agent_data:
+            return  # Agent not initialized
+        
+        # Ensure earnings_disclosures exists
+        if "earnings_disclosures" not in self.agent_data[agent_id]:
+            self.agent_data[agent_id]["earnings_disclosures"] = []
+        
+        disclosure_data = {
+            "disclosure_point": disclosure_point,
+            "message": disclosure_message,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        self.agent_data[agent_id]["earnings_disclosures"].append(disclosure_data)
+    
+    def log_detailed_examples_phase(self, timestamp: datetime, analysis: Dict):
+        """Log the detailed examples presentation phase."""
+        self.experiment_metadata["detailed_examples"] = {
+            "timestamp": timestamp.isoformat(),
+            "principle_outcomes_analysis": analysis,
+            "distributions_presented": len(self.config.income_distributions),
+            "enabled": True
+        }
+    
+    def log_first_assessment(self, ranking: PreferenceRanking):
+        """Log first assessment (after reading principles)."""
+        self._log_assessment_step("first", "after_reading_principles", ranking)
+
+    def log_second_assessment(self, ranking: PreferenceRanking):
+        """Log second assessment (after detailed examples)."""
+        self._log_assessment_step("second", "after_detailed_examples", ranking)
+
+    def log_third_assessment(self, ranking: PreferenceRanking):
+        """Log third assessment (after individual rounds)."""
+        self._log_assessment_step("third", "after_individual_rounds", ranking)
+
+    def _log_assessment_step(self, assessment_number: str, phase: str, ranking: PreferenceRanking):
+        """Generic method to log assessment steps."""
+        agent_id = ranking.agent_id
+        
+        if agent_id not in self.agent_data:
+            return  # Agent not initialized
+        
+        # Ensure assessments list exists
+        if "assessments" not in self.agent_data[agent_id]:
+            self.agent_data[agent_id]["assessments"] = []
+        
+        assessment_data = {
+            "assessment_number": assessment_number,
+            "phase": phase,
+            "timestamp": ranking.timestamp.isoformat(),
+            "agent_id": ranking.agent_id,
+            "rankings": ranking.rankings,
+            "certainty_level": ranking.certainty_level.value,
+            "reasoning": ranking.reasoning
+        }
+        
+        self.agent_data[agent_id]["assessments"].append(assessment_data)
+        
+        # Also log to regular preference rankings for backward compatibility
+        self.log_preference_ranking(ranking)
     
     def export_unified_json(self, output_dir: Optional[str] = None) -> str:
         """

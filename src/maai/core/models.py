@@ -194,6 +194,115 @@ class AgentMemory(BaseModel):
         return [entry.strategy_update for entry in self.memory_entries]
 
 
+# Phase 1 Memory Models
+class IndividualMemoryType(str, Enum):
+    """Types of individual memories generated in Phase 1."""
+    REFLECTION = "reflection"
+    LEARNING = "learning"
+    INTEGRATION = "integration"
+    CONSOLIDATION = "consolidation"
+
+
+class IndividualMemoryContent(BaseModel):
+    """Content structure for individual memory entries."""
+    situation_assessment: str = Field(..., description="Agent's assessment of the current Phase 1 situation")
+    reasoning_process: str = Field(..., description="Agent's internal reasoning process")
+    insights_gained: str = Field(..., description="Key insights or learnings from the experience")
+    confidence_level: float = Field(..., ge=0.0, le=1.0, description="Agent's confidence in their understanding (0.0-1.0)")
+    strategic_implications: Optional[str] = Field(None, description="How this affects strategy for group phase")
+    preference_evolution: Optional[str] = Field(None, description="How preferences have evolved")
+
+
+class IndividualMemoryEntry(BaseModel):
+    """Represents a Phase 1 individual memory entry for an agent."""
+    memory_id: str = Field(..., description="Unique identifier for this memory entry")
+    agent_id: str = Field(..., description="Agent identifier")
+    phase: str = Field(default="individual", description="Phase when memory was created")
+    memory_type: IndividualMemoryType = Field(..., description="Type of individual memory")
+    content: IndividualMemoryContent = Field(..., description="Memory content")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Memory creation timestamp")
+    activity_context: str = Field(..., description="Phase 1 activity context (e.g., 'initial_ranking', 'detailed_examples', 'individual_round_3')")
+    round_context: Optional[int] = Field(None, description="Individual round number if applicable")
+
+
+class IndividualReflectionContext(BaseModel):
+    """Context for generating individual reflection memories."""
+    activity: str = Field(..., description="Current Phase 1 activity")
+    data: Dict[str, Any] = Field(default_factory=dict, description="Relevant data for reflection")
+    reasoning_prompt: str = Field(..., description="Specific question to guide reflection")
+
+
+class LearningContext(BaseModel):
+    """Context for generating learning accumulation memories."""
+    principle_id: Optional[int] = Field(None, description="Principle being learned about")
+    learning_stage: str = Field(..., description="Stage of learning (examples, application, etc.)")
+    previous_understanding: Optional[str] = Field(None, description="Previous understanding to build on")
+    new_information: str = Field(..., description="New information to integrate")
+
+
+class Phase1ExperienceData(BaseModel):
+    """Data for integrating Phase 1 experiences into memory."""
+    round_number: Optional[int] = Field(None, description="Individual round number if applicable")
+    principle_choice: Optional[PrincipleChoice] = Field(None, description="Principle choice made")
+    economic_outcome: Optional[EconomicOutcome] = Field(None, description="Economic outcome received")
+    examples_shown: Optional[List[Dict[str, Any]]] = Field(None, description="Examples shown to agent")
+    reflection_prompt: str = Field(..., description="Reflection question to guide experience integration")
+
+
+class ConsolidatedMemory(BaseModel):
+    """Summary of Phase 1 memories for Phase 2 context."""
+    agent_id: str = Field(..., description="Agent identifier")
+    consolidated_insights: str = Field(..., description="Key insights from Phase 1")
+    strategic_preferences: str = Field(..., description="Strategic preferences developed")
+    economic_learnings: str = Field(..., description="Learnings from economic outcomes")
+    confidence_summary: str = Field(..., description="Summary of confidence evolution")
+    principle_understanding: str = Field(..., description="Understanding of principles developed")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Consolidation timestamp")
+
+
+class EnhancedAgentMemory(BaseModel):
+    """Extended memory system supporting both Phase 1 and Phase 2 memories."""
+    agent_id: str = Field(..., description="Unique identifier for the agent")
+    # Phase 2 (group) memories
+    memory_entries: List[MemoryEntry] = Field(default_factory=list, description="Phase 2 deliberation memory entries")
+    # Phase 1 (individual) memories
+    individual_memories: List[IndividualMemoryEntry] = Field(default_factory=list, description="Phase 1 individual memory entries")
+    # Phase transition
+    consolidated_memory: Optional[ConsolidatedMemory] = Field(None, description="Consolidated Phase 1 memory for Phase 2")
+    
+    def add_memory(self, entry: MemoryEntry):
+        """Add a Phase 2 memory entry."""
+        self.memory_entries.append(entry)
+    
+    def add_individual_memory(self, entry: IndividualMemoryEntry):
+        """Add a Phase 1 individual memory entry."""
+        self.individual_memories.append(entry)
+    
+    def get_latest_memory(self) -> Optional[MemoryEntry]:
+        """Get the most recent Phase 2 memory entry."""
+        return self.memory_entries[-1] if self.memory_entries else None
+    
+    def get_latest_individual_memory(self) -> Optional[IndividualMemoryEntry]:
+        """Get the most recent Phase 1 memory entry."""
+        return self.individual_memories[-1] if self.individual_memories else None
+    
+    def get_strategy_evolution(self) -> List[str]:
+        """Get the evolution of strategies over Phase 2."""
+        return [entry.strategy_update for entry in self.memory_entries]
+    
+    def get_individual_insights(self) -> List[str]:
+        """Get insights from Phase 1 experiences."""
+        return [entry.content.insights_gained for entry in self.individual_memories]
+    
+    def has_individual_memories(self) -> bool:
+        """Check if agent has any Phase 1 memories."""
+        return len(self.individual_memories) > 0
+    
+    def get_memories_by_activity(self, activity: str) -> List[IndividualMemoryEntry]:
+        """Get individual memories for a specific Phase 1 activity."""
+        return [entry for entry in self.individual_memories if entry.activity_context == activity]
+
+
 class DeliberationResponse(BaseModel):
     """Represents a single agent's response during deliberation."""
     agent_id: str = Field(..., description="Unique identifier for the agent")
@@ -204,6 +313,82 @@ class DeliberationResponse(BaseModel):
     round_number: int = Field(..., ge=0, description="Current deliberation round (0 for initial evaluation)")
     timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
     speaking_position: int = Field(default=0, description="Position in speaking order (0 for initial eval, 1+ for rounds)")
+
+
+# Earnings Tracking Models
+class EarningsUpdate(BaseModel):
+    """Record of a single earnings update."""
+    round_type: str = Field(..., description="Type of round: 'individual_round' | 'group_outcome'")
+    round_number: Optional[int] = Field(None, description="Round number if applicable")
+    payout_amount: float = Field(..., description="Payout amount for this update")
+    cumulative_total: float = Field(..., description="Cumulative total after this update")
+    timestamp: datetime = Field(default_factory=datetime.now, description="Update timestamp")
+    context: str = Field(..., description="Description of what earned this payout")
+
+
+class AgentEarnings(BaseModel):
+    """Track cumulative earnings for an agent throughout the experiment."""
+    agent_id: str = Field(..., description="Agent identifier")
+    phase1_earnings: float = Field(default=0.0, description="Total earnings from Phase 1 individual rounds")
+    phase2_earnings: float = Field(default=0.0, description="Total earnings from Phase 2 group outcome")
+    individual_round_payouts: List[float] = Field(default_factory=list, description="Individual payout amounts from each round")
+    total_earnings: float = Field(default=0.0, description="Total earnings across all phases")
+    earnings_history: List[EarningsUpdate] = Field(default_factory=list, description="Chronological history of all earnings updates")
+    
+    def add_individual_round_payout(self, payout: float, round_num: int, context: str = ""):
+        """Add payout from an individual round."""
+        self.individual_round_payouts.append(payout)
+        self.phase1_earnings += payout
+        self.total_earnings += payout
+        
+        update = EarningsUpdate(
+            round_type="individual_round",
+            round_number=round_num,
+            payout_amount=payout,
+            cumulative_total=self.total_earnings,
+            context=context or f"Individual round {round_num} payout"
+        )
+        self.earnings_history.append(update)
+    
+    def add_group_payout(self, payout: float, context: str = ""):
+        """Add payout from group outcome."""
+        self.phase2_earnings += payout
+        self.total_earnings += payout
+        
+        update = EarningsUpdate(
+            round_type="group_outcome",
+            round_number=None,
+            payout_amount=payout,
+            cumulative_total=self.total_earnings,
+            context=context or "Group decision outcome payout"
+        )
+        self.earnings_history.append(update)
+
+
+class EarningsContext(BaseModel):
+    """Context for earnings disclosure to agents."""
+    agent_id: str = Field(..., description="Agent identifier")
+    current_total: float = Field(..., description="Current total earnings")
+    phase1_total: float = Field(..., description="Total Phase 1 earnings")
+    phase2_total: float = Field(..., description="Total Phase 2 earnings")
+    round_count: int = Field(..., description="Number of rounds completed")
+    potential_range: Dict[str, float] = Field(..., description="Potential earnings range (min/max)")
+    performance_percentile: Optional[float] = Field(None, description="Performance percentile among all agents")
+
+
+class EarningsTrackingConfig(BaseModel):
+    """Configuration for earnings tracking and disclosure."""
+    enabled: bool = Field(default=True, description="Enable earnings tracking")
+    disclosure_points: List[str] = Field(
+        default=["after_round_2", "end_phase1", "after_group", "experiment_end"],
+        description="When to disclose earnings to agents"
+    )
+    disclosure_style: str = Field(default="motivational", description="Style of earnings disclosure: 'minimal' | 'standard' | 'motivational' | 'detailed'")
+    show_performance_context: bool = Field(default=True, description="Include comparative performance information")
+    show_potential_ranges: bool = Field(default=True, description="Show min/max possible earnings")
+    include_phase_breakdown: bool = Field(default=True, description="Separate Phase 1 vs Phase 2 reporting")
+    congratulatory_threshold: float = Field(default=0.75, description="Performance percentile for congratulatory messaging")
+    encouragement_threshold: float = Field(default=0.25, description="Performance percentile for encouragement messaging")
 
 
 class ConsensusResult(BaseModel):
@@ -236,6 +421,16 @@ class ExperimentConfig(BaseModel):
     individual_rounds: int = Field(default=4, ge=1, description="Number of individual application rounds in Phase 1")
     enable_detailed_examples: bool = Field(default=True, description="Enable detailed income distribution examples")
     enable_secret_ballot: bool = Field(default=True, description="Enable secret ballot voting in Phase 2")
+    
+    # Phase 1 Memory Configuration
+    enable_phase1_memory: bool = Field(default=True, description="Enable Phase 1 individual memory generation")
+    phase1_memory_frequency: str = Field(default="each_activity", description="Phase 1 memory generation frequency: 'each_activity'|'each_round'|'phase_end'")
+    phase1_consolidation_strategy: str = Field(default="summary", description="Phase 1 memory consolidation strategy: 'summary'|'detailed'|'key_insights'")
+    phase1_memory_integration: bool = Field(default=True, description="Include Phase 1 memories in Phase 2 context")
+    phase1_reflection_depth: str = Field(default="standard", description="Depth of Phase 1 reflections: 'brief'|'standard'|'detailed'")
+    
+    # Earnings Tracking Configuration
+    earnings_tracking: EarningsTrackingConfig = Field(default_factory=EarningsTrackingConfig, description="Earnings tracking configuration")
     
     @property
     def num_agents(self) -> int:
@@ -296,6 +491,9 @@ class ExperimentResults(BaseModel):
     performance_metrics: PerformanceMetrics = Field(..., description="Performance data")
     start_time: datetime = Field(default_factory=datetime.now, description="Experiment start time")
     end_time: Optional[datetime] = Field(None, description="Experiment end time")
+    # Earnings tracking
+    agent_earnings: List[AgentEarnings] = Field(default_factory=list, description="Earnings tracking for all agents")
+    earnings_disclosures: Dict[str, List[str]] = Field(default_factory=dict, description="Earnings disclosures sent to each agent")
 
 
 # Principle definitions for easy reference

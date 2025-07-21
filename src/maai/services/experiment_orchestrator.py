@@ -20,7 +20,10 @@ from ..core.models import (
     PreferenceRanking,
     EconomicOutcome,
     IncomeDistribution,
-    get_principle_by_id
+    get_principle_by_id,
+    IndividualReflectionContext,
+    LearningContext,
+    Phase1ExperienceData
 )
 from ..agents.enhanced import DeliberationAgent, create_deliberation_agents, create_discussion_moderator
 from .consensus_service import ConsensusService
@@ -32,6 +35,8 @@ from .public_history_service import PublicHistoryService
 from .economics_service import EconomicsService
 from .preference_service import PreferenceService
 from .validation_service import ValidationService
+from .detailed_examples_service import DetailedExamplesService
+from .earnings_tracking_service import EarningsTrackingService
 
 
 class ExperimentOrchestrator:
@@ -93,6 +98,8 @@ class ExperimentOrchestrator:
         self.economics_service: Optional[EconomicsService] = None
         self.preference_service: Optional[PreferenceService] = None
         self.validation_service: Optional[ValidationService] = None
+        self.detailed_examples_service: Optional[DetailedExamplesService] = None
+        self.earnings_tracking_service: Optional[EarningsTrackingService] = None
         
         # Experiment logger (initialized when experiment starts)
         self.logger: Optional[ExperimentLogger] = None
@@ -133,16 +140,26 @@ class ExperimentOrchestrator:
         )
         self.preference_service = self._preference_service or PreferenceService()
         self.validation_service = self._validation_service or ValidationService()
+        self.detailed_examples_service = DetailedExamplesService(self.economics_service)
+        self.earnings_tracking_service = EarningsTrackingService(
+            config.payout_ratio, 
+            config.earnings_tracking, 
+            config.income_distributions
+        )
         
         # Update services with logger and public history service
         self.conversation_service.logger = self.logger
         self.conversation_service.public_history_service = self.public_history_service
         self.memory_service.logger = self.logger
+        self.earnings_tracking_service.logger = self.logger
+        
+        # Configure Phase 1 memory settings
+        self.memory_service.enable_phase1_memory = config.enable_phase1_memory
         
         print(f"\n=== Starting New Game Logic Experiment ===")
         print(f"Experiment ID: {config.experiment_id}")
         print(f"Agents: {config.num_agents}")
-        print(f"Individual Rounds: {config.individual_rounds}")
+        print(f"Individual Rounds: 4 (fixed per new_logic.md)")
         print(f"Group Deliberation Max Rounds: {config.max_rounds}")
         print(f"Income Distributions: {len(config.income_distributions)}")
         print(f"Payout Ratio: ${config.payout_ratio:.4f} per $1")
@@ -157,11 +174,16 @@ class ExperimentOrchestrator:
             # Step 1: Initial preference ranking
             await self._collect_initial_preference_ranking()
             
-            # Step 2: Individual principle application rounds
+            # Step 1.5: Present detailed examples (if enabled)
+            if getattr(config, 'enable_detailed_examples', True):
+                await self._present_detailed_examples()
+                # Step 1.6: Second Assessment - Post-examples preference ranking
+                await self._collect_post_examples_preference_ranking()
+            
+            # Step 2: Individual principle application rounds  
             await self._run_individual_application_rounds()
             
-            # Step 3: Post-individual preference ranking
-            await self._collect_post_individual_ranking()
+            # Step 3: Third Assessment - Post-individual preference ranking (moved to end of individual rounds)
             
             # PHASE 2: Group Experiment
             print(f"\n=== PHASE 2: Group Experiment ===")
@@ -179,6 +201,9 @@ class ExperimentOrchestrator:
             # Step 7: Final preference ranking
             await self._collect_final_preference_ranking(consensus_result)
             
+            # Final earnings disclosure
+            await self._final_earnings_disclosure()
+            
             # Finalize results
             results = self._finalize_results(consensus_result)
             
@@ -187,7 +212,7 @@ class ExperimentOrchestrator:
             if consensus_result.unanimous:
                 principle = get_principle_by_id(consensus_result.agreed_principle.principle_id)
                 print(f"Agreed principle: {principle['name']}")
-            print(f"Individual rounds completed: {config.individual_rounds}")
+            print(f"Individual rounds completed: {self.config.individual_rounds}")
             print(f"Total economic outcomes: {len(self.economic_outcomes)}")
             
             # Phase 8: Log final data and export unified JSON file
@@ -417,6 +442,20 @@ class ExperimentOrchestrator:
         if self.public_history_service:
             round_summaries = self.public_history_service.get_round_summaries()
         
+        # Get earnings data
+        agent_earnings_list = []
+        earnings_disclosures = {}
+        if self.earnings_tracking_service:
+            agent_earnings_dict = self.earnings_tracking_service.get_all_agent_earnings()
+            agent_earnings_list = list(agent_earnings_dict.values())
+            
+            for agent_id in agent_earnings_dict.keys():
+                earnings_disclosures[agent_id] = self.earnings_tracking_service.get_disclosure_history(agent_id)
+            
+            # Log final earnings summaries to experiment logger
+            for earnings in agent_earnings_list:
+                self.logger.log_agent_earnings_summary(earnings)
+        
         results = ExperimentResults(
             experiment_id=self.config.experiment_id,
             configuration=self.config,
@@ -430,7 +469,9 @@ class ExperimentOrchestrator:
             feedback_responses=self.feedback_responses,
             performance_metrics=self.performance_metrics,
             start_time=self.start_time,
-            end_time=end_time
+            end_time=end_time,
+            agent_earnings=agent_earnings_list,
+            earnings_disclosures=earnings_disclosures
         )
         
         return results
@@ -493,20 +534,89 @@ class ExperimentOrchestrator:
         
         # Log to experiment logger
         for ranking in self.initial_preference_rankings:
-            self.logger.log_preference_ranking(ranking)
+            self.logger.log_first_assessment(ranking)
+        
+        # Generate Phase 1 memory: Initial reflection
+        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "each_round"]:
+            print("Generating initial reflection memories...")
+            for agent in self.agents:
+                # Find this agent's ranking
+                agent_ranking = next((r for r in self.initial_preference_rankings if r.agent_id == agent.agent_id), None)
+                if agent_ranking:
+                    reflection_context = IndividualReflectionContext(
+                        activity="initial_ranking",
+                        data={"rankings": agent_ranking.rankings, "certainty": agent_ranking.certainty_level.value},
+                        reasoning_prompt="Why did you rank the four distributive justice principles in this order? What factors influenced your initial assessment?"
+                    )
+                    await self.memory_service.generate_individual_reflection(agent, reflection_context)
+    
+    async def _present_detailed_examples(self):
+        """Present detailed examples showing principle outcome mappings."""
+        print("\n--- Phase 1.2: Detailed Examples ---")
+        print("Presenting detailed examples of principle outcomes to agents...")
+        
+        await self.detailed_examples_service.present_detailed_examples(self.agents)
+        
+        print(f"Detailed examples presented to {len(self.agents)} agents")
+        
+        # Log to experiment logger
+        if self.logger:
+            analysis = self.economics_service.analyze_all_principle_outcomes()
+            self.logger.log_detailed_examples_phase(
+                timestamp=datetime.now(),
+                analysis=analysis
+            )
+        
+        # Generate Phase 1 memory: Learning from examples
+        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "each_round"]:
+            print("Generating learning memories from detailed examples...")
+            for agent in self.agents:
+                # Get the analysis for learning context
+                principle_analysis = self.economics_service.analyze_all_principle_outcomes()
+                examples_summary = f"Saw {len(self.config.income_distributions)} income distribution scenarios across 4 principles"
+                
+                learning_context = LearningContext(
+                    learning_stage="detailed_examples",
+                    new_information=f"Detailed examples showing how each principle maps to specific income distributions. {examples_summary}",
+                    previous_understanding="Initial rankings based on principle descriptions only"
+                )
+                await self.memory_service.update_individual_learning(agent, learning_context)
+    
+    async def _collect_post_examples_preference_ranking(self):
+        """Collect preference rankings after detailed examples (Second Assessment)."""
+        print("\n--- Phase 1.2.1: Second Assessment (After Detailed Examples) ---")
+        
+        post_examples_rankings = await self.preference_service.collect_batch_preference_rankings(
+            self.agents, 
+            "post_examples", 
+            "Now that you have seen detailed examples of how each principle maps to specific income distributions, please rank the principles again."
+        )
+        
+        print(f"Collected post-examples rankings from {len(post_examples_rankings)} agents")
+        
+        # Store and log rankings
+        for ranking in post_examples_rankings:
+            self.logger.log_second_assessment(ranking)
     
     async def _run_individual_application_rounds(self):
-        """Run individual principle application rounds with economic outcomes."""
-        print(f"\n--- Phase 1.2: Individual Application Rounds ({self.config.individual_rounds} rounds) ---")
+        """Run configurable number of individual principle application rounds with economic outcomes."""
+        rounds_count = self.config.individual_rounds
+        print(f"\n--- Phase 1.3: Individual Application Rounds ({rounds_count} rounds) ---")
         
-        for round_num in range(1, self.config.individual_rounds + 1):
-            print(f"\n  Round {round_num}/{self.config.individual_rounds}")
+        for round_num in range(1, rounds_count + 1):  # Use configurable count
+            print(f"\n  Round {round_num}/{rounds_count}")
             
             # For each agent, let them choose a principle and apply it
             for agent in self.agents:
                 await self._run_individual_round_for_agent(agent, round_num)
         
-        print(f"Completed {self.config.individual_rounds} individual rounds with {len(self.economic_outcomes)} total outcomes")
+        print(f"Completed {rounds_count} individual rounds with {len(self.economic_outcomes)} total outcomes")
+        
+        # Step 3: Third Assessment - Post-individual preference ranking
+        await self._collect_post_individual_preference_ranking()
+        
+        # End of Phase 1 earnings disclosure
+        await self._phase1_end_earnings_disclosure()
     
     async def _run_individual_round_for_agent(self, agent, round_num):
         """Run a single individual round for one agent."""
@@ -571,10 +681,32 @@ Format: "I choose principle [number] [with constraint $X if applicable] because 
         # Store the outcome
         self.economic_outcomes.append(economic_outcome)
         
+        # Track earnings for this agent
+        context_description = f"Round {round_num}: {principle_choice.principle_name}, {economic_outcome.assigned_income_class.value} class, ${economic_outcome.actual_income:,}"
+        self.earnings_tracking_service.add_individual_round_payout(
+            agent.agent_id, 
+            economic_outcome.payout_amount, 
+            round_num, 
+            context_description
+        )
+        
         print(f"    {agent.name}: Principle {principle_choice.principle_id} -> {economic_outcome.assigned_income_class.value} class (${economic_outcome.actual_income:,}, payout: ${economic_outcome.payout_amount:.2f})")
+        
+        # Check for strategic earnings disclosure
+        await self._check_earnings_disclosure(agent, round_num)
         
         # Log to experiment logger
         self.logger.log_economic_outcome(economic_outcome)
+        
+        # Generate Phase 1 memory: Experience integration
+        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "each_round"]:
+            experience_data = Phase1ExperienceData(
+                round_number=round_num,
+                principle_choice=principle_choice,
+                economic_outcome=economic_outcome,
+                reflection_prompt=f"What did you learn from Round {round_num}? How did the economic outcome (${economic_outcome.actual_income:,} as {economic_outcome.assigned_income_class.value}) affect your thinking about distributive justice principles?"
+            )
+            await self.memory_service.integrate_phase1_experience(agent, experience_data)
     
     async def _parse_individual_principle_choice(self, response_text, agent_id):
         """Parse agent's individual principle choice from response text."""
@@ -621,13 +753,14 @@ Format: "I choose principle [number] [with constraint $X if applicable] because 
             range_constraint=range_constraint
         )
     
-    async def _collect_post_individual_ranking(self):
-        """Collect preference rankings after individual rounds."""
-        print("\n--- Phase 1.3: Post-Individual Preference Ranking ---")
+    async def _collect_post_individual_preference_ranking(self):
+        """Collect preference rankings after individual rounds (Third Assessment)."""
+        print("\n--- Phase 1.3.1: Third Assessment (After Individual Application) ---")
         
-        context = f"""You have now completed {self.config.individual_rounds} individual rounds where you applied different principles and received economic outcomes.
+        rounds_count = self.config.individual_rounds
+        context = f"""You have now completed {rounds_count} individual rounds where you applied different principles and received economic outcomes.
 
-Based on your experience with the economic consequences of each principle, please rank the 4 distributive justice principles again."""
+Based on your actual experience with applying principles and receiving economic rewards, please rank the 4 distributive justice principles again."""
         
         self.post_individual_rankings = await self.preference_service.collect_batch_preference_rankings(
             self.agents, "post_individual", context
@@ -637,10 +770,42 @@ Based on your experience with the economic consequences of each principle, pleas
         
         # Log to experiment logger
         for ranking in self.post_individual_rankings:
-            self.logger.log_preference_ranking(ranking)
+            self.logger.log_third_assessment(ranking)
+        
+        # Generate Phase 1 memory: Final reflection
+        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "phase_end"]:
+            print("Generating post-individual reflection memories...")
+            for agent in self.agents:
+                # Find this agent's ranking
+                agent_ranking = next((r for r in self.post_individual_rankings if r.agent_id == agent.agent_id), None)
+                if agent_ranking:
+                    # Get agent's economic outcomes for context
+                    agent_outcomes = [outcome for outcome in self.economic_outcomes if outcome.agent_id == agent.agent_id]
+                    outcomes_summary = f"Completed {len(agent_outcomes)} individual rounds with varied economic outcomes"
+                    
+                    reflection_context = IndividualReflectionContext(
+                        activity="post_individual_ranking",
+                        data={
+                            "new_rankings": agent_ranking.rankings, 
+                            "certainty": agent_ranking.certainty_level.value,
+                            "economic_experiences": outcomes_summary
+                        },
+                        reasoning_prompt=f"How has your experience with {rounds_count} individual rounds and actual economic outcomes changed your ranking of the distributive justice principles? What insights did you gain?"
+                    )
+                    await self.memory_service.generate_individual_reflection(agent, reflection_context)
     
     async def _run_group_deliberation(self):
         """Run group deliberation phase (similar to existing system)."""
+        print(f"\n--- Phase 1 to Phase 2 Transition: Memory Consolidation ---")
+        
+        # Consolidate Phase 1 memories before starting group deliberation
+        if self.config.enable_phase1_memory and self.config.phase1_memory_integration:
+            print("Consolidating individual phase memories...")
+            for agent in self.agents:
+                consolidated_memory = await self.memory_service.consolidate_phase1_memories(agent.agent_id)
+                if consolidated_memory:
+                    print(f"  {agent.name}: Consolidated {len(self.memory_service.get_agent_memory(agent.agent_id).individual_memories)} individual memories")
+        
         print(f"\n--- Phase 2.1: Group Deliberation (max {self.config.max_rounds} rounds) ---")
         
         # This reuses the existing deliberation system but with updated context
@@ -749,10 +914,26 @@ Format your response as: "I vote for principle [number] [with constraint $X if a
                 )
             
             self.economic_outcomes.append(economic_outcome)
+            
+            # Track group earnings
+            if consensus_result.unanimous:
+                context_description = f"Group decision: {principle_choice.principle_name}, {economic_outcome.assigned_income_class.value} class, ${economic_outcome.actual_income:,}"
+            else:
+                context_description = f"Random assignment: {economic_outcome.assigned_income_class.value} class, ${economic_outcome.actual_income:,}"
+            
+            self.earnings_tracking_service.add_group_payout(
+                agent.agent_id,
+                economic_outcome.payout_amount,
+                context_description
+            )
+            
             print(f"  {agent.name}: {economic_outcome.assigned_income_class.value} class (${economic_outcome.actual_income:,}, payout: ${economic_outcome.payout_amount:.2f})")
             
             # Log to experiment logger
             self.logger.log_economic_outcome(economic_outcome)
+        
+        # After-group earnings disclosure
+        await self._after_group_earnings_disclosure(consensus_result)
     
     async def _collect_final_preference_ranking(self, consensus_result):
         """Collect final preference rankings after group experiment."""
@@ -799,3 +980,68 @@ Please provide your final ranking of all 4 distributive justice principles based
         # Reset services
         self.memory_service.clear_all_memories()
         self.conversation_service.speaking_orders = []
+    
+    async def _check_earnings_disclosure(self, agent, round_num):
+        """Check if earnings should be disclosed at this point."""
+        if not self.earnings_tracking_service or not self.earnings_tracking_service.config.enabled:
+            return
+        
+        # After round 2 disclosure
+        if round_num == 2 and self.earnings_tracking_service.should_disclose_at_point("after_round_2"):
+            await self._send_earnings_disclosure(agent, "after_round_2")
+    
+    async def _phase1_end_earnings_disclosure(self):
+        """Send Phase 1 end earnings disclosure to all agents."""
+        if not self.earnings_tracking_service or not self.earnings_tracking_service.should_disclose_at_point("end_phase1"):
+            return
+        
+        print("\n--- Phase 1 Earnings Summary ---")
+        for agent in self.agents:
+            await self._send_earnings_disclosure(agent, "end_phase1")
+    
+    async def _send_earnings_disclosure(self, agent, disclosure_point):
+        """Send earnings disclosure to an agent."""
+        from agents import Runner, ItemHelpers
+        
+        # Get earnings context
+        context = self.earnings_tracking_service.get_earnings_summary(agent.agent_id)
+        
+        # Generate disclosure message
+        disclosure_message = await self.earnings_tracking_service.generate_earnings_disclosure(
+            agent, context, disclosure_point
+        )
+        
+        if disclosure_message:
+            print(f"  Earnings disclosure to {agent.name}: {disclosure_message}")
+            
+            # Send disclosure message to agent
+            prompt = f"""EARNINGS UPDATE:
+
+{disclosure_message}
+
+Please acknowledge that you have received this earnings information with a brief response."""
+            
+            try:
+                result = await Runner.run(agent, prompt)
+                response_text = ItemHelpers.text_message_outputs(result.new_items)
+                print(f"    {agent.name} acknowledged: {response_text[:100]}...")
+            except Exception as e:
+                print(f"    Error sending earnings disclosure to {agent.name}: {e}")
+    
+    async def _after_group_earnings_disclosure(self, consensus_result):
+        """Send after-group earnings disclosure to all agents."""
+        if not self.earnings_tracking_service or not self.earnings_tracking_service.should_disclose_at_point("after_group"):
+            return
+        
+        print("\n--- Group Outcome Earnings Summary ---")
+        for agent in self.agents:
+            await self._send_earnings_disclosure(agent, "after_group")
+    
+    async def _final_earnings_disclosure(self):
+        """Send final experiment earnings disclosure to all agents."""
+        if not self.earnings_tracking_service or not self.earnings_tracking_service.should_disclose_at_point("experiment_end"):
+            return
+        
+        print("\n--- Final Earnings Summary ---")
+        for agent in self.agents:
+            await self._send_earnings_disclosure(agent, "experiment_end")

@@ -1,0 +1,80 @@
+experiment_id: earnings_tracking_example
+global_temperature: 0.1
+
+experiment:
+  max_rounds: 5
+  decision_rule: unanimity
+  timeout_seconds: 300
+
+# New game logic configuration
+individual_rounds: 4
+payout_ratio: 0.0001
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Phase 1 Memory Configuration
+enable_phase1_memory: true
+phase1_memory_frequency: "each_activity"
+phase1_consolidation_strategy: "summary"
+phase1_memory_integration: true
+phase1_reflection_depth: "standard"
+
+# Earnings Tracking Configuration (NEW!)
+earnings_tracking:
+  enabled: true
+  disclosure_points:
+    - "after_round_2"      # Show running total after 2nd individual round
+    - "end_phase1"         # Phase 1 summary before group deliberation
+    - "after_group"        # Group outcome with running total
+    - "experiment_end"     # Final comprehensive summary
+  
+  disclosure_style: "motivational"  # "minimal" | "standard" | "motivational" | "detailed"
+  show_performance_context: true    # Include comparative performance information
+  show_potential_ranges: true       # Show min/max possible earnings
+  include_phase_breakdown: true     # Separate Phase 1 vs Phase 2 reporting
+  
+  # Performance messaging thresholds
+  congratulatory_threshold: 0.75  # Performance percentile for congratulatory messaging
+  encouragement_threshold: 0.25   # Performance percentile for encouragement messaging
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution A"
+    income_by_class:
+      HIGH: 50000
+      MEDIUM_HIGH: 40000
+      MEDIUM: 30000
+      MEDIUM_LOW: 20000
+      LOW: 10000
+  - distribution_id: 2
+    name: "Distribution B"
+    income_by_class:
+      HIGH: 45000
+      MEDIUM_HIGH: 35000
+      MEDIUM: 25000
+      MEDIUM_LOW: 18000
+      LOW: 12000
+
+# Enhanced memory strategy that leverages Phase 1 experiences
+memory_strategy: "phase_aware_decomposed"
+
+agents:
+  - name: "Economist"
+    model: "gpt-4.1-mini"
+    personality: "You are an economist focused on efficiency and optimal resource allocation."
+  - name: "Philosopher"
+    model: "gpt-4.1-mini"
+    personality: "You are a philosopher concerned with justice and fairness for all members of society."
+  - name: "Pragmatist"
+    model: "gpt-4.1-mini"
+    personality: "You are a pragmatist focused on practical outcomes and real-world implementation."
+
+defaults:
+  personality: "You are an agent participating in an economic experiment."
+  model: "gpt-4.1-mini"
+  temperature: 0.1
+
+output:
+  directory: experiment_results
+  formats: [json]

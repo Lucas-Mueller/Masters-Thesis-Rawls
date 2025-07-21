@@ -23,6 +23,31 @@ defaults:
   personality: "You are an agent tasked to design a future society."
   model: "gpt-4.1-nano"
 
+# New game logic settings
+individual_rounds: 4  # Configurable number of individual application rounds
+payout_ratio: 0.0001  # $1 per $10,000 earned
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution A"
+    income_by_class:
+      High: 50000
+      Medium high: 40000
+      Medium: 30000
+      Medium low: 20000
+      Low: 10000
+  - distribution_id: 2
+    name: "Distribution B"
+    income_by_class:
+      High: 45000
+      Medium high: 35000
+      Medium: 25000
+      Medium low: 18000
+      Low: 12000
+
 output:
   directory: experiment_results
   formats:

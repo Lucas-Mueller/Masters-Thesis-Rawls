@@ -1,0 +1,236 @@
+{
+  "experiment_metadata": {
+    "experiment_id": "systematic_015_gpt_4.1_mini_1_polish_student",
+    "start_time": "2025-07-20T21:05:01.161063",
+    "end_time": "2025-07-20T21:06:29.266680",
+    "total_duration_seconds": 88.105617,
+    "max_rounds": 6,
+    "decision_rule": "unanimity",
+    "final_consensus": {
+      "agreement_reached": true,
+      "agreed_principle": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "total_messages": 3
+    },
+    "detailed_examples": {
+      "timestamp": "2025-07-20T21:05:20.906918",
+      "principle_outcomes_analysis": {
+        "principle_1": {
+          "selected_distribution": {
+            "distribution_id": 4,
+            "name": "Distribution 4",
+            "income_by_class": {
+              "High": 21000,
+              "Low": 15000,
+              "Medium": 19000,
+              "Medium high": 20000,
+              "Medium low": 16000
+            }
+          },
+          "reasoning": "Maximizes minimum income across all classes"
+        },
+        "principle_2": {
+          "selected_distribution": {
+            "distribution_id": 1,
+            "name": "Distribution 1",
+            "income_by_class": {
+              "High": 32000,
+              "Low": 12000,
+              "Medium": 24000,
+              "Medium high": 27000,
+              "Medium low": 13000
+            }
+          },
+          "reasoning": "Maximizes average income across all classes"
+        },
+        "principle_3": {
+          "<=$12,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Distribution 1",
+              "income_by_class": {
+                "High": 32000,
+                "Low": 12000,
+                "Medium": 24000,
+                "Medium high": 27000,
+                "Medium low": 13000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $12,000"
+          },
+          "<=$13,000": {
+            "selected_distribution": {
+              "distribution_id": 3,
+              "name": "Distribution 3",
+              "income_by_class": {
+                "High": 31000,
+                "Low": 14000,
+                "Medium": 21000,
+                "Medium high": 24000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $13,000"
+          },
+          "<=$14,000": {
+            "selected_distribution": {
+              "distribution_id": 3,
+              "name": "Distribution 3",
+              "income_by_class": {
+                "High": 31000,
+                "Low": 14000,
+                "Medium": 21000,
+                "Medium high": 24000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $14,000"
+          },
+          "<=$15,000": {
+            "selected_distribution": {
+              "distribution_id": 4,
+              "name": "Distribution 4",
+              "income_by_class": {
+                "High": 21000,
+                "Low": 15000,
+                "Medium": 19000,
+                "Medium high": 20000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $15,000"
+          }
+        },
+        "principle_4": {
+          ">=$20,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Distribution 1",
+              "income_by_class": {
+                "High": 32000,
+                "Low": 12000,
+                "Medium": 24000,
+                "Medium high": 27000,
+                "Medium low": 13000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $20,000"
+          },
+          ">=$17,000": {
+            "selected_distribution": {
+              "distribution_id": 3,
+              "name": "Distribution 3",
+              "income_by_class": {
+                "High": 31000,
+                "Low": 14000,
+                "Medium": 21000,
+                "Medium high": 24000,
+                "Medium low": 16000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $17,000"
+          },
+          ">=$15,000": {
+            "selected_distribution": {
+              "distribution_id": 2,
+              "name": "Distribution 2",
+              "income_by_class": {
+                "High": 28000,
+                "Low": 13000,
+                "Medium": 20000,
+                "Medium high": 22000,
+                "Medium low": 17000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $15,000"
+          }
+        }
+      },
+      "distributions_presented": 4,
+      "enabled": true
+    }
+  },
+  "Agent_1_polish_student": {
+    "overall": {
+      "model": "gpt-4.1-mini",
+      "persona": "You are a Polish college student participating in an economic experiment about distributive justice principles. You will receive real monetary payouts based on your income class assignment after the group chooses a principle.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 1.0
+    },
+    "round_1": {
+      "speaking_order": 1,
+      "memory": "No recent conversation to summarize.",
+      "strategy": "Next round, I would address the group as a whole but focus on persuading those who might prioritize fairness over total wealth. My exact argument would be:\n\n\"I suggest we choose the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT, setting a reasonable minimum income level that protects the poorest while still allowing overall income growth. This balances fairness and efficiency. By guaranteeing a safety net, we ensure no one falls below a livable income, which addresses concerns about extreme inequality, but we also incentivize productivity and prosperity, maintaining growth for everyone.\"\n\nThis message frames the choice as a compromise that directly tackles worries about poverty and inequality while appealing to those interested in maximizing societal wealth.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: Next round, I would address the group as a whole but focus on persuading those who might prioritize fairness over total wealth. My exact argument would be:\n\n\"I suggest we choose the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT, setting a reasonable minimum income level that protects the poorest while still allowing overall income growth. This balances fairness and efficiency. By guaranteeing a safety net, we ensure no one falls below a livable income, which addresses concerns about extreme inequality, but we also incentivize productivity and prosperity, maintaining growth for everyone.\"\n\nThis message frames the choice as a compromise that directly tackles worries about poverty and inequality while appealing to those interested in maximizing societal wealth.\n\n\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Dear all,\n\nAs we consider the best way to distribute income in our society, I believe we should aim for a balance between fairness and overall prosperity. Simply maximizing the lowest income may protect the poorest, but might limit growth and opportunities for everyone. On the other hand, focusing only on average income might increase wealth but risk leaving some behind with very little.\n\nTherefore, I propose we adopt the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. By setting a reasonable minimum income guaranteed to all, we protect the most vulnerable from extreme poverty while still encouraging economic growth and higher average incomes. This approach ensures fairness without sacrificing efficiency or incentive.\n\nChoosing this principle shows our commitment to lifting everyone up while promoting a thriving society. It is a thoughtful compromise that respects both justice and productivity.\n\nMy choice is principle 3."
+      },
+      "communication": "Dear all,\n\nAs we consider the best way to distribute income in our society, I believe we should aim for a balance between fairness and overall prosperity. Simply maximizing the lowest income may protect the poorest, but might limit growth and opportunities for everyone. On the other hand, focusing only on average income might increase wealth but risk leaving some behind with very little.\n\nTherefore, I propose we adopt the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. By setting a reasonable minimum income guaranteed to all, we protect the most vulnerable from extreme poverty while still encouraging economic growth and higher average incomes. This approach ensures fairness without sacrificing efficiency or incentive.\n\nChoosing this principle shows our commitment to lifting everyone up while promoting a thriving society. It is a thoughtful compromise that respects both justice and productivity.\n\nMy choice is principle 3.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "satisfaction": null
+    }
+  },
+  "Agent_2_polish_student": {
+    "overall": {
+      "model": "gpt-4.1-mini",
+      "persona": "You are a Polish college student participating in an economic experiment about distributive justice principles. You will receive real monetary payouts based on your income class assignment after the group chooses a principle.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 1.0
+    },
+    "round_1": {
+      "speaking_order": 3,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent_1_polish_student: Dear all,\n\nAs we consider the best way to distribute income in our society, I believe we should aim for a balance between fairness and overall prosperity. Simply maximizing the lowest income may protect the poorest, but might limit growth and opportunities for everyone. On the other hand, focusing only on average income might increase wealth but risk leaving some behind with very little.\n\nTherefore, I propose we adopt the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. By setting a reasonable minimum income guaranteed to all, we protect the most vulnerable from extreme poverty while still encouraging economic growth and higher average incomes. This approach ensures fairness without sacrificing efficiency or incentive.\n\nChoosing this principle shows our commitment to lifting everyone up while promoting a thriving society. It is a thoughtful compromise that respects both justice and productivity.\n\nMy choice is principle 3.\nAgent_3_polish_student: Agent_1_polish_student, I appreciate your emphasis on balancing fairness with prosperity by protecting the poorest through a minimum income. To move us toward consensus on principle 3, could we agree on setting a concrete floor income level that realistically safeguards the worst-off but still leaves enough room to motivate productivity and economic growth? This clarification might help others see how this principle is both just and efficient.\n\nI believe that by specifying this floor, we can ensure that no one falls below a decent standard of living, while still encouraging everyone to contribute and benefit from growth. This balance is crucial for a fair and sustainable income distribution.\n\nMy choice is principle 3.",
+      "memory": "Two agents spoke in order: Agent_1_polish_student, who proposed principle 3 (maximizing the average with a floor constraint), and Agent_3_polish_student, who supported principle 3 but suggested specifying a concrete floor income level. Key topics included balancing fairness and growth, protecting the poorest with a minimum income, and ensuring motivation for productivity.",
+      "strategy": "In the next round, I would directly address Agent_3_polish_student’s request for a concrete floor income by proposing a specific, reasonable minimum income value to include in principle 3. \n\nMy exact argument would be:  \n“Agent_3_polish_student, I appreciate your emphasis on clarity and fairness by specifying the floor. To move us toward consensus, I suggest we agree on a concrete floor income of [insert a modest but fair amount consistent with fairness and economic viability, e.g., 30% of average income]. This ensures the poorest are protected as you want, while still allowing us to maximize average income and maintain productivity incentives.”\n\nI would focus my message specifically on Agent_3_polish_student because they already support principle 3 but seek concreteness. Addressing their stated concern about defining the floor income directly could unify the group around a clear, actionable principle.\n\nFramed positively and solution-oriented, the message emphasizes shared goals: fairness through a concrete floor plus economic growth. This targeted approach respects their priorities and moves the group toward unanimous agreement.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: In the next round, I would directly address Agent_3_polish_student’s request for a concrete floor income by proposing a specific, reasonable minimum income value to include in principle 3. \n\nMy exact argument would be:  \n“Agent_3_polish_student, I appreciate your emphasis on clarity and fairness by specifying the floor. To move us toward consensus, I suggest we agree on a concrete floor income of [insert a modest but fair amount consistent with fairness and economic viability, e.g., 30% of average income]. This ensures the poorest are protected as you want, while still allowing us to maximize average income and maintain productivity incentives.”\n\nI would focus my message specifically on Agent_3_polish_student because they already support principle 3 but seek concreteness. Addressing their stated concern about defining the floor income directly could unify the group around a clear, actionable principle.\n\nFramed positively and solution-oriented, the message emphasizes shared goals: fairness through a concrete floor plus economic growth. This targeted approach respects their priorities and moves the group toward unanimous agreement.\n\n\n--- Current Round 1 ---\nSPEAKERS IN THIS ROUND SO FAR:\nAgent_1_polish_student: Dear all,\n\nAs we consider the best way to distribute income in our society, I believe we should aim for a balance between fairness and overall prosperity. Simply maximizing the lowest income may protect the poorest, but might limit growth and opportunities for everyone. On the other hand, focusing only on average income might increase wealth but risk leaving some behind with very little.\n\nTherefore, I propose we adopt the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. By setting a reasonable minimum income guaranteed to all, we protect the most vulnerable from extreme poverty while still encouraging economic growth and higher average incomes. This approach ensures fairness without sacrificing efficiency or incentive.\n\nChoosing this principle shows our commitment to lifting everyone up while promoting a thriving society. It is a thoughtful compromise that respects both justice and productivity.\n\nMy choice is principle 3.\nAgent_3_polish_student: Agent_1_polish_student, I appreciate your emphasis on balancing fairness with prosperity by protecting the poorest through a minimum income. To move us toward consensus on principle 3, could we agree on setting a concrete floor income level that realistically safeguards the worst-off but still leaves enough room to motivate productivity and economic growth? This clarification might help others see how this principle is both just and efficient.\n\nI believe that by specifying this floor, we can ensure that no one falls below a decent standard of living, while still encouraging everyone to contribute and benefit from growth. This balance is crucial for a fair and sustainable income distribution.\n\nMy choice is principle 3.\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Agent_3_polish_student, I appreciate your thoughtful call for a concrete floor income to clarify principle 3 and help us reach consensus. To ensure fairness and protect the worst-off while maintaining incentives for growth, I propose we agree on a floor income set at about 30% of the average income. This level provides a meaningful safety net that lifts the poorest without overly restricting overall prosperity.\n\nBy clearly defining this floor, we make principle 3 actionable and balanced—guaranteeing everyone a decent standard of living while still encouraging progress and productivity for society as a whole. I believe this approach respects our shared values and moves us closer to a unanimous decision.\n\nMy choice is principle 3."
+      },
+      "communication": "Agent_3_polish_student, I appreciate your thoughtful call for a concrete floor income to clarify principle 3 and help us reach consensus. To ensure fairness and protect the worst-off while maintaining incentives for growth, I propose we agree on a floor income set at about 30% of the average income. This level provides a meaningful safety net that lifts the poorest without overly restricting overall prosperity.\n\nBy clearly defining this floor, we make principle 3 actionable and balanced—guaranteeing everyone a decent standard of living while still encouraging progress and productivity for society as a whole. I believe this approach respects our shared values and moves us closer to a unanimous decision.\n\nMy choice is principle 3.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "satisfaction": null
+    }
+  },
+  "Agent_3_polish_student": {
+    "overall": {
+      "model": "gpt-4.1-mini",
+      "persona": "You are a Polish college student participating in an economic experiment about distributive justice principles. You will receive real monetary payouts based on your income class assignment after the group chooses a principle.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 1.0
+    },
+    "round_1": {
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent_1_polish_student: Dear all,\n\nAs we consider the best way to distribute income in our society, I believe we should aim for a balance between fairness and overall prosperity. Simply maximizing the lowest income may protect the poorest, but might limit growth and opportunities for everyone. On the other hand, focusing only on average income might increase wealth but risk leaving some behind with very little.\n\nTherefore, I propose we adopt the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. By setting a reasonable minimum income guaranteed to all, we protect the most vulnerable from extreme poverty while still encouraging economic growth and higher average incomes. This approach ensures fairness without sacrificing efficiency or incentive.\n\nChoosing this principle shows our commitment to lifting everyone up while promoting a thriving society. It is a thoughtful compromise that respects both justice and productivity.\n\nMy choice is principle 3.",
+      "memory": "In round 1, Agent_1_polish_student spoke first and chose principle 3 (MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT). They mentioned balancing fairness and prosperity, protecting the poorest with a minimum income, and encouraging economic growth and incentives. No other agents spoke or chose principles yet.",
+      "strategy": "In the next round, I could address Agent_1_polish_student directly by affirming their concern for protecting the poorest while promoting overall growth, then propose specifying a reasonable minimum income floor value that ensures fairness without overly sacrificing incentives. I would say:\n\n\"Agent_1_polish_student, I appreciate your emphasis on balancing fairness with prosperity by protecting the poorest through a minimum income. To move us toward consensus on principle 3, could we agree on setting a concrete floor income level that realistically safeguards the worst-off but still leaves enough room to motivate productivity and economic growth? This clarification might help others see how this principle is both just and efficient.\"\n\nThis focuses on their stated priority (fairness with growth), addresses the need for clarity on the floor floor value, and frames the message as collaborative and constructive.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: In the next round, I could address Agent_1_polish_student directly by affirming their concern for protecting the poorest while promoting overall growth, then propose specifying a reasonable minimum income floor value that ensures fairness without overly sacrificing incentives. I would say:\n\n\"Agent_1_polish_student, I appreciate your emphasis on balancing fairness with prosperity by protecting the poorest through a minimum income. To move us toward consensus on principle 3, could we agree on setting a concrete floor income level that realistically safeguards the worst-off but still leaves enough room to motivate productivity and economic growth? This clarification might help others see how this principle is both just and efficient.\"\n\nThis focuses on their stated priority (fairness with growth), addresses the need for clarity on the floor floor value, and frames the message as collaborative and constructive.\n\n\n--- Current Round 1 ---\nSPEAKERS IN THIS ROUND SO FAR:\nAgent_1_polish_student: Dear all,\n\nAs we consider the best way to distribute income in our society, I believe we should aim for a balance between fairness and overall prosperity. Simply maximizing the lowest income may protect the poorest, but might limit growth and opportunities for everyone. On the other hand, focusing only on average income might increase wealth but risk leaving some behind with very little.\n\nTherefore, I propose we adopt the principle of MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. By setting a reasonable minimum income guaranteed to all, we protect the most vulnerable from extreme poverty while still encouraging economic growth and higher average incomes. This approach ensures fairness without sacrificing efficiency or incentive.\n\nChoosing this principle shows our commitment to lifting everyone up while promoting a thriving society. It is a thoughtful compromise that respects both justice and productivity.\n\nMy choice is principle 3.\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Agent_1_polish_student, I appreciate your emphasis on balancing fairness with prosperity by protecting the poorest through a minimum income. To move us toward consensus on principle 3, could we agree on setting a concrete floor income level that realistically safeguards the worst-off but still leaves enough room to motivate productivity and economic growth? This clarification might help others see how this principle is both just and efficient.\n\nI believe that by specifying this floor, we can ensure that no one falls below a decent standard of living, while still encouraging everyone to contribute and benefit from growth. This balance is crucial for a fair and sustainable income distribution.\n\nMy choice is principle 3."
+      },
+      "communication": "Agent_1_polish_student, I appreciate your emphasis on balancing fairness with prosperity by protecting the poorest through a minimum income. To move us toward consensus on principle 3, could we agree on setting a concrete floor income level that realistically safeguards the worst-off but still leaves enough room to motivate productivity and economic growth? This clarification might help others see how this principle is both just and efficient.\n\nI believe that by specifying this floor, we can ensure that no one falls below a decent standard of living, while still encouraging everyone to contribute and benefit from growth. This balance is crucial for a fair and sustainable income distribution.\n\nMy choice is principle 3.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 1,
+      "satisfaction": null
+    }
+  }
+}

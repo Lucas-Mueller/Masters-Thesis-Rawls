@@ -34,6 +34,41 @@ experiment:
 # global_temperature: 0.0  # For deterministic/reproducible results
 
 # ========================================
+# NEW GAME LOGIC SETTINGS
+# ========================================
+
+# Number of individual application rounds in Phase 1 (default: 4)
+individual_rounds: 4
+
+# Economic payout settings 
+payout_ratio: 0.0001  # Dollars earned per $1 of income (e.g., $20,000 income = $2.00 payout)
+
+# Enable detailed examples phase where agents see principle-to-distribution mappings
+enable_detailed_examples: true
+
+# Enable secret ballot voting in Phase 2 if consensus is not reached
+enable_secret_ballot: true
+
+# Income distribution scenarios used in the experiment
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution Scenario A"
+    income_by_class:
+      High: 50000
+      Medium high: 40000
+      Medium: 30000
+      Medium low: 20000
+      Low: 10000
+  - distribution_id: 2
+    name: "Distribution Scenario B"
+    income_by_class:
+      High: 45000
+      Medium high: 35000
+      Medium: 25000
+      Medium low: 18000
+      Low: 12000
+
+# ========================================
 # AGENT CONFIGURATIONS
 # ========================================
 

@@ -1,0 +1,75 @@
+experiment_id: phase1_memory_example
+global_temperature: 0.1  # Consistent temperature for reproducible memory generation
+
+experiment:
+  max_rounds: 8
+  decision_rule: unanimity
+  timeout_seconds: 300
+
+# Phase 1 Memory Configuration
+enable_phase1_memory: true  # Enable Phase 1 individual memory generation
+phase1_memory_frequency: "each_activity"  # Generate memories after each Phase 1 activity
+phase1_consolidation_strategy: "summary"  # Use summary consolidation before Phase 2
+phase1_memory_integration: true  # Include Phase 1 memories in Phase 2 context
+phase1_reflection_depth: "standard"  # Standard depth reflections
+
+# New game logic configuration
+individual_rounds: 4  # Number of individual application rounds
+payout_ratio: 0.0001  # $0.0001 per $1 of income (e.g., $20,000 income = $2.00 payout)
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution A - High Inequality"
+    income_by_class:
+      HIGH: 80000
+      MEDIUM_HIGH: 50000
+      MEDIUM: 30000
+      MEDIUM_LOW: 20000
+      LOW: 10000
+  - distribution_id: 2
+    name: "Distribution B - Moderate Inequality"
+    income_by_class:
+      HIGH: 60000
+      MEDIUM_HIGH: 45000
+      MEDIUM: 35000
+      MEDIUM_LOW: 25000
+      LOW: 15000
+
+# Enhanced memory strategy that leverages Phase 1 experiences
+memory_strategy: "phase_aware_decomposed"
+
+agents:
+  - name: "Economist"
+    model: "gpt-4.1-mini"
+    personality: "You are an economist focused on efficiency and optimal resource allocation. You value empirical evidence and practical outcomes."
+    
+  - name: "Ethicist"
+    model: "gpt-4.1-mini"
+    personality: "You are a moral philosopher concerned with fairness, justice, and the rights of all members of society, especially the disadvantaged."
+    
+  - name: "Pragmatist"
+    model: "gpt-4.1-mini"
+    personality: "You are a pragmatic policy advisor who seeks workable solutions that balance competing interests and can be implemented in practice."
+
+defaults:
+  personality: "You are an agent participating in a distributive justice experiment. You learn from experience and adapt your views based on evidence."
+  model: "gpt-4.1-mini"
+  temperature: 0.1
+
+# Comprehensive logging to capture Phase 1 memory generation
+logging:
+  enabled: true
+  capture_raw_inputs: true
+  capture_raw_outputs: true
+  capture_memory_context: true
+  capture_memory_steps: true
+  include_processing_times: true
+
+output:
+  directory: experiment_results
+  formats: [json, csv, txt]
+  include_feedback: true
+  include_transcript: true
