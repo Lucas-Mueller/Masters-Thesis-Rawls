@@ -5,6 +5,7 @@ Batch experiment runner - runs multiple experiments in parallel.
 import asyncio
 import time
 from typing import List, Dict, Any
+from agents import trace, gen_trace_id
 
 from .single import run_experiment
 from .common import create_error_result, run_async_function_sync
@@ -57,15 +58,24 @@ async def run_batch(config_paths: List[str], max_concurrent: int = 3, output_dir
         for i, config_path in enumerate(config_paths)
     ]
     
-    # Execute all experiments in parallel
-    print(f"🚀 Starting batch execution: {len(config_paths)} experiments, max {max_concurrent} concurrent")
-    if output_dir:
-        print(f"📁 Output directory: {output_dir}")
-    else:
-        print(f"📁 Output directory: experiment_results (default)")
-    batch_start_time = time.time()
+    # Generate trace ID for batch execution
+    batch_trace_id = gen_trace_id()
     
-    results = await asyncio.gather(*tasks, return_exceptions=True)
+    # Execute all experiments in parallel with tracing
+    with trace(
+        workflow_name=f"Batch Distributive Justice Experiments",
+        trace_id=batch_trace_id,
+        group_id=f"batch_experiments_{int(time.time())}"
+    ):
+        print(f"🚀 Starting batch execution: {len(config_paths)} experiments, max {max_concurrent} concurrent")
+        if output_dir:
+            print(f"📁 Output directory: {output_dir}")
+        else:
+            print(f"📁 Output directory: experiment_results (default)")
+        print(f"🔍 Batch trace ID: {batch_trace_id}")
+        batch_start_time = time.time()
+        
+        results = await asyncio.gather(*tasks, return_exceptions=True)
     
     batch_duration = time.time() - batch_start_time
     
@@ -91,6 +101,7 @@ async def run_batch(config_paths: List[str], max_concurrent: int = 3, output_dir
     print(f"   Failed: {len(config_paths) - successful_runs}")
     print(f"   Total time: {batch_duration:.1f}s")
     print(f"   Average per experiment: {batch_duration/len(config_paths):.1f}s")
+    print(f"   Batch trace: https://platform.openai.com/traces/trace?trace_id={batch_trace_id}")
     
     return processed_results
 

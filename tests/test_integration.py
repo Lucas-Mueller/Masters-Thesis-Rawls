@@ -80,8 +80,8 @@ class TestIntegration:
         # Step 2: Mock experiment execution and test batch run
         from unittest.mock import patch, MagicMock
         
-        with patch('run_experiment.run_single_experiment') as mock_run:
-            with patch('run_experiment.load_config_from_file') as mock_load:
+        with patch('maai.services.experiment_orchestrator.ExperimentOrchestrator.run_experiment') as mock_run:
+            with patch('maai.config.manager.load_config_from_file') as mock_load:
                 
                 # Create mock results for both experiments
                 mock_results_1 = MagicMock()
@@ -140,8 +140,8 @@ class TestIntegration:
         # Step 2: Mock experiment execution
         from unittest.mock import patch, MagicMock
         
-        with patch('run_experiment.run_single_experiment') as mock_run:
-            with patch('run_experiment.load_config_from_file') as mock_load:
+        with patch('maai.services.experiment_orchestrator.ExperimentOrchestrator.run_experiment') as mock_run:
+            with patch('maai.config.manager.load_config_from_file') as mock_load:
                 
                 # Create mock config and results
                 mock_config = MagicMock()
@@ -179,8 +179,8 @@ class TestIntegration:
         # Step 2: Mock experiment execution to fail
         from unittest.mock import patch, MagicMock
         
-        with patch('run_experiment.run_single_experiment') as mock_run:
-            with patch('run_experiment.load_config_from_file') as mock_load:
+        with patch('maai.services.experiment_orchestrator.ExperimentOrchestrator.run_experiment') as mock_run:
+            with patch('maai.config.manager.load_config_from_file') as mock_load:
                 
                 # Make the experiment fail
                 mock_run.side_effect = Exception("Test integration error")
@@ -212,8 +212,8 @@ class TestIntegration:
         # Step 2: Mock experiment execution with mixed results
         from unittest.mock import patch, MagicMock
         
-        with patch('run_experiment.run_single_experiment') as mock_run:
-            with patch('run_experiment.load_config_from_file') as mock_load:
+        with patch('maai.services.experiment_orchestrator.ExperimentOrchestrator.run_experiment') as mock_run:
+            with patch('maai.config.manager.load_config_from_file') as mock_load:
                 
                 # Create mock config loading
                 def mock_load_config(config_name):

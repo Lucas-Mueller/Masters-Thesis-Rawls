@@ -3,9 +3,10 @@ Single experiment runner - runs one experiment with a given configuration.
 """
 
 from typing import Dict, Any
+from agents import trace, gen_trace_id
 
 from ..config.manager import load_config_from_file
-from ..core.deliberation_manager import run_single_experiment
+from ..services.experiment_orchestrator import ExperimentOrchestrator
 from .common import create_error_result, normalize_config_path, run_async_function_sync
 
 
@@ -46,8 +47,18 @@ async def run_experiment(config_path: str, output_dir: str = None, config_dir: s
         if output_dir is not None:
             config.output.directory = output_dir
         
-        # Run experiment
-        results = await run_single_experiment(config)
+        # Generate trace ID for comprehensive tracing
+        trace_id = gen_trace_id()
+        
+        # Run experiment with comprehensive tracing
+        with trace(
+            workflow_name=f"Distributive Justice Experiment: {config.experiment_id}",
+            trace_id=trace_id,
+            group_id=f"experiment_{config.experiment_id}"
+        ):
+            # Run experiment using ExperimentOrchestrator directly
+            orchestrator = ExperimentOrchestrator()
+            results = await orchestrator.run_experiment(config, trace_id=trace_id)
         
         # Determine output path
         output_path = f"{config.output.directory}/{config.experiment_id}.json"
@@ -62,7 +73,9 @@ async def run_experiment(config_path: str, output_dir: str = None, config_dir: s
             "rounds_to_consensus": results.consensus_result.rounds_to_consensus,
             "total_messages": len(results.deliberation_transcript),
             "results": results,  # Keep full results for advanced users
-            "output_path": output_path  # Path to the saved JSON file
+            "output_path": output_path,  # Path to the saved JSON file
+            "trace_id": trace_id,  # OpenAI Agents SDK trace ID for viewing in platform
+            "trace_url": f"https://platform.openai.com/traces/trace?trace_id={trace_id}"
         }
         
     except Exception as e:

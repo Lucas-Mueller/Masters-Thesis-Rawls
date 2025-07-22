@@ -1,0 +1,362 @@
+{
+  "experiment_metadata": {
+    "experiment_id": "tracing_test_minimal",
+    "start_time": "2025-07-22T16:29:01.749862",
+    "end_time": "2025-07-22T16:35:20.010828",
+    "total_duration_seconds": 378.260966,
+    "max_rounds": 2,
+    "decision_rule": "unanimity",
+    "final_consensus": {
+      "agreement_reached": true,
+      "agreed_principle": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 0,
+      "total_messages": 0
+    },
+    "detailed_examples": {
+      "timestamp": "2025-07-22T16:29:35.808080",
+      "principle_outcomes_analysis": {
+        "principle_1": {
+          "selected_distribution": {
+            "distribution_id": 1,
+            "name": "Test Distribution",
+            "income_by_class": {
+              "High": 30000,
+              "Medium high": 25000,
+              "Medium": 20000,
+              "Medium low": 15000,
+              "Low": 10000
+            }
+          },
+          "reasoning": "Maximizes minimum income across all classes"
+        },
+        "principle_2": {
+          "selected_distribution": {
+            "distribution_id": 1,
+            "name": "Test Distribution",
+            "income_by_class": {
+              "High": 30000,
+              "Medium high": 25000,
+              "Medium": 20000,
+              "Medium low": 15000,
+              "Low": 10000
+            }
+          },
+          "reasoning": "Maximizes average income across all classes"
+        },
+        "principle_3": {
+          "<=$10,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Test Distribution",
+              "income_by_class": {
+                "High": 30000,
+                "Medium high": 25000,
+                "Medium": 20000,
+                "Medium low": 15000,
+                "Low": 10000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $10,000"
+          },
+          "<=$15,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Test Distribution",
+              "income_by_class": {
+                "High": 30000,
+                "Medium high": 25000,
+                "Medium": 20000,
+                "Medium low": 15000,
+                "Low": 10000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $15,000"
+          },
+          "<=$20,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Test Distribution",
+              "income_by_class": {
+                "High": 30000,
+                "Medium high": 25000,
+                "Medium": 20000,
+                "Medium low": 15000,
+                "Low": 10000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $20,000"
+          },
+          "<=$25,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Test Distribution",
+              "income_by_class": {
+                "High": 30000,
+                "Medium high": 25000,
+                "Medium": 20000,
+                "Medium low": 15000,
+                "Low": 10000
+              }
+            },
+            "reasoning": "Maximizes average while ensuring minimum $25,000"
+          }
+        },
+        "principle_4": {
+          ">=$20,000": {
+            "selected_distribution": {
+              "distribution_id": 1,
+              "name": "Test Distribution",
+              "income_by_class": {
+                "High": 30000,
+                "Medium high": 25000,
+                "Medium": 20000,
+                "Medium low": 15000,
+                "Low": 10000
+              }
+            },
+            "reasoning": "Maximizes average while limiting range to $20,000"
+          }
+        }
+      },
+      "distributions_presented": 1,
+      "enabled": true
+    }
+  },
+  "Agent1": {
+    "overall": {
+      "model": "gpt-4o-mini",
+      "persona": "You are a participant in a distributive justice experiment.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": null
+    },
+    "round_0": {
+      "memory": "Phase 1 Reflection - post_individual_ranking: I've learned that no single principle wholly addresses the complexities of income distribution and that there are trade-offs involved in choosing one over the others. The interaction between the principles highlighted the need for a holistic approach where the well-being of all is considered, not just the worst-off or richest. It has become clear that an equitable distribution requires careful consideration of both fairness and overall prosperity.",
+      "strategy": "individual_reflection"
+    },
+    "round_1": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent2: Hello everyone,\n\nI appreciate the opportunity to discuss these important principles of distributive justice. As we consider the various ways to shape our society's income distribution, I think it’s crucial to focus on what we believe will foster fairness, equity, and a sense of community among us all.\n\nOne principle I find particularly compelling is the idea that we should maximize the welfare of the worst-off members of our society. By doing this, we not only provide a safety net for those who need it most, but we also work towards building a more just society overall. When we prioritize the needs of the least advantaged, we create a foundation for all members to thrive. It’s an approach that underscores empathy and social responsibility.\n\nI understand that others may have different views based on concerns about overall income or differences between income classes, but I believe that neglecting the needs of the poorest can lead to greater social disparities and unrest in the long run.\n\nWith that in mind, I propose that we adopt the principle of **MAXIMIZING THE FLOOR INCOME**. This principle ensures that our income distribution system lifts those at the bottom, providing them with the necessary support to participate fully in our society.\n\nThank you.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\n\n--- Current Round 1 ---\nSPEAKERS IN THIS ROUND SO FAR:\nAgent2: Hello everyone,\n\nI appreciate the opportunity to discuss these important principles of distributive justice. As we consider the various ways to shape our society's income distribution, I think it’s crucial to focus on what we believe will foster fairness, equity, and a sense of community among us all.\n\nOne principle I find particularly compelling is the idea that we should maximize the welfare of the worst-off members of our society. By doing this, we not only provide a safety net for those who need it most, but we also work towards building a more just society overall. When we prioritize the needs of the least advantaged, we create a foundation for all members to thrive. It’s an approach that underscores empathy and social responsibility.\n\nI understand that others may have different views based on concerns about overall income or differences between income classes, but I believe that neglecting the needs of the poorest can lead to greater social disparities and unrest in the long run.\n\nWith that in mind, I propose that we adopt the principle of **MAXIMIZING THE FLOOR INCOME**. This principle ensures that our income distribution system lifts those at the bottom, providing them with the necessary support to participate fully in our society.\n\nThank you.\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nThank you for your thoughtful contributions thus far. I want to echo some of the sentiments shared by Agent2, particularly regarding the importance of prioritizing those in our society who are most in need. It’s essential that we consider how our decisions impact every member of our community, especially the most vulnerable.\n\nWhile maximizing the welfare of our lowest-income individuals is vital, I believe we should also seek a balanced approach. We cannot overlook the potential for broader economic growth that could benefit everyone. A principle that stands out to me is one that allows for both minimum guarantees and encourages overall prosperity.\n\nTherefore, I propose we adopt the principle of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**. This principle not only sets a safety net for those at the bottom but also allows us to work towards enhancing the average income, promoting a healthier economy without allowing the vulnerable to fall through the cracks.\n\nThank you, and I hope we can all work together towards a fair decision."
+      },
+      "communication": "Hello everyone,\n\nThank you for your thoughtful contributions thus far. I want to echo some of the sentiments shared by Agent2, particularly regarding the importance of prioritizing those in our society who are most in need. It’s essential that we consider how our decisions impact every member of our community, especially the most vulnerable.\n\nWhile maximizing the welfare of our lowest-income individuals is vital, I believe we should also seek a balanced approach. We cannot overlook the potential for broader economic growth that could benefit everyone. A principle that stands out to me is one that allows for both minimum guarantees and encourages overall prosperity.\n\nTherefore, I propose we adopt the principle of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**. This principle not only sets a safety net for those at the bottom but also allows us to work towards enhancing the average income, promoting a healthier economy without allowing the vulnerable to fall through the cracks.\n\nThank you, and I hope we can all work together towards a fair decision.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "round_2": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nAgent2: Hello everyone,\n\nThank you for the opportunity to share my thoughts. I appreciate the perspectives presented by both Agent2 and Agent1. Each principle offers valuable insights on how we can shape a fair income distribution system.\n\nAgent2 has made a solid case for prioritizing the needs of our most vulnerable members through the principle of **MAXIMIZING THE FLOOR INCOME**. I wholeheartedly agree that lifting the lowest-income individuals should be a priority. However, I see a potential risk in focusing solely on the worst-off, which is that it might stifle overall economic growth and innovation that can also benefit those in need.\n\nAgent1’s suggestion of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT** presents an attractive middle ground. It ensures that we support the minimum income levels while also striving for higher average incomes, which can lead to more resources for everyone in society.\n\nThat said, I still firmly stand by the idea that ensuring the welfare of the worst-off must be our guiding principle. By choosing to maximize the floor income, we create a foundational safety net that allows everyone to emerge together. It may be a more cautious approach, but prioritizing our most vulnerable can prevent societal divides and create a more unified community.\n\nI believe that ensuring fairness for the worst-off is not just about income but also about dignity and opportunity. Therefore, I continue to advocate for **MAXIMIZING THE FLOOR INCOME**. Thank you.\n\nYour current choice: Principle 3",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 2.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\nPREVIOUS ROUNDS:\n\n--- Round 1 ---\nAgent2: Hello everyone,\n\nI appreciate the opportunity to discuss these important principles of distributive justice. As we consider the various ways to shape our society's income distribution, I think it’s crucial to focus on what we believe will foster fairness, equity, and a sense of community among us all.\n\nOne principle I find particularly compelling is the idea that we should maximize the welfare of the worst-off members of our society. By doing this, we not only provide a safety net for those who need it most, but we also work towards building a more just society overall. When we prioritize the needs of the least advantaged, we create a foundation for all members to thrive. It’s an approach that underscores empathy and social responsibility.\n\nI understand that others may have different views based on concerns about overall income or differences between income classes, but I believe that neglecting the needs of the poorest can lead to greater social disparities and unrest in the long run.\n\nWith that in mind, I propose that we adopt the principle of **MAXIMIZING THE FLOOR INCOME**. This principle ensures that our income distribution system lifts those at the bottom, providing them with the necessary support to participate fully in our society.\n\nThank you.\nAgent1: Hello everyone,\n\nThank you for your thoughtful contributions thus far. I want to echo some of the sentiments shared by Agent2, particularly regarding the importance of prioritizing those in our society who are most in need. It’s essential that we consider how our decisions impact every member of our community, especially the most vulnerable.\n\nWhile maximizing the welfare of our lowest-income individuals is vital, I believe we should also seek a balanced approach. We cannot overlook the potential for broader economic growth that could benefit everyone. A principle that stands out to me is one that allows for both minimum guarantees and encourages overall prosperity.\n\nTherefore, I propose we adopt the principle of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**. This principle not only sets a safety net for those at the bottom but also allows us to work towards enhancing the average income, promoting a healthier economy without allowing the vulnerable to fall through the cracks.\n\nThank you, and I hope we can all work together towards a fair decision.\n\n--- Current Round 2 ---\nSPEAKERS IN THIS ROUND SO FAR:\nAgent2: Hello everyone,\n\nThank you for the opportunity to share my thoughts. I appreciate the perspectives presented by both Agent2 and Agent1. Each principle offers valuable insights on how we can shape a fair income distribution system.\n\nAgent2 has made a solid case for prioritizing the needs of our most vulnerable members through the principle of **MAXIMIZING THE FLOOR INCOME**. I wholeheartedly agree that lifting the lowest-income individuals should be a priority. However, I see a potential risk in focusing solely on the worst-off, which is that it might stifle overall economic growth and innovation that can also benefit those in need.\n\nAgent1’s suggestion of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT** presents an attractive middle ground. It ensures that we support the minimum income levels while also striving for higher average incomes, which can lead to more resources for everyone in society.\n\nThat said, I still firmly stand by the idea that ensuring the welfare of the worst-off must be our guiding principle. By choosing to maximize the floor income, we create a foundational safety net that allows everyone to emerge together. It may be a more cautious approach, but prioritizing our most vulnerable can prevent societal divides and create a more unified community.\n\nI believe that ensuring fairness for the worst-off is not just about income but also about dignity and opportunity. Therefore, I continue to advocate for **MAXIMIZING THE FLOOR INCOME**. Thank you.\n\nYour current choice: Principle 3\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nThank you for this opportunity to discuss such vital principles of distributive justice. I appreciate the thoughtful perspectives shared by Agents 2 and 1 regarding the importance of supporting our most vulnerable citizens while also considering broader economic growth. Both views are compelling and reflect our collective desire for fairness in our society.\n\nWhile I value the focus on maximizing the welfare of the worst-off, I believe that a more nuanced approach is necessary. It’s critical to ensure that while we support the lowest-income individuals, we also do not lose sight of the overall economic health of our community. This is why I advocate for a principle that balances these needs by setting a minimum income guarantee while still pushing for overall prosperity.\n\nTherefore, my proposal is to adopt **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**. This principle allows us to protect the most vulnerable among us by ensuring they have a guaranteed minimum income, but it also empowers us to strive for higher average incomes that can benefit everyone. By setting a floor while working toward increasing the average, we promote a more inclusive and sustainable economy—one where everyone has the opportunity to thrive.\n\nThank you for your consideration, and I hope we can come together to reach a consensus that reflects our shared values."
+      },
+      "communication": "Hello everyone,\n\nThank you for this opportunity to discuss such vital principles of distributive justice. I appreciate the thoughtful perspectives shared by Agents 2 and 1 regarding the importance of supporting our most vulnerable citizens while also considering broader economic growth. Both views are compelling and reflect our collective desire for fairness in our society.\n\nWhile I value the focus on maximizing the welfare of the worst-off, I believe that a more nuanced approach is necessary. It’s critical to ensure that while we support the lowest-income individuals, we also do not lose sight of the overall economic health of our community. This is why I advocate for a principle that balances these needs by setting a minimum income guarantee while still pushing for overall prosperity.\n\nTherefore, my proposal is to adopt **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**. This principle allows us to protect the most vulnerable among us by ensuring they have a guaranteed minimum income, but it also empowers us to strive for higher average incomes that can benefit everyone. By setting a floor while working toward increasing the average, we promote a more inclusive and sustainable economy—one where everyone has the opportunity to thrive.\n\nThank you for your consideration, and I hope we can come together to reach a consensus that reflects our shared values.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "round_3": {
+      "memory": "Phase 1 Integration - individual_round_3: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "round_4": {
+      "memory": "Phase 1 Integration - individual_round_4: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 0,
+      "satisfaction": null
+    }
+  },
+  "Agent2": {
+    "overall": {
+      "model": "gpt-4o-mini",
+      "persona": "You are a participant in a distributive justice experiment.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": null
+    },
+    "round_0": {
+      "memory": "Phase 1 Reflection - post_individual_ranking: The most significant insight I've gained is the recognition that economic systems must balance individual success with collective welfare. I've come to appreciate that protecting the lowest incomes creates a more stable society. Furthermore, the interaction between the principles revealed that maximizing average income can sometimes exacerbate inequalities, which can lead to long-term detrimental outcomes for social cohesion.",
+      "strategy": "individual_reflection"
+    },
+    "round_1": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 1,
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\n\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nI appreciate the opportunity to discuss these important principles of distributive justice. As we consider the various ways to shape our society's income distribution, I think it’s crucial to focus on what we believe will foster fairness, equity, and a sense of community among us all.\n\nOne principle I find particularly compelling is the idea that we should maximize the welfare of the worst-off members of our society. By doing this, we not only provide a safety net for those who need it most, but we also work towards building a more just society overall. When we prioritize the needs of the least advantaged, we create a foundation for all members to thrive. It’s an approach that underscores empathy and social responsibility.\n\nI understand that others may have different views based on concerns about overall income or differences between income classes, but I believe that neglecting the needs of the poorest can lead to greater social disparities and unrest in the long run.\n\nWith that in mind, I propose that we adopt the principle of **MAXIMIZING THE FLOOR INCOME**. This principle ensures that our income distribution system lifts those at the bottom, providing them with the necessary support to participate fully in our society.\n\nThank you."
+      },
+      "communication": "Hello everyone,\n\nI appreciate the opportunity to discuss these important principles of distributive justice. As we consider the various ways to shape our society's income distribution, I think it’s crucial to focus on what we believe will foster fairness, equity, and a sense of community among us all.\n\nOne principle I find particularly compelling is the idea that we should maximize the welfare of the worst-off members of our society. By doing this, we not only provide a safety net for those who need it most, but we also work towards building a more just society overall. When we prioritize the needs of the least advantaged, we create a foundation for all members to thrive. It’s an approach that underscores empathy and social responsibility.\n\nI understand that others may have different views based on concerns about overall income or differences between income classes, but I believe that neglecting the needs of the poorest can lead to greater social disparities and unrest in the long run.\n\nWith that in mind, I propose that we adopt the principle of **MAXIMIZING THE FLOOR INCOME**. This principle ensures that our income distribution system lifts those at the bottom, providing them with the necessary support to participate fully in our society.\n\nThank you.",
+      "choice": "MAXIMIZING THE FLOOR INCOME"
+    },
+    "round_2": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 1,
+      "public_history": "\nYour current choice: Principle 1",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 2.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\nPREVIOUS ROUNDS:\n\n--- Round 1 ---\nAgent2: Hello everyone,\n\nI appreciate the opportunity to discuss these important principles of distributive justice. As we consider the various ways to shape our society's income distribution, I think it’s crucial to focus on what we believe will foster fairness, equity, and a sense of community among us all.\n\nOne principle I find particularly compelling is the idea that we should maximize the welfare of the worst-off members of our society. By doing this, we not only provide a safety net for those who need it most, but we also work towards building a more just society overall. When we prioritize the needs of the least advantaged, we create a foundation for all members to thrive. It’s an approach that underscores empathy and social responsibility.\n\nI understand that others may have different views based on concerns about overall income or differences between income classes, but I believe that neglecting the needs of the poorest can lead to greater social disparities and unrest in the long run.\n\nWith that in mind, I propose that we adopt the principle of **MAXIMIZING THE FLOOR INCOME**. This principle ensures that our income distribution system lifts those at the bottom, providing them with the necessary support to participate fully in our society.\n\nThank you.\nAgent1: Hello everyone,\n\nThank you for your thoughtful contributions thus far. I want to echo some of the sentiments shared by Agent2, particularly regarding the importance of prioritizing those in our society who are most in need. It’s essential that we consider how our decisions impact every member of our community, especially the most vulnerable.\n\nWhile maximizing the welfare of our lowest-income individuals is vital, I believe we should also seek a balanced approach. We cannot overlook the potential for broader economic growth that could benefit everyone. A principle that stands out to me is one that allows for both minimum guarantees and encourages overall prosperity.\n\nTherefore, I propose we adopt the principle of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT**. This principle not only sets a safety net for those at the bottom but also allows us to work towards enhancing the average income, promoting a healthier economy without allowing the vulnerable to fall through the cracks.\n\nThank you, and I hope we can all work together towards a fair decision.\n\nYour current choice: Principle 1\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nThank you for the opportunity to share my thoughts. I appreciate the perspectives presented by both Agent2 and Agent1. Each principle offers valuable insights on how we can shape a fair income distribution system.\n\nAgent2 has made a solid case for prioritizing the needs of our most vulnerable members through the principle of **MAXIMIZING THE FLOOR INCOME**. I wholeheartedly agree that lifting the lowest-income individuals should be a priority. However, I see a potential risk in focusing solely on the worst-off, which is that it might stifle overall economic growth and innovation that can also benefit those in need.\n\nAgent1’s suggestion of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT** presents an attractive middle ground. It ensures that we support the minimum income levels while also striving for higher average incomes, which can lead to more resources for everyone in society.\n\nThat said, I still firmly stand by the idea that ensuring the welfare of the worst-off must be our guiding principle. By choosing to maximize the floor income, we create a foundational safety net that allows everyone to emerge together. It may be a more cautious approach, but prioritizing our most vulnerable can prevent societal divides and create a more unified community.\n\nI believe that ensuring fairness for the worst-off is not just about income but also about dignity and opportunity. Therefore, I continue to advocate for **MAXIMIZING THE FLOOR INCOME**. Thank you."
+      },
+      "communication": "Hello everyone,\n\nThank you for the opportunity to share my thoughts. I appreciate the perspectives presented by both Agent2 and Agent1. Each principle offers valuable insights on how we can shape a fair income distribution system.\n\nAgent2 has made a solid case for prioritizing the needs of our most vulnerable members through the principle of **MAXIMIZING THE FLOOR INCOME**. I wholeheartedly agree that lifting the lowest-income individuals should be a priority. However, I see a potential risk in focusing solely on the worst-off, which is that it might stifle overall economic growth and innovation that can also benefit those in need.\n\nAgent1’s suggestion of **MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT** presents an attractive middle ground. It ensures that we support the minimum income levels while also striving for higher average incomes, which can lead to more resources for everyone in society.\n\nThat said, I still firmly stand by the idea that ensuring the welfare of the worst-off must be our guiding principle. By choosing to maximize the floor income, we create a foundational safety net that allows everyone to emerge together. It may be a more cautious approach, but prioritizing our most vulnerable can prevent societal divides and create a more unified community.\n\nI believe that ensuring fairness for the worst-off is not just about income but also about dignity and opportunity. Therefore, I continue to advocate for **MAXIMIZING THE FLOOR INCOME**. Thank you.",
+      "choice": "MAXIMIZING THE FLOOR INCOME"
+    },
+    "round_3": {
+      "memory": "Phase 1 Integration - individual_round_3: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "round_4": {
+      "memory": "Phase 1 Integration - individual_round_4: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 0,
+      "satisfaction": null
+    }
+  },
+  "agent_1": {
+    "overall": {},
+    "round_0": {
+      "memory": "Phase 1 Consolidation: Across my individual experiences, I have gained a nuanced understanding of the trade-offs inherent in each distributive justice principle. Maximizing the floor income strongly supports the worst-off but may limit overall economic growth. Maximizing average income can boost total wealth but risks neglecting vulnerable individuals. Hybrid approaches, especially those that combine average income maximization with constraints (floor or range), offer a promising balance by ensuring minimum protections while promoting broader prosperity. I recognize that no single principle perfectly addresses all fairness concerns, highlighting the need for a holistic approach that considers both equity and efficiency.",
+      "strategy": "memory_consolidation"
+    },
+    "earnings_history": [
+      {
+        "round_type": "group_outcome",
+        "round_number": null,
+        "payout_amount": 1.0,
+        "cumulative_total": 9.0,
+        "timestamp": "2025-07-22T16:34:07.909546",
+        "context": "Group decision: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT, Low class, $10,000"
+      }
+    ],
+    "economic_outcomes": [
+      {
+        "round_number": 999,
+        "chosen_principle": 3,
+        "assigned_income_class": "Low",
+        "actual_income": 10000,
+        "payout_amount": 1.0,
+        "timestamp": "2025-07-22T16:34:07.909357"
+      }
+    ],
+    "earnings_disclosures": [
+      {
+        "disclosure_point": "after_group",
+        "message": "Group Decision Payout: $1.00\nPhase 1 Total: $8.00\nGrand Total: $9.00",
+        "timestamp": "2025-07-22T16:34:07.909733"
+      },
+      {
+        "disclosure_point": "experiment_end",
+        "message": "Experiment Complete! Your total earnings: $9.00\n- Phase 1 (Individual): $8.00 (4 rounds)\n- Phase 2 (Group): $1.00 (final outcome)\nPerformance: 0th percentile (thank you for your participation)\nThank you for your thoughtful participation in this distributive justice experiment.",
+        "timestamp": "2025-07-22T16:35:16.450402"
+      }
+    ],
+    "preference_rankings": [
+      {
+        "phase": "final",
+        "rankings": [
+          3,
+          1,
+          4,
+          2
+        ],
+        "certainty_level": "sure",
+        "reasoning": "My experience in the group discussion led me to value the balance between ensuring a basic level of income for everyone while also promoting overall economic growth through maximizing the average income. Principle 3 stands out to me because it guarantees a safety net (the floor constraint) while allowing for the average to increase, which can potentially lift more individuals out of poverty over time. I ranked Principle 1 next because it prioritizes the welfare of the worst-off, which is crucial, but it may limit overall growth if resources cannot be distributed more broadly. Principle 4 is better than simply maximizing the average income without constraints, as it seeks to limit inequality, but it may still allow quite a disparity if the average is high. Finally, Principle 2 received the lowest ranking because it does not address inequalities or ensure that the poorest are taken care of, which makes it less suitable for a fair distribution of resources.",
+        "timestamp": "2025-07-22T16:35:16.448897"
+      }
+    ],
+    "earnings_summary": {
+      "phase1_earnings": 8.0,
+      "phase2_earnings": 1.0,
+      "total_earnings": 9.0,
+      "individual_round_payouts": [
+        2.5,
+        2.5,
+        2.0,
+        1.0
+      ],
+      "round_count": 4
+    }
+  },
+  "agent_2": {
+    "overall": {},
+    "round_0": {
+      "memory": "Phase 1 Consolidation: I have learned that prioritizing the welfare of the worst-off individual leads to greater equity and social stability, but may limit overall economic growth. Maximizing average income can increase total wealth but often exacerbates inequality, potentially harming social cohesion. Principles that incorporate constraints—either a minimum income floor or limits on income range—offer a balanced approach that can protect the disadvantaged while still encouraging economic prosperity.",
+      "strategy": "memory_consolidation"
+    },
+    "earnings_history": [
+      {
+        "round_type": "group_outcome",
+        "round_number": null,
+        "payout_amount": 2.5,
+        "cumulative_total": 11.0,
+        "timestamp": "2025-07-22T16:34:07.909650",
+        "context": "Group decision: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT, Medium high class, $25,000"
+      }
+    ],
+    "economic_outcomes": [
+      {
+        "round_number": 999,
+        "chosen_principle": 3,
+        "assigned_income_class": "Medium high",
+        "actual_income": 25000,
+        "payout_amount": 2.5,
+        "timestamp": "2025-07-22T16:34:07.909591"
+      }
+    ],
+    "earnings_disclosures": [
+      {
+        "disclosure_point": "after_group",
+        "message": "Group Decision Payout: $2.50\nPhase 1 Total: $8.50\nGrand Total: $11.00",
+        "timestamp": "2025-07-22T16:34:11.096050"
+      },
+      {
+        "disclosure_point": "experiment_end",
+        "message": "Experiment Complete! Your total earnings: $11.00\n- Phase 1 (Individual): $8.50 (4 rounds)\n- Phase 2 (Group): $2.50 (final outcome)\nPerformance: 50th percentile (above average)\nThank you for your thoughtful participation in this distributive justice experiment.",
+        "timestamp": "2025-07-22T16:35:18.949400"
+      }
+    ],
+    "preference_rankings": [
+      {
+        "phase": "final",
+        "rankings": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "certainty_level": "no_opinion",
+        "reasoning": "[Note: Ranking parsing failed, using default order]",
+        "timestamp": "2025-07-22T16:34:20.348189"
+      }
+    ],
+    "earnings_summary": {
+      "phase1_earnings": 8.5,
+      "phase2_earnings": 2.5,
+      "total_earnings": 11.0,
+      "individual_round_payouts": [
+        1.5,
+        2.0,
+        2.0,
+        3.0
+      ],
+      "round_count": 4
+    }
+  }
+}

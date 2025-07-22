@@ -12,7 +12,7 @@ import pytest
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from maai.config.manager import load_config_from_file
-from maai.core.deliberation_manager import run_single_experiment
+from maai.services.experiment_orchestrator import ExperimentOrchestrator
 from maai.agents.enhanced import create_deliberation_agents
 from maai.core.models import ExperimentConfig, AgentConfig, DefaultConfig
 
@@ -124,7 +124,8 @@ async def test_temperature_with_experiment():
     # This test just verifies the experiment can run with temperature settings
     # We don't need to check output determinism - just that it doesn't crash
     try:
-        result = await run_single_experiment(config)
+        orchestrator = ExperimentOrchestrator()
+        result = await orchestrator.run_experiment(config)
         assert result is not None
         assert result.experiment_id == "temperature_test"
         print("✅ Temperature configuration works with experiments")

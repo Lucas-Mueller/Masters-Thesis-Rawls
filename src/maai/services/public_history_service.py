@@ -11,10 +11,8 @@ from ..core.models import (
     PublicHistoryMode, 
     DeliberationResponse, 
     RoundSummary, 
-    ExperimentConfig,
-    SummaryAgentConfig
+    ExperimentConfig
 )
-from ..agents.summary_agent import SummaryAgent
 
 
 class PublicHistoryService:
@@ -32,19 +30,7 @@ class PublicHistoryService:
         """
         self.config = config
         self.mode = config.public_history_mode
-        self.summary_agent_config = config.summary_agent
         self.round_summaries: List[RoundSummary] = []
-        self._summary_agent: Optional[SummaryAgent] = None
-        
-    async def _get_summary_agent(self) -> SummaryAgent:
-        """Get or create the summary agent lazily."""
-        if self._summary_agent is None:
-            self._summary_agent = SummaryAgent(
-                model=self.summary_agent_config.model,
-                temperature=self.summary_agent_config.temperature,
-                max_tokens=self.summary_agent_config.max_tokens
-            )
-        return self._summary_agent
     
     async def build_public_context(
         self, 
@@ -180,25 +166,31 @@ class PublicHistoryService:
                 key_arguments={},
                 principle_preferences={},
                 consensus_status="No activity",
-                summary_agent_model=self.summary_agent_config.model
+                summary_agent_model="system"
             )
         
-        # Get summary agent
-        summary_agent = await self._get_summary_agent()
+        # Generate simple text-based summary since SummaryAgent was removed
+        participants = list(set([r.agent_name for r in round_responses]))
+        key_topics = []
         
-        # Generate summary
-        summary_data = await summary_agent.generate_round_summary(
-            round_number, round_responses
-        )
+        for response in round_responses:
+            if "principle" in response.public_message.lower():
+                key_topics.append(f"{response.agent_name} discussed principles")
+            if "income" in response.public_message.lower():
+                key_topics.append(f"{response.agent_name} discussed income")
+                
+        summary_text = f"Round {round_number} had {len(round_responses)} contributions from {', '.join(participants)}."
+        if key_topics:
+            summary_text += f" Key topics: {'; '.join(key_topics[:3])}."
         
         # Create and store the summary
         round_summary = RoundSummary(
             round_number=round_number,
-            summary_text=summary_data["summary_text"],
-            key_arguments=summary_data["key_arguments"],
-            principle_preferences=summary_data["principle_preferences"],
-            consensus_status=summary_data["consensus_status"],
-            summary_agent_model=self.summary_agent_config.model
+            summary_text=summary_text,
+            key_arguments={agent: f"Participated in round {round_number}" for agent in participants},
+            principle_preferences={},
+            consensus_status="Discussion ongoing",
+            summary_agent_model="system"
         )
         
         # Store for future use

@@ -1,0 +1,14 @@
+{
+  "experiment_id": "gpt41mini_clean_architecture_demo",
+  "timestamp": "2025-07-22T16:18:11.730151",
+  "architecture": "clean_modern",
+  "status": "configured_not_executed",
+  "reason": "execution_error",
+  "config_summary": {
+    "agents": 2,
+    "model": "gpt-4.1-mini",
+    "earnings_tracking": true,
+    "memory_strategy": "phase_aware_decomposed",
+    "individual_rounds": 3
+  }
+}

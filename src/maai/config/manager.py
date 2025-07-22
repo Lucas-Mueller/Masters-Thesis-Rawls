@@ -156,7 +156,7 @@ class ConfigManager:
         
         # Create ExperimentConfig object with validation
         try:
-            from ..core.models import PublicHistoryMode, SummaryAgentConfig
+            from ..core.models import PublicHistoryMode
             
             # Parse public history mode
             public_history_mode = PublicHistoryMode.FULL  # Default
@@ -167,15 +167,6 @@ class ConfigManager:
                 elif mode_str == "full":
                     public_history_mode = PublicHistoryMode.FULL
             
-            # Parse summary agent config
-            summary_agent = SummaryAgentConfig()  # Default
-            if "summary_agent" in config_data:
-                summary_agent_data = config_data["summary_agent"]
-                summary_agent = SummaryAgentConfig(
-                    model=summary_agent_data.get("model", "gpt-4.1-mini"),
-                    temperature=summary_agent_data.get("temperature", 0.1),
-                    max_tokens=summary_agent_data.get("max_tokens", 1000)
-                )
             
             # Parse income distributions
             income_distributions = []
@@ -205,7 +196,6 @@ class ConfigManager:
                 global_temperature=config_data.get("global_temperature"),
                 memory_strategy=config_data.get("memory_strategy", "recent"),
                 public_history_mode=public_history_mode,
-                summary_agent=summary_agent,
                 output=output,
                 # New game logic fields
                 income_distributions=income_distributions,

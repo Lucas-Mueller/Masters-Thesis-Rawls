@@ -9,12 +9,12 @@ __version__ = "2.0.0"
 __author__ = "MAAI Research Team"
 
 from .core.models import ExperimentConfig, ExperimentResults
-from .core.deliberation_manager import run_single_experiment
 from .config.manager import load_config_from_file
+from .services.experiment_orchestrator import ExperimentOrchestrator
 
 __all__ = [
     "ExperimentConfig",
-    "ExperimentResults", 
-    "run_single_experiment",
+    "ExperimentResults",
+    "ExperimentOrchestrator",
     "load_config_from_file"
 ]

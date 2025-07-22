@@ -72,13 +72,6 @@ class CertaintyLevel(str, Enum):
         return mapping[self.value]
 
 
-class SummaryAgentConfig(BaseModel):
-    """Configuration for the summary agent."""
-    model: str = Field(default="gpt-4.1-mini", description="Model to use for summary generation")
-    temperature: float = Field(default=0.1, ge=0.0, le=2.0, description="Temperature for summary generation")
-    max_tokens: int = Field(default=1000, ge=100, le=4000, description="Maximum tokens for summaries")
-
-
 class RoundSummary(BaseModel):
     """Summary of a completed deliberation round."""
     round_number: int = Field(..., ge=1, description="Round number")
@@ -174,24 +167,6 @@ class MemoryEntry(BaseModel):
     other_agents_analysis: str = Field(..., description="Analysis of other agents' positions and motivations")
     strategy_update: str = Field(..., description="Agent's updated strategy based on analysis")
     speaking_position: int = Field(..., description="Position in speaking order for this round (1=first, etc.)")
-
-
-class AgentMemory(BaseModel):
-    """Complete memory system for an agent."""
-    agent_id: str = Field(..., description="Unique identifier for the agent")
-    memory_entries: List[MemoryEntry] = Field(default_factory=list, description="Chronological memory entries")
-    
-    def add_memory(self, entry: MemoryEntry):
-        """Add a new memory entry."""
-        self.memory_entries.append(entry)
-    
-    def get_latest_memory(self) -> Optional[MemoryEntry]:
-        """Get the most recent memory entry."""
-        return self.memory_entries[-1] if self.memory_entries else None
-    
-    def get_strategy_evolution(self) -> List[str]:
-        """Get the evolution of strategies over time."""
-        return [entry.strategy_update for entry in self.memory_entries]
 
 
 # Phase 1 Memory Models
@@ -411,7 +386,6 @@ class ExperimentConfig(BaseModel):
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
     memory_strategy: str = Field(default="decomposed", description="Memory strategy: recent|decomposed")
     public_history_mode: PublicHistoryMode = Field(default=PublicHistoryMode.FULL, description="Public history mode: full|summarized")
-    summary_agent: SummaryAgentConfig = Field(default_factory=SummaryAgentConfig, description="Summary agent configuration")
     logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output configuration")
     
@@ -464,30 +438,17 @@ class AgentEvaluationResponse(BaseModel):
     timestamp: datetime = Field(default_factory=datetime.now, description="Response timestamp")
 
 
-class FeedbackResponse(BaseModel):
-    """Individual agent feedback after experiment completion."""
-    agent_id: str = Field(..., description="Agent identifier")
-    agent_name: str = Field(..., description="Agent name")
-    satisfaction_rating: int = Field(..., ge=1, le=10, description="Satisfaction with group choice (1-10)")
-    fairness_rating: int = Field(..., ge=1, le=10, description="Perceived fairness of chosen principle (1-10)")
-    would_choose_again: bool = Field(..., description="Whether agent would make same choice again")
-    alternative_preference: Optional[int] = Field(None, ge=1, le=4, description="Alternative principle preference if any")
-    reasoning: str = Field(..., description="Agent's reasoning for their feedback")
-    timestamp: datetime = Field(default_factory=datetime.now, description="Feedback timestamp")
-
-
 class ExperimentResults(BaseModel):
     """Complete results of an experiment."""
     experiment_id: str = Field(..., description="Unique experiment identifier")
     configuration: ExperimentConfig = Field(..., description="Experiment configuration")
     deliberation_transcript: List[DeliberationResponse] = Field(default_factory=list, description="Full conversation transcript")
-    agent_memories: List[AgentMemory] = Field(default_factory=list, description="Private agent memories")
+    agent_memories: List[EnhancedAgentMemory] = Field(default_factory=list, description="Private agent memories")
     speaking_orders: List[List[str]] = Field(default_factory=list, description="Speaking order for each round")
     round_summaries: List[RoundSummary] = Field(default_factory=list, description="AI-generated summaries of each round")
     consensus_result: ConsensusResult = Field(..., description="Consensus outcome")
     initial_evaluation_responses: List[AgentEvaluationResponse] = Field(default_factory=list, description="Initial Likert scale assessments (before deliberation)")
     evaluation_responses: List[AgentEvaluationResponse] = Field(default_factory=list, description="Post-consensus principle evaluations")
-    feedback_responses: List[FeedbackResponse] = Field(default_factory=list, description="Post-experiment feedback (legacy)")
     performance_metrics: PerformanceMetrics = Field(..., description="Performance data")
     start_time: datetime = Field(default_factory=datetime.now, description="Experiment start time")
     end_time: Optional[datetime] = Field(None, description="Experiment end time")

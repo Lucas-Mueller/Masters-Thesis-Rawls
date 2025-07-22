@@ -13,10 +13,10 @@ from datetime import datetime
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src'))
 
 from maai.core.models import (
-    ExperimentConfig, AgentMemory, MemoryEntry, PrincipleChoice, AgentConfig, DefaultConfig,
+    ExperimentConfig, EnhancedAgentMemory, MemoryEntry, PrincipleChoice, AgentConfig, DefaultConfig,
     IncomeDistribution, EconomicOutcome, PreferenceRanking, IncomeClass, CertaintyLevel
 )
-from maai.core.deliberation_manager import run_single_experiment, DeliberationManager
+from maai.services.experiment_orchestrator import ExperimentOrchestrator
 from maai.config.manager import load_config_from_file
 
 
@@ -27,7 +27,7 @@ async def test_basic_functionality():
     print("1. Testing data models...")
     try:
         # Test memory models
-        memory = AgentMemory(agent_id="test_agent")
+        memory = EnhancedAgentMemory(agent_id="test_agent")
         memory_entry = MemoryEntry(
             round_number=1,
             timestamp=datetime.now(),
@@ -37,7 +37,7 @@ async def test_basic_functionality():
             speaking_position=1
         )
         memory.add_memory(memory_entry)
-        print(f"   ✓ AgentMemory created with {len(memory.memory_entries)} entries")
+        print(f"   ✓ EnhancedAgentMemory created with {len(memory.memory_entries)} entries")
         
         # Test configuration with new format (including new game logic fields)
         sample_distributions = [
@@ -73,9 +73,9 @@ async def test_basic_functionality():
         print(f"   ✓ Agent configuration - agents defined: {len(config.agents)}")
         print(f"   ✓ Agent configuration - defaults available: {config.defaults.model}")
         
-        # Test manager initialization
-        manager = DeliberationManager(config)
-        print(f"   ✓ DeliberationManager created")
+        # Test orchestrator initialization
+        orchestrator = ExperimentOrchestrator()
+        print(f"   ✓ ExperimentOrchestrator created")
         
     except Exception as e:
         print(f"   ✗ Error in basic functionality: {e}")
@@ -158,7 +158,8 @@ async def test_small_experiment():
     print(f"Running experiment: {config.experiment_id}")
     
     try:
-        results = await run_single_experiment(config)
+        orchestrator = ExperimentOrchestrator()
+        results = await orchestrator.run_experiment(config)
         
         print(f"\n--- Results ---")
         print(f"Consensus reached: {results.consensus_result.unanimous}")

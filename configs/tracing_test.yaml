@@ -1,0 +1,53 @@
+experiment_id: "tracing_test_minimal"
+
+# Minimal experiment settings for tracing test
+experiment:
+  max_rounds: 2  # Minimal rounds for quick testing
+  decision_rule: unanimity
+  timeout_seconds: 60
+
+# New game logic settings
+individual_rounds: 2  # Reduced for quick testing
+payout_ratio: 0.0001
+enable_detailed_examples: true
+enable_secret_ballot: false  # Disable for faster testing
+
+# Simple income distribution
+income_distributions:
+  - distribution_id: 1
+    name: "Test Distribution"
+    income_by_class:
+      High: 30000
+      Medium high: 25000
+      Medium: 20000
+      Medium low: 15000
+      Low: 10000
+
+# Minimal agents configuration (2 agents for speed)
+agents:
+  - name: "Agent1"
+    model: "gpt-4o-mini"
+    personality: "You are a participant in a distributive justice experiment."
+  - name: "Agent2" 
+    model: "gpt-4o-mini"
+    personality: "You are a participant in a distributive justice experiment."
+
+defaults:
+  personality: "You are a participant in a distributive justice experiment."
+  model: "gpt-4o-mini"
+
+# Phase 1 Memory Configuration (minimal)
+enable_phase1_memory: true
+phase1_memory_frequency: "each_activity"
+phase1_consolidation_strategy: "summary"
+phase1_memory_integration: true
+phase1_reflection_depth: "brief"
+
+# Earnings tracking (disabled for speed)
+earnings_tracking:
+  enabled: false
+
+# Output settings
+output:
+  directory: "test_tracing_output"
+  formats: ["json"]

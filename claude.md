@@ -463,6 +463,7 @@ The Phase 1 Memory System addresses a critical gap in agent continuity by preser
 - Supports GPT-4.1, GPT-4.1 mini/nano, Claude, and DeepSeek models
 - All operations are async-first using asyncio
 - Pydantic models ensure data validation throughout the system
+- **Comprehensive Tracing**: Full OpenAI Agents SDK tracing integration for complete experiment observability
 
 ## Advanced Service Configuration
 
@@ -483,6 +484,56 @@ results = await orchestrator.run_experiment(config)
 ```
 
 This allows researchers to A/B test different consensus mechanisms, communication patterns, and memory strategies without changing core code.
+
+## OpenAI Agents SDK Tracing
+
+**Comprehensive Experiment Tracing**: The framework integrates with OpenAI Agents SDK's tracing system to provide complete observability of all experiment operations.
+
+**What Gets Traced**:
+- Complete experiment workflow from initialization to completion
+- All agent interactions and LLM generation calls
+- Phase 1: Individual familiarization activities (rankings, examples, individual rounds)
+- Phase 2: Group deliberation rounds and consensus detection
+- Economic outcomes and earnings tracking
+- Memory generation and consolidation processes
+- Data export and logging operations
+
+**Tracing Features**:
+- **Hierarchical Spans**: Organized experiment structure with custom spans for each phase and activity
+- **Metadata Rich**: Experiment configuration, agent details, and performance metrics included
+- **Cross-Experiment Linking**: Batch experiments linked with group IDs for comparative analysis
+- **Platform Integration**: Direct links to OpenAI platform for trace visualization
+- **Research Optimized**: Tailored for multi-agent deliberation research workflows
+
+**Usage**:
+```python
+# Single experiment with tracing
+result = await run_experiment('config_name')
+print(f"View trace: {result['trace_url']}")
+
+# Batch experiments with linked tracing
+results = await run_batch(['config1', 'config2'])
+for result in results:
+    print(f"{result['experiment_id']}: {result['trace_url']}")
+```
+
+**Trace Structure**:
+```
+Distributive Justice Experiment
+├── Agent Initialization
+├── Phase 1: Individual Familiarization
+│   ├── Initial Preference Ranking
+│   ├── Detailed Examples Presentation
+│   ├── Individual Application Rounds
+│   │   ├── Individual Round 1 - Agent1
+│   │   └── Individual Round 1 - Agent2
+│   └── Post-Individual Ranking
+├── Phase 2: Group Experiment
+│   ├── Group Deliberation
+│   ├── Group Economic Outcomes
+│   └── Final Preference Ranking
+└── Data Export and Logging
+```
 
 ## Batch Experiment System
 

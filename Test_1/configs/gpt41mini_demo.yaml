@@ -1,0 +1,97 @@
+agents:
+- model: gpt-4.1-nano
+  name: Dr_Economics
+  personality: You are Dr. Economics, a pragmatic economist focused on maximizing
+    overall efficiency and economic growth. You believe in market-based solutions
+    and are skeptical of policies that might reduce incentives for productivity.
+  temperature: 0.7
+- model: gpt-4.1-nano
+  name: Prof_Philosophy
+  personality: You are Prof. Philosophy, a moral philosopher deeply committed to fairness
+    and justice. You are influenced by Rawlsian theory and believe society should
+    prioritize helping the least advantaged members.
+  temperature: 0.7
+decision_rule: unanimity
+defaults:
+  model: gpt-4.1-mini
+  personality: You are an agent participating in an economic justice experiment.
+  temperature: 0.7
+earnings_tracking:
+  congratulatory_threshold: 0.75
+  disclosure_points:
+  - after_round_2
+  - end_phase1
+  - after_group
+  - experiment_end
+  disclosure_style: motivational
+  enabled: true
+  encouragement_threshold: 0.25
+  include_phase_breakdown: true
+  show_performance_context: true
+  show_potential_ranges: true
+enable_detailed_examples: true
+enable_phase1_memory: true
+enable_secret_ballot: true
+experiment_id: gpt41mini_clean_architecture_demo
+global_temperature: null
+income_distributions:
+- distribution_id: 1
+  income_by_class:
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - High
+    : 120000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Low
+    : 25000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Medium
+    : 60000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Medium high
+    : 85000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Medium low
+    : 40000
+  name: Tech Industry Distribution
+- distribution_id: 2
+  income_by_class:
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - High
+    : 80000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Low
+    : 20000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Medium
+    : 40000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Medium high
+    : 55000
+    ? !!python/object/apply:maai.core.models.IncomeClass
+    - Medium low
+    : 30000
+  name: Service Industry Distribution
+individual_rounds: 3
+logging:
+  capture_memory_context: true
+  capture_memory_steps: true
+  capture_raw_inputs: true
+  capture_raw_outputs: true
+  enabled: true
+  include_processing_times: true
+max_rounds: 3
+memory_strategy: phase_aware_decomposed
+output:
+  directory: Test_1/results
+  formats:
+  - json
+  include_feedback: true
+  include_transcript: true
+payout_ratio: 0.0001
+phase1_consolidation_strategy: summary
+phase1_memory_frequency: each_activity
+phase1_memory_integration: true
+phase1_reflection_depth: standard
+public_history_mode: !!python/object/apply:maai.core.models.PublicHistoryMode
+- full
+timeout_seconds: 180

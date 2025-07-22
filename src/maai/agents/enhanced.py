@@ -8,7 +8,7 @@ from typing import Optional, List
 from agents import Agent, trace
 from agents.extensions.models.litellm_model import LitellmModel
 from agents.model_settings import ModelSettings
-from ..core.models import PrincipleChoice, DeliberationResponse, ConsensusResult, FeedbackResponse, get_all_principles_text, get_default_personality
+from ..core.models import PrincipleChoice, DeliberationResponse, ConsensusResult, get_all_principles_text, get_default_personality
 from datetime import datetime
 
 

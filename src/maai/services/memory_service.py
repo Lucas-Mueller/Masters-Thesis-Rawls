@@ -9,7 +9,7 @@ from typing import Dict, List, Optional
 from uuid import uuid4
 from agents import Runner, ItemHelpers
 from ..core.models import (
-    AgentMemory, MemoryEntry, DeliberationResponse,
+    MemoryEntry, DeliberationResponse,
     EnhancedAgentMemory, IndividualMemoryEntry, IndividualMemoryType,
     IndividualMemoryContent, IndividualReflectionContext, LearningContext,
     Phase1ExperienceData, ConsolidatedMemory, PrincipleChoice, EconomicOutcome

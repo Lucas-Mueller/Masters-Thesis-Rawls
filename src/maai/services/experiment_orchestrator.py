@@ -6,7 +6,7 @@ Coordinates all services to run complete deliberation experiments.
 import time
 from datetime import datetime
 from typing import List, Optional
-# No longer need trace import - handled by main caller
+from agents import gen_trace_id
 from agents.model_settings import ModelSettings
 from ..core.models import (
     ExperimentConfig,
@@ -14,9 +14,7 @@ from ..core.models import (
     PerformanceMetrics,
     ConsensusResult,
     DeliberationResponse,
-    FeedbackResponse,
     AgentEvaluationResponse,
-    AgentMemory,
     PreferenceRanking,
     EconomicOutcome,
     IncomeDistribution,
@@ -81,7 +79,6 @@ class ExperimentOrchestrator:
         self.transcript: List[DeliberationResponse] = []
         self.initial_evaluation_responses: List[AgentEvaluationResponse] = []
         self.evaluation_responses: List[AgentEvaluationResponse] = []
-        self.feedback_responses: List[FeedbackResponse] = []
         self.current_round = 0
         self.start_time: Optional[datetime] = None
         self.performance_metrics = PerformanceMetrics(
@@ -103,8 +100,11 @@ class ExperimentOrchestrator:
         
         # Experiment logger (initialized when experiment starts)
         self.logger: Optional[ExperimentLogger] = None
+        
+        # Tracing
+        self.trace_id: Optional[str] = None
     
-    async def run_experiment(self, config: ExperimentConfig) -> ExperimentResults:
+    async def run_experiment(self, config: ExperimentConfig, trace_id: str = None) -> ExperimentResults:
         """
         Run a complete deliberation experiment with new two-phase game logic.
         
@@ -120,12 +120,14 @@ class ExperimentOrchestrator:
         
         Args:
             config: Experiment configuration
+            trace_id: Optional trace ID for OpenAI Agents SDK tracing
             
         Returns:
             Complete experiment results
         """
         self.config = config
         self.start_time = datetime.now()
+        self.trace_id = trace_id or gen_trace_id()
         
         # Initialize experiment logger
         self.logger = ExperimentLogger(config.experiment_id, config)
@@ -220,6 +222,12 @@ class ExperimentOrchestrator:
             exported_file = self.logger.export_unified_json()
             print(f"\n--- Data Export Complete ---")
             print(f"  Unified Agent-Centric JSON: {exported_file}")
+            
+            # Print trace information
+            if self.trace_id:
+                print(f"\n--- Tracing Information ---")
+                print(f"  Trace ID: {self.trace_id}")
+                print(f"  View trace: https://platform.openai.com/traces/trace?trace_id={self.trace_id}")
             
             return results
             
@@ -382,44 +390,6 @@ class ExperimentOrchestrator:
             if response.evaluation_duration:
                 print(f"      (Evaluation time: {response.evaluation_duration:.1f}s)")
     
-    async def _collect_feedback(self, consensus_result: ConsensusResult):
-        """Generate simple post-experiment feedback based on agent choices."""
-        print("\n--- Post-Experiment Feedback Analysis ---")
-        
-        if not consensus_result.unanimous:
-            print("  No consensus reached - generating feedback based on experience")
-        else:
-            principle = get_principle_by_id(consensus_result.agreed_principle.principle_id)
-            print(f"  Consensus reached on Principle {consensus_result.agreed_principle.principle_id}: {principle['name']}")
-        
-        # Generate simple feedback based on agent behavior
-        for agent in self.agents:
-            # Simple satisfaction calculation based on consensus and agent's final choice
-            if consensus_result.unanimous:
-                # If consensus reached and agent agreed, high satisfaction
-                satisfaction = 8 if agent.current_choice.principle_id == consensus_result.agreed_principle.principle_id else 6
-                fairness = 8 if agent.current_choice.principle_id == consensus_result.agreed_principle.principle_id else 7
-                would_choose_again = agent.current_choice.principle_id == consensus_result.agreed_principle.principle_id
-            else:
-                # No consensus, moderate satisfaction
-                satisfaction = 5
-                fairness = 6
-                would_choose_again = True
-            
-            feedback = FeedbackResponse(
-                agent_id=agent.agent_id,
-                agent_name=agent.name,
-                satisfaction_rating=satisfaction,
-                fairness_rating=fairness,
-                would_choose_again=would_choose_again,
-                alternative_preference=None,
-                reasoning=f"Generated based on final choice: Principle {agent.current_choice.principle_id}",
-                timestamp=datetime.now()
-            )
-            
-            self.feedback_responses.append(feedback)
-            print(f"  {agent.name}: Satisfaction {feedback.satisfaction_rating}/10, Fairness {feedback.fairness_rating}/10")
-    
     def _finalize_results(self, consensus_result: ConsensusResult) -> ExperimentResults:
         """Finalize and package all experiment results."""
         end_time = datetime.now()
@@ -466,7 +436,6 @@ class ExperimentOrchestrator:
             consensus_result=consensus_result,
             initial_evaluation_responses=self.initial_evaluation_responses,
             evaluation_responses=self.evaluation_responses,
-            feedback_responses=self.feedback_responses,
             performance_metrics=self.performance_metrics,
             start_time=self.start_time,
             end_time=end_time,
@@ -968,7 +937,6 @@ Please provide your final ranking of all 4 distributive justice principles based
         self.transcript = []
         self.initial_evaluation_responses = []
         self.evaluation_responses = []
-        self.feedback_responses = []
         self.current_round = 0
         self.start_time = None
         self.performance_metrics = PerformanceMetrics(

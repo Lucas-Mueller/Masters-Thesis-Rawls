@@ -50,9 +50,9 @@ class TestRunExperiment:
         config_path = generator.generate_and_save_config("test_experiment.yaml", "test_experiment")
         
         # Mock the core experiment function
-        with patch('run_experiment.run_single_experiment') as mock_run:
+        with patch('maai.services.experiment_orchestrator.ExperimentOrchestrator.run_experiment') as mock_run:
             # Mock the config loading
-            with patch('run_experiment.load_config_from_file') as mock_load:
+            with patch('maai.config.manager.load_config_from_file') as mock_load:
                 # Create mock config object
                 mock_config = MagicMock()
                 mock_config.experiment_id = "test_experiment"
@@ -90,9 +90,9 @@ class TestRunExperiment:
         config_path = generator.generate_and_save_config("test_path.yaml", "test_path")
         
         # Mock the core experiment function
-        with patch('run_experiment.run_single_experiment') as mock_run:
+        with patch('maai.services.experiment_orchestrator.ExperimentOrchestrator.run_experiment') as mock_run:
             # Mock the config loading
-            with patch('run_experiment.load_config_from_file') as mock_load:
+            with patch('maai.config.manager.load_config_from_file') as mock_load:
                 # Create mock config object
                 mock_config = MagicMock()
                 mock_config.experiment_id = "test_path"
