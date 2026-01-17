@@ -127,25 +127,34 @@ class ExperimentLogger:
     
     def log_agent_interaction(self, agent_id: str, round_num: int, 
                             interaction_type: str, input_prompt: str = None,
-                            raw_response: str = None, sequence_num: int = 0):
-        """Log individual agent interactions with sequence tracking."""
+                            raw_response: str = None, sequence_num: int = 0,
+                            memory_state: Dict[str, Any] = None, bank_balance: float = None):
+        """Log individual agent interactions with complete I/O and state tracking."""
         round_key = f"round_{round_num}"
         if agent_id not in self.agent_data:
             self.agent_data[agent_id] = {"overall": {}}
         if round_key not in self.agent_data[agent_id]:
             self.agent_data[agent_id][round_key] = {}
             
-        # Initialize input/output dicts if they don't exist
+        # Initialize data structures if they don't exist
         if "input_dict" not in self.agent_data[agent_id][round_key]:
             self.agent_data[agent_id][round_key]["input_dict"] = {}
         if "output_dict" not in self.agent_data[agent_id][round_key]:
             self.agent_data[agent_id][round_key]["output_dict"] = {}
+        if "memory_state_dict" not in self.agent_data[agent_id][round_key]:
+            self.agent_data[agent_id][round_key]["memory_state_dict"] = {}
+        if "bank_balance_dict" not in self.agent_data[agent_id][round_key]:
+            self.agent_data[agent_id][round_key]["bank_balance_dict"] = {}
             
         # Store input/output with sequence number
         if input_prompt:
             self.agent_data[agent_id][round_key]["input_dict"][str(sequence_num)] = input_prompt
         if raw_response:
             self.agent_data[agent_id][round_key]["output_dict"][str(sequence_num)] = raw_response
+        if memory_state:
+            self.agent_data[agent_id][round_key]["memory_state_dict"][str(sequence_num)] = memory_state
+        if bank_balance is not None:
+            self.agent_data[agent_id][round_key]["bank_balance_dict"][str(sequence_num)] = bank_balance
     
     def log_final_consensus(self, agent_id: str, agreement_reached: bool,
                           agreement_choice: str = None, num_rounds: int = None,

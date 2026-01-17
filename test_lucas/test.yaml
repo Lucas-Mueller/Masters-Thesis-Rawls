@@ -1,0 +1,109 @@
+experiment_id: test_lucas_message_structure_refined
+global_temperature: 0.1
+
+# Configuration updated for Message Structure Refinements (Phase 5 Complete)
+# Uses simplified memory system with MessageBuilder integration
+
+experiment:
+  max_rounds: 5
+  decision_rule: unanimity
+  timeout_seconds: 300
+
+# New game logic configuration
+individual_rounds: 4
+payout_ratio: 0.0001  # $1 per $10,000 income
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Simplified Memory Configuration (New Pattern)
+enable_phase1_memory: true  # Only this option remains
+
+# Earnings tracking configuration
+earnings_tracking:
+  enabled: true
+  disclosure_points: ["after_round_2", "end_phase1", "after_group", "experiment_end"]
+  disclosure_style: "motivational"
+  show_performance_context: true
+  show_potential_ranges: true
+  include_phase_breakdown: true
+  congratulatory_threshold: 0.75
+  encouragement_threshold: 0.25
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Distribution A"
+    income_by_class:
+      High: 32000
+      Medium high: 27000
+      Medium: 24000
+      Medium low: 13000
+      Low: 12000
+  - distribution_id: 2
+    name: "Distribution B"
+    income_by_class:
+      High: 28000
+      Medium high: 22000
+      Medium: 20000
+      Medium low: 17000
+      Low: 13000
+  - distribution_id: 3
+    name: "Distribution C"
+    income_by_class:
+      High: 31000
+      Medium high: 24000
+      Medium: 21000
+      Medium low: 16000
+      Low: 14000
+  - distribution_id: 4
+    name: "Distribution D"
+    income_by_class:
+      High: 21000
+      Medium high: 20000
+      Medium: 19000
+      Medium low: 16000
+      Low: 15000
+
+# Agent configurations for refined message structure
+agents:
+  - name: "Economist"
+    model: "gpt-4.1-nano"
+    personality: |
+      You are an economist focused on efficiency and optimal resource allocation. 
+      You make decisions based on economic theory and empirical evidence, always considering both efficiency and fairness.
+      You analyze income distributions systematically and prefer principles that maximize overall welfare while considering equity concerns.
+  - name: "Philosopher"
+    model: "gpt-4.1-nano"
+    personality: |
+      You are a philosopher concerned with justice and fairness for all members of society.
+      You approach distributive justice from ethical principles, focusing on what would be most just and fair.
+      You carefully consider the moral implications of different distribution principles and advocate for those that protect the most vulnerable.
+
+defaults:
+  personality: |
+    You are a participant in a negotiation about distributive justice principles.
+    You make thoughtful decisions about justice principles, balancing efficiency and fairness considerations.
+    You engage constructively in discussions and are open to changing your mind based on compelling arguments.
+  model: "gpt-4.1-mini"
+  temperature: 0.1
+
+# Logging configuration - agent-centric JSON format
+logging:
+  enabled: true
+  capture_raw_inputs: true
+  capture_raw_outputs: true
+  capture_memory_context: true
+  capture_memory_steps: true
+  include_processing_times: true
+
+output:
+  directory: test_lucas
+  formats: ["json"]
+  include_feedback: true
+  include_transcript: true
+
+# Note: Configuration simplified with Message Structure Refinements
+# - Memory strategy options removed (single mode only)
+# - Complex reasoning prompts removed  
+# - MessageBuilder provides standardized communication
+# - Bank balance format: "You have a current bank balance of $X.XXXX"

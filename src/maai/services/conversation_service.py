@@ -11,6 +11,8 @@ from agents import Runner, ItemHelpers
 from ..core.models import DeliberationResponse, PrincipleChoice, MemoryEntry, get_all_principles_text
 from ..agents.enhanced import DeliberationAgent
 from .public_history_service import PublicHistoryService
+from .message_builder_service import MessageBuilder
+from .simple_memory_service import SimpleMemoryService
 
 
 class CommunicationPattern(ABC):
@@ -134,7 +136,7 @@ class RoundContext:
 class ConversationService:
     """Service for managing agent communication flow and patterns."""
     
-    def __init__(self, communication_pattern: CommunicationPattern = None, logger=None, public_history_service: PublicHistoryService = None):
+    def __init__(self, communication_pattern: CommunicationPattern = None, logger=None, public_history_service: PublicHistoryService = None, message_builder: MessageBuilder = None, memory_service: SimpleMemoryService = None):
         """
         Initialize conversation service.
         
@@ -143,11 +145,15 @@ class ConversationService:
                                   Defaults to RandomCommunicationPattern.
             logger: ExperimentLogger instance for logging agent interactions
             public_history_service: Service for managing public history
+            message_builder: MessageBuilder for standardized agent communication
+            memory_service: SimpleMemoryService for agent memory management
         """
         self.pattern = communication_pattern or RandomCommunicationPattern()
         self.speaking_orders: List[List[str]] = []
         self.logger = logger
         self.public_history_service = public_history_service
+        self.message_builder = message_builder or MessageBuilder()
+        self.memory_service = memory_service or SimpleMemoryService()
     
     def generate_speaking_order(self, agents: List[DeliberationAgent], round_num: int) -> List[str]:
         """
@@ -189,11 +195,11 @@ class ConversationService:
             agent = next(a for a in agents if a.agent_id == agent_id)
             print(f"\n  --- {agent.name} (Position {position}) ---")
             
-            # Initial evaluation prompt
-            evaluation_prompt = f"""
-{get_all_principles_text()}
-
-Please carefully evaluate each of these four principles of distributive justice.
+            # Get current memory context
+            memory_context = self.memory_service.get_memory_context(agent.agent_id)
+            
+            # Build standardized message for initial evaluation
+            task_instruction = f"""Please carefully evaluate each of these four principles of distributive justice.
 
 Consider that:
 - You will be participating in an economic scenario where principles determine income distributions
@@ -207,16 +213,29 @@ After your evaluation, please:
 3. If choosing principle 4, specify your range constraint amount (maximum income difference)
 4. Explain your reasoning clearly
 
-Format your response clearly with your final choice at the end.
-"""
+Format your response clearly with your final choice at the end."""
+
+            message = self.message_builder.build_message(
+                agent=agent,
+                task_instruction=task_instruction,
+                memory_context=memory_context
+            )
             
             # Get agent's response
             import time
             start_time = time.time()
             
-            result = await Runner.run(agent, evaluation_prompt)
+            result = await Runner.run(agent, message.to_input_prompt())
             response_text = ItemHelpers.text_message_outputs(result.new_items)
             processing_time_ms = (time.time() - start_time) * 1000
+            
+            # Update agent memory with this interaction
+            await self.memory_service.update_memory(
+                agent=agent,
+                last_input=message.to_input_prompt(),
+                last_output=response_text,
+                current_memory=memory_context
+            )
             
             choice = await self._extract_principle_choice(response_text, agent.agent_id, agent.name)
             
@@ -370,6 +389,71 @@ Format your response clearly with your final choice at the end.
         
         return initial_responses
     
+    async def conduct_round_simplified(self, round_context: RoundContext, 
+                                     moderator) -> List[DeliberationResponse]:
+        """
+        Conduct a single round of deliberation using the simplified MessageBuilder system.
+        
+        Args:
+            round_context: Context for this round
+            moderator: Discussion moderator for choice extraction
+            
+        Returns:
+            List of new DeliberationResponse entries
+        """
+        new_responses = []
+        
+        for position, agent_id in enumerate(round_context.speaking_order, 1):
+            agent = round_context.get_agent_by_id(agent_id)
+            print(f"    {agent.name} (Position {position})")
+            
+            # Log round start
+            if self.logger:
+                public_history = self._build_public_context(agent_id, round_context)
+                self.logger.log_round_start(
+                    agent_id=agent.name,
+                    round_num=round_context.round_number,
+                    speaking_order=position,
+                    public_history=public_history
+                )
+            
+            # Generate public communication using MessageBuilder
+            public_message = await self._generate_public_communication(
+                agent, round_context
+            )
+            
+            # Extract principle choice
+            updated_choice = await self._extract_principle_choice(public_message, agent.agent_id, agent.name, moderator)
+            agent.current_choice = updated_choice
+            
+            # Log communication and choice
+            if self.logger:
+                self.logger.log_communication(
+                    agent_id=agent.name,
+                    round_num=round_context.round_number,
+                    communication=public_message,
+                    choice=updated_choice.principle_name
+                )
+            
+            # Create response entry  
+            response = DeliberationResponse(
+                agent_id=agent.agent_id,
+                agent_name=agent.name,
+                public_message=public_message,
+                private_memory_entry=None,  # Simplified system doesn't use complex memory entries
+                updated_choice=updated_choice,
+                round_number=round_context.round_number,
+                timestamp=datetime.now(),
+                speaking_position=position
+            )
+            
+            new_responses.append(response)
+            round_context.transcript.append(response)
+            
+            print(f"      Choice: {updated_choice.principle_name}")
+        
+        return new_responses
+    
     async def conduct_round(self, round_context: RoundContext, 
                           memory_service, moderator) -> List[DeliberationResponse]:
         """
@@ -413,12 +497,17 @@ Format your response clearly with your final choice at the end.
                     strategy=private_memory_entry.strategy_update
                 )
             
-            # 2. Generate public communication
-            public_message = await self._generate_public_communication(
-                agent, round_context, private_memory_entry
+            # 2. Get the full memory context that was used for memory generation
+            full_memory_context = memory_service._build_memory_context(
+                agent.agent_id, round_context.round_number, round_context.transcript, memory_service.earnings_service
             )
             
-            # 3. Extract principle choice
+            # 3. Generate public communication with simplified system
+            public_message = await self._generate_public_communication(
+                agent, round_context
+            )
+            
+            # 4. Extract principle choice
             updated_choice = await self._extract_principle_choice(public_message, agent.agent_id, agent.name, moderator)
             agent.current_choice = updated_choice
             
@@ -431,7 +520,7 @@ Format your response clearly with your final choice at the end.
                     choice=updated_choice.principle_name
                 )
             
-            # 4. Create response entry
+            # 5. Create response entry
             response = DeliberationResponse(
                 agent_id=agent.agent_id,
                 agent_name=agent.name,
@@ -452,49 +541,66 @@ Format your response clearly with your final choice at the end.
         return new_responses
     
     async def _generate_public_communication(self, agent: DeliberationAgent, 
-                                           round_context: RoundContext, 
-                                           memory_entry: MemoryEntry) -> str:
-        """Generate agent's public communication based on their memory."""
+                                           round_context: RoundContext) -> str:
+        """Generate agent's public communication using MessageBuilder."""
         # Build context for public communication
         public_context = await self._build_public_context_async(agent.agent_id, round_context)
         
-        communication_prompt = f"""Now it's your turn to speak publicly to the other agents in round {round_context.round_number}.
-
-Based on your private analysis:
-STRATEGY: {memory_entry.strategy_update}
+        # Get current memory context
+        memory_context = self.memory_service.get_memory_context(agent.agent_id)
+        
+        # Create task instruction for public communication
+        task_instruction = f"""Now it's your turn to speak publicly to the other agents in round {round_context.round_number}.
 
 {public_context}
 
+What do you want to say to the group? End with your current principle choice (1, 2, 3, or 4)."""
 
-What do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).
-"""
+        # Build standardized message
+        message = self.message_builder.build_message(
+            agent=agent,
+            task_instruction=task_instruction,
+            memory_context=memory_context
+        )
         
         # Get public communication
         import time
         start_time = time.time()
         
-        # Log interaction with unified format
+        # Log interaction if logger is available
         if self.logger:
             self.logger.log_agent_interaction(
                 agent_id=agent.name,
                 round_num=round_context.round_number,
                 interaction_type="communication",
-                input_prompt=communication_prompt,
-                sequence_num=1  # Communication generation step
+                input_prompt=message.to_input_prompt(),
+                sequence_num=1,
+                memory_state={"simplified_memory": memory_context[:200] + "..." if len(memory_context) > 200 else memory_context},
+                bank_balance=0.0  # Will be updated by proper integration
             )
         
-        comm_result = await Runner.run(agent, communication_prompt)
+        comm_result = await Runner.run(agent, message.to_input_prompt())
         response_text = ItemHelpers.text_message_outputs(comm_result.new_items)
         processing_time_ms = (time.time() - start_time) * 1000
         
-        # Log response with unified format
+        # Update agent memory with this communication
+        await self.memory_service.update_memory(
+            agent=agent,
+            last_input=message.to_input_prompt(),
+            last_output=response_text,
+            current_memory=memory_context
+        )
+        
+        # Log response with state information
         if self.logger:
             self.logger.log_agent_interaction(
                 agent_id=agent.name,
                 round_num=round_context.round_number,
                 interaction_type="communication",
                 raw_response=response_text,
-                sequence_num=1  # Communication generation step
+                sequence_num=2,  # Response step (after input)
+                memory_state=memory_state,  # Reuse the memory state from above
+                bank_balance=bank_balance   # Reuse the bank balance from above
             )
         
         return response_text

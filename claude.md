@@ -29,7 +29,12 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 - `ConsensusService` (src/maai/services/consensus_service.py): Multiple consensus detection strategies with constraint handling
 - `ConversationService` (src/maai/services/conversation_service.py): Communication pattern management
 - `MemoryService` (src/maai/services/memory_service.py): Agent memory management strategies
+- `SimpleMemoryService` (src/maai/services/simple_memory_service.py): Simplified memory management with standardized operations
+- `MessageBuilderService` (src/maai/services/message_builder_service.py): Centralized message construction with 4-part standardized structure
+- `ConstraintExtractionService` (src/maai/services/constraint_extraction_service.py): AI-powered extraction of principle choices using GPT-4.1-mini
+- `PublicHistoryService` (src/maai/services/public_history_service.py): Public conversation history management and formatting
 - `EconomicsService` (src/maai/services/economics_service.py): Income distribution management and economic outcome calculation
+- `EarningsTrackingService` (src/maai/services/earnings_tracking_service.py): Enhanced earnings tracking with disclosure points and bank balance reporting
 - `PreferenceService` (src/maai/services/preference_service.py): Preference ranking collection and analysis
 - `ValidationService` (src/maai/services/validation_service.py): Principle choice validation and constraint requirement checking
 - `ExperimentLogger` (src/maai/services/experiment_logger.py): Comprehensive agent-centric experiment data collection
@@ -38,6 +43,10 @@ This is a Master's thesis project implementing a Multi-Agent Distributive Justic
 **Key Design Decisions**:
 - **Economic Incentive-Based**: Agents receive real monetary payouts based on income assignments, not philosophical reasoning
 - **Two-Phase Structure**: Phase 1 (Individual Familiarization) + Phase 2 (Group Deliberation)
+- **Standardized Message Structure**: 4-part message construction via `MessageBuilderService` for consistent agent communication
+- **Negotiation Language Framework**: Shift from "experiment" to "negotiation" terminology throughout agent interactions
+- **Bank Balance Reporting**: Standardized earnings disclosure using "You have a current bank balance of $X.XXXX" format
+- **AI-Powered Constraint Extraction**: Use of GPT-4.1-mini for natural language parsing of principle choices via `ConstraintExtractionService`
 - **Phase 1 Memory System**: Agents generate and preserve memories during individual experiences, creating continuity between phases
 - **Preference Rankings**: 1-4 rankings with certainty levels replace Likert scale evaluation
 - **Income Distributions**: Multiple distribution scenarios with 5 income classes each (HIGH, MEDIUM_HIGH, MEDIUM, MEDIUM_LOW, LOW)
@@ -126,31 +135,30 @@ python config_generator.py
 
 ### Testing
 ```bash
-# Run all tests (consolidated)
+# Run all tests with comprehensive test runner (recommended)
 python tests/run_all_tests.py
 
-# Run with pytest support
+# Run tests with pytest support and detailed output
 python tests/run_all_tests.py --pytest
 
-# Run individual test files
-python tests/test_core.py
-python tests/test_decomposed_memory.py
-python tests/test_experiment_logger.py
-python tests/test_temperature_configuration.py
-python tests/test_unified_logging.py
-python tests/test_consensus_service.py
-python tests/test_conversation_service.py
-python tests/test_evaluation_service.py
-python tests/test_public_history_service.py
-python tests/test_integration.py
-python tests/test_detailed_examples_service.py
-python tests/test_phase1_memory.py
+# Run individual test categories
+python tests/test_core.py                    # Core functionality tests
+python tests/test_constraint_enforcement.py # Constraint validation tests
+python tests/test_message_structure_overhaul.py # Message structure tests
+python tests/test_experiment_logger.py      # Logging system tests
+python tests/test_consensus_service.py      # Consensus detection tests
+python tests/test_conversation_service.py   # Communication pattern tests
+python tests/test_public_history_service.py # Public history management tests
+python tests/test_integration.py           # Integration tests
+python tests/test_phase1_memory.py         # Phase 1 memory system tests
 
-# Run with pytest directly
+# Run with pytest directly for detailed output
 pytest tests/ -v --tb=short
 
-# Test Phase 1 memory integration
-python test_phase1_integration.py
+# Validate specific implementations
+python validate_memory_fix.py              # Memory system validation
+python validate_message_overhaul.py        # Message structure validation
+python test_memory_integration.py          # Memory integration testing
 ```
 
 ### Direct API Usage
@@ -230,20 +238,12 @@ jupyter notebook Systematic_Analysis.ipynb
 - Default temperature can be set in the `defaults` section
 - Temperature precedence: `global_temperature` > agent-specific `temperature` > default `temperature`
 
-**Memory Strategy System**:
-- Configure how agents generate and manage private memories using `memory_strategy` field
-- Available strategies:
-  - `"recent"`: Include only the most recent N memory entries (default)
-  - `"decomposed"`: Use focused, sequential prompts for improved memory quality
-  - `"phase_aware_decomposed"`: Enhanced decomposed strategy that leverages Phase 1 experiences in Phase 2 reasoning
-- Decomposed strategy breaks memory generation into three focused steps:
-  1. **Factual Recap**: "What actually happened?" (objective events only)
-  2. **Agent Analysis**: "Focus on ONE agent's behavior" (specific observations)
-  3. **Strategic Action**: "What's ONE concrete thing you could do next?" (actionable strategy)
-- Phase-aware strategy enhances steps 2-3 with Phase 1 insights when available:
-  - Agent analysis considers individual learning experiences
-  - Strategic actions leverage consolidated Phase 1 preferences and economic learnings
-- Decomposed strategies reduce cognitive overload and produce more specific, actionable memories
+**Memory Configuration System**:
+- Simplified memory management using `enable_phase1_memory` configuration
+- `enable_phase1_memory`: Enable/disable Phase 1 memory generation and integration (default: true)
+- When enabled, agents generate memories during individual activities and carry them into group deliberation
+- Memory system uses the `SimpleMemoryService` for standardized memory operations
+- Phase 1 memories are automatically consolidated and integrated into Phase 2 context
 
 **Example Configuration Structure**:
 ```yaml
@@ -261,12 +261,8 @@ payout_ratio: 0.0001  # $0.0001 per $1 of income (e.g., $20,000 income = $2.00 p
 enable_detailed_examples: true
 enable_secret_ballot: true
 
-# Phase 1 Memory Configuration
-enable_phase1_memory: true  # Enable Phase 1 individual memory generation
-phase1_memory_frequency: "each_activity"  # Generate memories after each Phase 1 activity
-phase1_consolidation_strategy: "summary"  # Use summary consolidation before Phase 2
-phase1_memory_integration: true  # Include Phase 1 memories in Phase 2 context
-phase1_reflection_depth: "standard"  # Standard depth reflections
+# Phase 1 Memory Configuration (Simplified)
+enable_phase1_memory: true  # Enable Phase 1 individual memory generation and integration
 
 # Income distribution scenarios
 income_distributions:
@@ -287,9 +283,6 @@ income_distributions:
       MEDIUM_LOW: 18000
       LOW: 12000
 
-# Enhanced memory strategy that leverages Phase 1 experiences
-memory_strategy: "phase_aware_decomposed"
-
 agents:
   - name: "Economist"
     model: "gpt-4.1-mini"
@@ -308,12 +301,12 @@ output:
   formats: [json]
 ```
 
-**Phase 1 Memory Configuration Options**:
-- `enable_phase1_memory`: Enable/disable Phase 1 memory generation (default: true)
-- `phase1_memory_frequency`: When to generate memories - "each_activity"|"each_round"|"phase_end" (default: "each_activity")
-- `phase1_consolidation_strategy`: How to consolidate memories - "summary"|"detailed"|"key_insights" (default: "summary")
-- `phase1_memory_integration`: Include Phase 1 memories in Phase 2 context (default: true)
-- `phase1_reflection_depth`: Depth of reflections - "brief"|"standard"|"detailed" (default: "standard")
+**Simplified Configuration Options**:
+- `enable_phase1_memory`: Enable/disable Phase 1 memory generation and integration (default: true)
+- `global_temperature`: Set temperature for all agents, overriding individual settings
+- `enable_detailed_examples`: Enable concrete income distribution examples in Phase 1
+- `enable_secret_ballot`: Enable secret ballot voting for consensus detection
+- `payout_ratio`: Economic payout rate (e.g., 0.0001 = $0.0001 per $1 of income)
 
 ## Parallel Execution System
 
@@ -470,20 +463,25 @@ The Phase 1 Memory System addresses a critical gap in agent continuity by preser
 The service architecture enables flexible research experimentation:
 
 ```python
-# Example: Custom consensus strategy
+# Example: Service integration pattern
 from src.maai.services.experiment_orchestrator import ExperimentOrchestrator
+from src.maai.services.message_builder_service import MessageBuilderService
+from src.maai.services.constraint_extraction_service import ConstraintExtractionService
+from src.maai.services.simple_memory_service import SimpleMemoryService
 
+# Initialize orchestrator with integrated services
 orchestrator = ExperimentOrchestrator(
-    consensus_strategy="threshold",  # or "id_match", "semantic"
-    conversation_pattern="sequential",  # or "random", "hierarchical"
-    memory_strategy="decomposed"  # or "recent"
+    message_builder=MessageBuilderService(),
+    constraint_extractor=ConstraintExtractionService(),
+    memory_service=SimpleMemoryService(),
+    enable_phase1_memory=True
 )
 
 # Configure different experimental conditions
 results = await orchestrator.run_experiment(config)
 ```
 
-This allows researchers to A/B test different consensus mechanisms, communication patterns, and memory strategies without changing core code.
+This allows researchers to leverage standardized message construction, AI-powered constraint extraction, and simplified memory management without changing core experimental logic.
 
 ## OpenAI Agents SDK Tracing
 

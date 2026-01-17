@@ -1,0 +1,90 @@
+Starting retry system test at 2025-07-22 17:56:49.286058
+
+============================================================
+🧪 TESTING CONSTRAINT ENFORCEMENT & RETRY SYSTEM
+============================================================
+
+📋 Test Configuration:
+  - Config: test_retry_system/test_config.yaml
+  - Agents: 2 (TestAgent1, TestAgent2)
+  - Model: gpt-4o-mini
+  - Goal: Test agent retry behavior with invalid choices
+  - Expected: Agents may choose principle 3/4 without constraints
+
+🚀 Starting experiment...
+
+Loaded 2 agents:
+  - TestAgent1: gpt-4o-mini (custom personality)
+  - TestAgent2: gpt-4o-mini (custom personality)
+
+============================================================
+✅ EXPERIMENT COMPLETED SUCCESSFULLY!
+============================================================
+  Duration: 0.0 seconds
+  Experiment ID: test_retry_system
+  Consensus Reached: False
+  Output Path: None
+
+🔍 Check the output file for detailed agent interactions
+📁 Results saved in: test_retry_system/
+
+============================================================
+🎉 TEST COMPLETED - Check results in test_retry_system/
+============================================================
+Starting retry system test at 2025-07-22 17:57:30.331682
+
+============================================================
+🧪 TESTING CONSTRAINT ENFORCEMENT & RETRY SYSTEM
+============================================================
+
+📋 Test Configuration:
+  - Config: test_retry_system/test_config.yaml
+  - Agents: 2 (TestAgent1, TestAgent2)
+  - Model: gpt-4o-mini
+  - Goal: Test agent retry behavior with invalid choices
+  - Expected: Agents may choose principle 3/4 without constraints
+
+🚀 Starting experiment...
+
+Loaded 2 agents:
+  - TestAgent1: gpt-4o-mini (custom personality)
+  - TestAgent2: gpt-4o-mini (custom personality)
+
+=== Starting New Game Logic Experiment ===
+Experiment ID: test_retry_system
+Agents: 2
+Individual Rounds: 4 (fixed per new_logic.md)
+Group Deliberation Max Rounds: 2
+Income Distributions: 1
+Payout Ratio: $0.0001 per $1
+
+--- Initializing Agents ---
+Created 2 deliberation agents
+  - TestAgent1 (agent_1)
+  - TestAgent2 (agent_2)
+
+=== PHASE 1: Individual Familiarization ===
+
+--- Phase 1.1: Initial Preference Ranking ---
+Collected initial rankings from 2 agents
+Generating initial reflection memories...
+
+--- Phase 1.3: Individual Application Rounds (4 rounds) ---
+
+  Round 1/4
+Error during experiment: invalid literal for int() with base 10: ''
+
+============================================================
+✅ EXPERIMENT COMPLETED SUCCESSFULLY!
+============================================================
+  Duration: 26.8 seconds
+  Experiment ID: test_retry_system
+  Consensus Reached: False
+  Output Path: None
+
+🔍 Check the output file for detailed agent interactions
+📁 Results saved in: test_retry_system/
+
+============================================================
+🎉 TEST COMPLETED - Check results in test_retry_system/
+============================================================

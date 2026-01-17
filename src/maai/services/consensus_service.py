@@ -66,27 +66,16 @@ class IdMatchingStrategy(ConsensusDetectionStrategy):
             sample_response = next(iter(latest_responses.values()))
             agreed_principle = sample_response.updated_choice
             
-            # Ensure constraint values are properly set for principles 3 and 4
+            # Validate that constraint values are properly set for principles 3 and 4
+            # No longer apply default values - require explicit constraints
             if consensus_principle_id == 3 and agreed_principle.floor_constraint is None:
-                # Import here to avoid circular imports
-                from ..core.models import PrincipleChoice, get_principle_by_id
-                principle_info = get_principle_by_id(consensus_principle_id)
-                agreed_principle = PrincipleChoice(
-                    principle_id=consensus_principle_id,
-                    principle_name=principle_info['name'],
-                    reasoning=agreed_principle.reasoning,
-                    floor_constraint=15000  # Default floor constraint
-                )
+                # This should not happen if validation is working correctly
+                print(f"Warning: Consensus detected for principle 3 without floor constraint")
+                return ConsensusResult(unanimous=False, agreed_principle=None, dissenting_agents=list(latest_responses.keys()), rounds_to_consensus=0, total_messages=len(transcript))
             elif consensus_principle_id == 4 and agreed_principle.range_constraint is None:
-                # Import here to avoid circular imports  
-                from ..core.models import PrincipleChoice, get_principle_by_id
-                principle_info = get_principle_by_id(consensus_principle_id)
-                agreed_principle = PrincipleChoice(
-                    principle_id=consensus_principle_id,
-                    principle_name=principle_info['name'],
-                    reasoning=agreed_principle.reasoning,
-                    range_constraint=20000  # Default range constraint
-                )
+                # This should not happen if validation is working correctly
+                print(f"Warning: Consensus detected for principle 4 without range constraint")
+                return ConsensusResult(unanimous=False, agreed_principle=None, dissenting_agents=list(latest_responses.keys()), rounds_to_consensus=0, total_messages=len(transcript))
             
             # Calculate rounds to consensus
             max_round = max(resp.round_number for resp in latest_responses.values())

@@ -25,34 +25,30 @@ class DeliberationAgent(Agent):
                  personality: str = "You are an agent tasked to design a future society.",
                  model_settings: Optional[ModelSettings] = None):
         
-        base_instructions = f"""
+        # System prompt with new structure
+        system_prompt = f"""=== ROLE DESCRIPTION ===
 {personality}
 
-You are participating in a deliberation about distributive justice principles.
+=== NEGOTIATION DESCRIPTION ===
+You are participating in a negotiation about distributive justice principles where you and other participants will discuss fair income distribution approaches.
 
-{get_all_principles_text()}
+The negotiation consists of two phases:
+Phase 1 (Individual): You will learn about principles individually through examples and practice rounds
+Phase 2 (Group): You will discuss with other participants to reach agreement on one principle
 
-IMPORTANT: 
-Your task is to:
-Choose the best principle for your society's income distribution system
+Your decisions have real financial consequences - you will receive actual monetary payouts based on your assigned income class after the group decides on a principle.
 
-Important context:
-- You will be participating in an economic scenario where your chosen principle determines income distributions
-- Your income class will be randomly assigned AFTER the group decides on a principle
-- Different principles result in different income distributions for all members of society
-- You will receive economic rewards based on the actual income assigned to your class
-- If the group cannot reach unanimous agreement, a random distribution will be used
-- Focus on what would be fair and just for society as a whole
-
-"""
+The four principles being considered are:
+{get_all_principles_text()}"""
         
         super().__init__(
             name=name,
-            instructions=base_instructions,
+            instructions=system_prompt,  # Only role and negotiation description
             model=model,
             model_settings=model_settings
         )
         self.agent_id = agent_id
+        self.personality = personality  # Store personality for MessageBuilder
         self.current_choice: Optional[PrincipleChoice] = None
         self.round_history: List[str] = []
 

@@ -12,6 +12,8 @@ from ..core.models import (
     get_all_principles_text
 )
 from ..agents.enhanced import DeliberationAgent
+from .message_builder_service import MessageBuilder
+from .simple_memory_service import SimpleMemoryService
 
 
 class PreferenceService:
@@ -20,15 +22,19 @@ class PreferenceService:
     Replaces the Likert scale evaluation system with ranking collection.
     """
     
-    def __init__(self, max_concurrent_evaluations: int = 50):
+    def __init__(self, max_concurrent_evaluations: int = 50, message_builder: MessageBuilder = None, memory_service: SimpleMemoryService = None):
         """
         Initialize the preference service.
         
         Args:
             max_concurrent_evaluations: Maximum number of concurrent preference collections
+            message_builder: MessageBuilder for standardized agent communication
+            memory_service: SimpleMemoryService for agent memory management
         """
         self.max_concurrent_evaluations = max_concurrent_evaluations
         self.semaphore = asyncio.Semaphore(max_concurrent_evaluations)
+        self.message_builder = message_builder or MessageBuilder()
+        self.memory_service = memory_service or SimpleMemoryService()
     
     async def collect_preference_ranking(
         self, 
@@ -50,7 +56,11 @@ class PreferenceService:
         async with self.semaphore:
             principles_text = get_all_principles_text()
             
-            prompt = f"""Please rank the 4 distributive justice principles from best (1) to worst (4) according to your preference.
+            # Get current memory context
+            memory_context = self.memory_service.get_memory_context(agent.agent_id)
+            
+            # Build task instruction
+            task_instruction = f"""Please rank the 4 distributive justice principles from best (1) to worst (4) according to your preference.
 
 {principles_text}
 
@@ -66,13 +76,26 @@ RANKING:
 4. [Principle number] - [Principle name]
 
 CERTAINTY: [Very Unsure/Unsure/No Opinion/Sure/Very Sure]
-
-REASONING: [Explain your ranking and certainty level]
 """
+
+            # Build standardized message
+            message = self.message_builder.build_message(
+                agent=agent,
+                task_instruction=task_instruction,
+                memory_context=memory_context
+            )
             
             # Get agent's response
-            result = await Runner.run(agent, prompt)
+            result = await Runner.run(agent, message.to_input_prompt())
             response_text = ItemHelpers.text_message_outputs(result.new_items)
+            
+            # Update agent memory with this interaction
+            await self.memory_service.update_memory(
+                agent=agent,
+                last_input=message.to_input_prompt(),
+                last_output=response_text,
+                current_memory=memory_context
+            )
             
             # Parse the ranking response
             return self._parse_ranking_response(response_text, agent.agent_id, phase)
@@ -131,10 +154,6 @@ REASONING: [Explain your ranking and certainty level]
                 certainty_text = line.split(':', 1)[1].strip().lower()
                 certainty_level = self._parse_certainty_level(certainty_text)
                 continue
-            elif line.upper().startswith('REASONING:'):
-                current_section = 'reasoning'
-                reasoning = line.split(':', 1)[1].strip()
-                continue
             
             if current_section == 'ranking' and line:
                 # Parse ranking line: "1. 2 - Maximize the Average Income"
@@ -146,14 +165,12 @@ REASONING: [Explain your ranking and certainty level]
                 except (ValueError, IndexError):
                     # Skip malformed lines
                     continue
-            elif current_section == 'reasoning' and line:
-                reasoning += " " + line
         
         # Ensure we have exactly 4 rankings
         if len(rankings) != 4 or set(rankings) != {1, 2, 3, 4}:
             # Default ranking if parsing failed
             rankings = [1, 2, 3, 4]
-            reasoning += " [Note: Ranking parsing failed, using default order]"
+            reasoning = "[Note: Ranking parsing failed, using default order]"
         
         return PreferenceRanking(
             agent_id=agent_id,

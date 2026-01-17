@@ -156,6 +156,7 @@ class MemoryService:
         self.agent_memories: Dict[str, EnhancedAgentMemory] = {}
         self.logger = logger
         self.enable_phase1_memory = enable_phase1_memory
+        self.earnings_service = None  # Will be set by experiment orchestrator
     
     def initialize_agent_memory(self, agent_id: str):
         """Initialize memory for an agent."""
@@ -185,7 +186,7 @@ class MemoryService:
         agent_memory = self.get_agent_memory(agent.agent_id)
         
         # Build memory context
-        memory_context = self._build_memory_context(agent.agent_id, round_number, transcript)
+        memory_context = self._build_memory_context(agent.agent_id, round_number, transcript, self.earnings_service)
         
         # Log memory context
         if self.logger:
@@ -223,9 +224,27 @@ class MemoryService:
         return memory_entry
     
     def _build_memory_context(self, agent_id: str, round_number: int, 
-                             transcript: List[DeliberationResponse]) -> str:
-        """Build context for memory update including conversation history and Phase 1 memories."""
+                             transcript: List[DeliberationResponse], 
+                             earnings_service=None) -> str:
+        """Build context for memory update including conversation history, Phase 1 memories, and bank account."""
         context_parts = []
+        
+        # Add bank account balance at the start
+        if earnings_service:
+            try:
+                agent_earnings_dict = earnings_service.get_all_agent_earnings()
+                agent_earnings = agent_earnings_dict.get(agent_id)
+                if agent_earnings:
+                    context_parts.append(f"YOUR CURRENT BANK ACCOUNT: ${agent_earnings.total_earnings:.4f}")
+                    if agent_earnings.earnings_history:
+                        recent_earnings = agent_earnings.earnings_history[-3:]  # Last 3 transactions
+                        context_parts.append("RECENT EARNINGS HISTORY:")
+                        for earning in recent_earnings:
+                            context_parts.append(f"  {earning.context}: +${earning.payout_amount:.4f}")
+                    context_parts.append("")
+            except Exception as e:
+                # Don't break memory generation if earnings service fails
+                print(f"Warning: Could not get earnings for agent {agent_id}: {e}")
         
         # Add Phase 1 context if enabled (only for Phase 2 rounds)
         if self.enable_phase1_memory and round_number >= 1:

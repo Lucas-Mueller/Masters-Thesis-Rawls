@@ -28,6 +28,7 @@ from .consensus_service import ConsensusService
 from .conversation_service import ConversationService, RoundContext
 from .memory_service import MemoryService
 from .evaluation_service import EvaluationService
+from .constraint_extraction_service import ConstraintExtractionService
 from .experiment_logger import ExperimentLogger
 from .public_history_service import PublicHistoryService
 from .economics_service import EconomicsService
@@ -35,6 +36,8 @@ from .preference_service import PreferenceService
 from .validation_service import ValidationService
 from .detailed_examples_service import DetailedExamplesService
 from .earnings_tracking_service import EarningsTrackingService
+from .message_builder_service import MessageBuilder
+from .simple_memory_service import SimpleMemoryService
 
 
 class ExperimentOrchestrator:
@@ -48,29 +51,44 @@ class ExperimentOrchestrator:
                  public_history_service: PublicHistoryService = None,
                  economics_service: EconomicsService = None,
                  preference_service: PreferenceService = None,
-                 validation_service: ValidationService = None):
+                 validation_service: ValidationService = None,
+                 constraint_extraction_service: ConstraintExtractionService = None,
+                 message_builder: MessageBuilder = None,
+                 simple_memory_service: SimpleMemoryService = None):
         """
         Initialize experiment orchestrator.
         
         Args:
             consensus_service: Service for consensus detection
             conversation_service: Service for conversation management
-            memory_service: Service for memory management
+            memory_service: Service for memory management (legacy)
             evaluation_service: Service for post-consensus evaluation
             public_history_service: Service for public history management
             economics_service: Service for economic calculations and outcomes
             preference_service: Service for preference ranking collection
             validation_service: Service for principle choice validation
+            constraint_extraction_service: Service for AI-based constraint extraction
+            message_builder: MessageBuilder for standardized agent communication
+            simple_memory_service: SimpleMemoryService for simplified memory management
         """
+        # Initialize new message-based services
+        self.message_builder = message_builder or MessageBuilder()
+        self.simple_memory_service = simple_memory_service or SimpleMemoryService()
+        
+        # Initialize services with proper dependencies
         self.consensus_service = consensus_service or ConsensusService()
-        self.conversation_service = conversation_service or ConversationService()
-        self.memory_service = memory_service or MemoryService()
+        self.conversation_service = conversation_service or ConversationService(
+            message_builder=self.message_builder,
+            memory_service=self.simple_memory_service
+        )
+        self.memory_service = memory_service or MemoryService()  # Keep for backward compatibility  
         self.evaluation_service = evaluation_service or EvaluationService()
         self.public_history_service = public_history_service
         # New services will be initialized when experiment starts (need config)
         self._economics_service = economics_service
         self._preference_service = preference_service
         self._validation_service = validation_service
+        self.constraint_extraction_service = constraint_extraction_service or ConstraintExtractionService()
         
         # Experiment state
         self.config: Optional[ExperimentConfig] = None
@@ -140,7 +158,10 @@ class ExperimentOrchestrator:
         self.economics_service = self._economics_service or EconomicsService(
             config.income_distributions, config.payout_ratio
         )
-        self.preference_service = self._preference_service or PreferenceService()
+        self.preference_service = self._preference_service or PreferenceService(
+            message_builder=self.message_builder,
+            memory_service=self.simple_memory_service
+        )
         self.validation_service = self._validation_service or ValidationService()
         self.detailed_examples_service = DetailedExamplesService(self.economics_service)
         self.earnings_tracking_service = EarningsTrackingService(
@@ -153,6 +174,10 @@ class ExperimentOrchestrator:
         self.conversation_service.logger = self.logger
         self.conversation_service.public_history_service = self.public_history_service
         self.memory_service.logger = self.logger
+        self.memory_service.earnings_service = self.earnings_tracking_service
+        
+        # Update MessageBuilder with earnings service for bank balance
+        self.message_builder.earnings_service = self.earnings_tracking_service
         self.earnings_tracking_service.logger = self.logger
         
         # Configure Phase 1 memory settings
@@ -190,12 +215,11 @@ class ExperimentOrchestrator:
             # PHASE 2: Group Experiment
             print(f"\n=== PHASE 2: Group Experiment ===")
             
-            # Step 4: Group deliberation
-            consensus_result = await self._run_group_deliberation()
+            # Step 4: Open group discussion (no binding decisions)
+            await self._run_group_discussion()
             
-            # Step 5: Secret ballot voting (if no consensus)
-            if not consensus_result.unanimous:
-                consensus_result = await self._conduct_secret_ballot()
+            # Step 5: Secret ballot voting (final decision-making phase)
+            consensus_result = await self._conduct_secret_ballot()
             
             # Step 6: Apply group decision economic outcomes
             await self._apply_group_economic_outcomes(consensus_result)
@@ -296,9 +320,9 @@ class ExperimentOrchestrator:
         else:
             print(f"  Initial choices: {[agent.current_choice.principle_id for agent in self.agents]}")
     
-    async def _run_deliberation_rounds(self) -> ConsensusResult:
-        """Run multiple rounds of deliberation until consensus or timeout."""
-        print("\n--- Starting Multi-Round Deliberation ---")
+    async def _run_discussion_rounds(self):
+        """Run multiple rounds of open discussion (no binding consensus detection)."""
+        print("\n--- Starting Multi-Round Open Discussion ---")
         
         consensus_result = None
         
@@ -324,9 +348,15 @@ class ExperimentOrchestrator:
             )
             
             # Conduct round using conversation service
-            await self.conversation_service.conduct_round(
-                round_context, self.memory_service, self.moderator
-            )
+            # Use simplified method if available, otherwise fall back to old method
+            if hasattr(self.conversation_service, 'conduct_round_simplified'):
+                await self.conversation_service.conduct_round_simplified(
+                    round_context, self.moderator
+                )
+            else:
+                await self.conversation_service.conduct_round(
+                    round_context, self.memory_service, self.moderator
+                )
             
             # Generate round summary if using summarized public history mode
             if self.public_history_service and self.public_history_service.should_generate_summaries():
@@ -341,29 +371,14 @@ class ExperimentOrchestrator:
                     except Exception as e:
                         print(f"    ⚠️  Summary generation failed: {e}")
             
-            # Check for consensus after round
-            consensus_result = await self.consensus_service.detect_consensus(self.transcript)
-            
             round_duration = time.time() - round_start_time
             print(f"  Round {round_num} completed in {round_duration:.1f}s")
             
-            if consensus_result.unanimous:
-                print(f"  ✓ Unanimous agreement reached!")
-                break
-            else:
-                print(f"  Current choices: {[agent.current_choice.principle_id for agent in self.agents]}")
-                print(f"  Dissenting agents: {consensus_result.dissenting_agents}")
+            # Show current positions but don't check for binding consensus
+            print(f"  Current positions: {[agent.current_choice.principle_id for agent in self.agents]}")
         
-        if not consensus_result or not consensus_result.unanimous:
-            print(f"\n  ⚠️  No consensus reached after {self.config.max_rounds} rounds")
-        
-        return consensus_result or ConsensusResult(
-            unanimous=False,
-            agreed_principle=None,
-            dissenting_agents=[agent.agent_id for agent in self.agents],
-            rounds_to_consensus=0,
-            total_messages=len(self.transcript)
-        )
+        print(f"\n  ✓ Open discussion completed after {self.config.max_rounds} rounds")
+        print("  Proceeding to secret ballot for final decision...")
     
     async def _conduct_evaluation(self, consensus_result: ConsensusResult):
         """Conduct post-consensus evaluation using Likert scale ratings."""
@@ -506,7 +521,7 @@ class ExperimentOrchestrator:
             self.logger.log_first_assessment(ranking)
         
         # Generate Phase 1 memory: Initial reflection
-        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "each_round"]:
+        if self.config.enable_phase1_memory:
             print("Generating initial reflection memories...")
             for agent in self.agents:
                 # Find this agent's ranking
@@ -537,7 +552,7 @@ class ExperimentOrchestrator:
             )
         
         # Generate Phase 1 memory: Learning from examples
-        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "each_round"]:
+        if self.config.enable_phase1_memory:
             print("Generating learning memories from detailed examples...")
             for agent in self.agents:
                 # Get the analysis for learning context
@@ -594,7 +609,7 @@ class ExperimentOrchestrator:
         # Present current distributions if detailed examples are enabled
         distributions_text = ""
         if self.config.enable_detailed_examples and self.config.income_distributions:
-            distributions_text = "\nCurrent income distribution scenarios:\n"
+            distributions_text = "\nCurrent income distribution scenarios (yearly dollar income for a household):\n"
             for dist in self.config.income_distributions:
                 distributions_text += f"\n{dist.name}:\n"
                 for income_class, amount in dist.income_by_class.items():
@@ -609,11 +624,11 @@ You are now going to make an individual choice about which distributive justice 
 Please choose one of the four principles of distributive justice:
 1. MAXIMIZING THE FLOOR INCOME
 2. MAXIMIZING THE AVERAGE INCOME  
-3. MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT (specify the floor amount in dollars)
-4. MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT (specify the range amount in dollars)
+3. MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT (specify the value of the floor - lowest income)
+4. MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT (specify the dollar difference between the high and low incomes)
 
 Your choice will determine which income distribution is selected, and you will be randomly assigned to an income class.
-You will receive actual economic rewards based on your assigned income.
+You will receive actual economic rewards based on your assigned income. You receive $1 for every $10,000 of your assigned income, and you are explicitly told what you would have received in competing distributions.
 
 Please state:
 1. Your chosen principle (1, 2, 3, or 4)
@@ -627,20 +642,39 @@ Format: "I choose principle [number] [with constraint $X if applicable] because 
         result = await Runner.run(agent, prompt)
         response_text = ItemHelpers.text_message_outputs(result.new_items)
         
-        # Parse the principle choice
-        principle_choice = await self._parse_individual_principle_choice(response_text, agent.agent_id)
-        
-        # Validate the choice
-        validation_result = self.validation_service.validate_principle_choice(principle_choice)
-        if not validation_result['is_valid']:
-            print(f"    Invalid choice from {agent.name}: {validation_result['errors']}")
-            # For simplicity, default to principle 1 if invalid
-            from ..core.models import PrincipleChoice, get_principle_by_id
-            principle_choice = PrincipleChoice(
-                principle_id=1,
-                principle_name=get_principle_by_id(1)['name'],
-                reasoning="Invalid choice, defaulted to principle 1"
-            )
+        # Parse and validate the principle choice with retry logic
+        max_retries = 3
+        for attempt in range(max_retries):
+            # Parse the principle choice
+            principle_choice = await self._parse_individual_principle_choice(response_text, agent.agent_id)
+            
+            # Validate the choice
+            validation_result = self.validation_service.validate_principle_choice(principle_choice)
+            if validation_result['is_valid']:
+                break
+            
+            print(f"    Invalid choice from {agent.name} (attempt {attempt + 1}): {validation_result['errors']}")
+            
+            if attempt < max_retries - 1:
+                # Re-prompt the agent with error feedback
+                error_message = " ".join(validation_result['errors'])
+                retry_prompt = f"""Your previous choice was invalid: {error_message}
+
+Please make a choice from among the four principles of justice:
+1. MAXIMIZING THE FLOOR INCOME
+2. MAXIMIZING THE AVERAGE INCOME
+3. MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT (specify the value of the floor - lowest income)
+4. MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT (specify the dollar difference between the high and low incomes)
+
+If you choose principle 3 or 4, you must specify the constraint amount to make a well-defined choice.
+
+Format: "I choose principle [number] [with constraint $X if applicable] because [reasoning]"
+"""
+                result = await Runner.run(agent, retry_prompt)
+                response_text = ItemHelpers.text_message_outputs(result.new_items)
+            else:
+                # After max retries, this should not happen in a well-designed system
+                raise ValueError(f"Agent {agent.name} failed to provide valid choice after {max_retries} attempts")
         
         # Create economic outcome
         economic_outcome = self.economics_service.create_economic_outcome(
@@ -668,7 +702,7 @@ Format: "I choose principle [number] [with constraint $X if applicable] because 
         self.logger.log_economic_outcome(economic_outcome)
         
         # Generate Phase 1 memory: Experience integration
-        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "each_round"]:
+        if self.config.enable_phase1_memory:
             experience_data = Phase1ExperienceData(
                 round_number=round_num,
                 principle_choice=principle_choice,
@@ -678,11 +712,44 @@ Format: "I choose principle [number] [with constraint $X if applicable] because 
             await self.memory_service.integrate_phase1_experience(agent, experience_data)
     
     async def _parse_individual_principle_choice(self, response_text, agent_id):
-        """Parse agent's individual principle choice from response text."""
+        """
+        Parse agent's individual principle choice from response text using AI extraction.
+        
+        This method now uses GPT-4.1-mini to robustly extract principle choices and constraints
+        from natural language responses, replacing the previous regex-based approach.
+        """
+        print(f"    🤖 Using AI extraction for agent {agent_id}'s principle choice...")
+        
+        try:
+            # Use AI-based constraint extraction service
+            principle_choice = await self.constraint_extraction_service.extract_principle_choice(
+                response_text, agent_id
+            )
+            
+            print(f"    ✅ AI extracted: Principle {principle_choice.principle_id}")
+            if principle_choice.floor_constraint is not None:
+                print(f"    ✅ Floor constraint: ${principle_choice.floor_constraint:,}")
+            if principle_choice.range_constraint is not None:
+                print(f"    ✅ Range constraint: ${principle_choice.range_constraint:,}")
+            
+            return principle_choice
+            
+        except Exception as e:
+            print(f"    ⚠️  AI extraction failed for agent {agent_id}: {e}")
+            print(f"    🔄 Falling back to regex-based parsing...")
+            
+            # Fallback to basic regex parsing if AI extraction fails
+            return self._fallback_regex_parsing(response_text, agent_id)
+    
+    def _fallback_regex_parsing(self, response_text, agent_id):
+        """
+        Fallback regex-based parsing when AI extraction fails.
+        Simplified version of the original regex approach.
+        """
         from ..core.models import PrincipleChoice, get_principle_by_id
         import re
         
-        # Try to extract principle number
+        # Extract principle number
         principle_match = re.search(r'principle (\d+)', response_text.lower())
         principle_id = int(principle_match.group(1)) if principle_match else 1
         
@@ -690,27 +757,27 @@ Format: "I choose principle [number] [with constraint $X if applicable] because 
         if principle_id not in [1, 2, 3, 4]:
             principle_id = 1
         
-        # Try to extract constraints
+        # Simple constraint extraction (basic patterns only)
         floor_constraint = None
         range_constraint = None
         
         if principle_id == 3:
-            # Look for floor constraint
+            # Simple floor constraint pattern
             floor_match = re.search(r'\$?([\d,]+)', response_text)
             if floor_match:
-                floor_constraint = int(floor_match.group(1).replace(',', ''))
-            else:
-                # Provide reasonable default floor constraint if not specified
-                floor_constraint = 15000  # Default minimum income of $15,000
+                try:
+                    floor_constraint = int(floor_match.group(1).replace(',', ''))
+                except ValueError:
+                    pass
         
         elif principle_id == 4:
-            # Look for range constraint  
+            # Simple range constraint pattern  
             range_match = re.search(r'\$?([\d,]+)', response_text)
             if range_match:
-                range_constraint = int(range_match.group(1).replace(',', ''))
-            else:
-                # Provide reasonable default range constraint if not specified
-                range_constraint = 20000  # Default max income difference of $20,000
+                try:
+                    range_constraint = int(range_match.group(1).replace(',', ''))
+                except ValueError:
+                    pass
         
         principle_info = get_principle_by_id(principle_id)
         
@@ -742,7 +809,7 @@ Based on your actual experience with applying principles and receiving economic 
             self.logger.log_third_assessment(ranking)
         
         # Generate Phase 1 memory: Final reflection
-        if self.config.enable_phase1_memory and self.config.phase1_memory_frequency in ["each_activity", "phase_end"]:
+        if self.config.enable_phase1_memory:
             print("Generating post-individual reflection memories...")
             for agent in self.agents:
                 # Find this agent's ranking
@@ -763,25 +830,25 @@ Based on your actual experience with applying principles and receiving economic 
                     )
                     await self.memory_service.generate_individual_reflection(agent, reflection_context)
     
-    async def _run_group_deliberation(self):
-        """Run group deliberation phase (similar to existing system)."""
+    async def _run_group_discussion(self):
+        """Run open group discussion phase (no binding decisions)."""
         print(f"\n--- Phase 1 to Phase 2 Transition: Memory Consolidation ---")
         
         # Consolidate Phase 1 memories before starting group deliberation
-        if self.config.enable_phase1_memory and self.config.phase1_memory_integration:
+        if self.config.enable_phase1_memory:
             print("Consolidating individual phase memories...")
             for agent in self.agents:
                 consolidated_memory = await self.memory_service.consolidate_phase1_memories(agent.agent_id)
                 if consolidated_memory:
                     print(f"  {agent.name}: Consolidated {len(self.memory_service.get_agent_memory(agent.agent_id).individual_memories)} individual memories")
         
-        print(f"\n--- Phase 2.1: Group Deliberation (max {self.config.max_rounds} rounds) ---")
+        print(f"\n--- Phase 2.1: Open Group Discussion (max {self.config.max_rounds} rounds) ---")
         
-        # This reuses the existing deliberation system but with updated context
-        return await self._run_deliberation_rounds()
+        # Run discussion rounds without binding consensus detection
+        await self._run_discussion_rounds()
     
     async def _conduct_secret_ballot(self):
-        """Conduct secret ballot voting if no consensus was reached."""
+        """Conduct secret ballot voting as the final decision-making phase."""
         print("\n--- Phase 2.2: Secret Ballot Voting ---")
         
         # For simplicity, collect individual votes privately
@@ -828,8 +895,8 @@ Please cast your final vote for which distributive justice principle the group s
 Choose one of the four principles:
 1. MAXIMIZING THE FLOOR INCOME
 2. MAXIMIZING THE AVERAGE INCOME  
-3. MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT (specify the floor amount)
-4. MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT (specify the range amount)
+3. MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT (specify the value of the floor - lowest income)
+4. MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT (specify the dollar difference between the high and low incomes)
 
 Your vote is secret and will not be shared with other agents.
 
@@ -839,8 +906,41 @@ Format your response as: "I vote for principle [number] [with constraint $X if a
         result = await Runner.run(agent, prompt)
         response_text = ItemHelpers.text_message_outputs(result.new_items)
         
-        # Parse the vote (reuse existing parsing logic)
-        return await self._parse_individual_principle_choice(response_text, agent.agent_id)
+        # Parse and validate the vote with retry logic
+        max_retries = 3
+        for attempt in range(max_retries):
+            # Parse the vote
+            principle_choice = await self._parse_individual_principle_choice(response_text, agent.agent_id)
+            
+            # Validate the vote
+            validation_result = self.validation_service.validate_principle_choice(principle_choice)
+            if validation_result['is_valid']:
+                return principle_choice
+            
+            print(f"    Invalid vote from {agent.name} (attempt {attempt + 1}): {validation_result['errors']}")
+            
+            if attempt < max_retries - 1:
+                # Re-prompt the agent with error feedback
+                error_message = " ".join(validation_result['errors'])
+                retry_prompt = f"""Your previous vote was invalid: {error_message}
+
+SECRET BALLOT VOTE - Please cast a valid vote:
+
+Choose one of the four principles:
+1. MAXIMIZING THE FLOOR INCOME
+2. MAXIMIZING THE AVERAGE INCOME  
+3. MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT (specify the value of the floor - lowest income)
+4. MAXIMIZING THE AVERAGE WITH A RANGE CONSTRAINT (specify the dollar difference between the high and low incomes)
+
+If you choose principle 3 or 4, you must specify the constraint amount to make a well-defined choice.
+
+Format your response as: "I vote for principle [number] [with constraint $X if applicable]"
+"""
+                result = await Runner.run(agent, retry_prompt)
+                response_text = ItemHelpers.text_message_outputs(result.new_items)
+            else:
+                # After max retries, this should not happen in a well-designed system
+                raise ValueError(f"Agent {agent.name} failed to provide valid vote after {max_retries} attempts")
     
     async def _apply_group_economic_outcomes(self, consensus_result):
         """Apply economic outcomes based on group decision."""

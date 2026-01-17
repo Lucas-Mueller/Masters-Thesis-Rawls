@@ -1,0 +1,95 @@
+experiment_id: test_refined_message_structure
+global_temperature: 0.0  # Deterministic for testing
+
+# Configuration using the new simplified pattern from Message Structure Refinements
+# Phase 5 Complete: All services now use MessageBuilder with standardized communication
+
+experiment:
+  max_rounds: 3
+  decision_rule: unanimity
+  timeout_seconds: 300
+
+# New game logic configuration
+individual_rounds: 2  # Reduced for testing
+payout_ratio: 0.0001  # $1 per $10,000 income
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# Simplified Memory Configuration (New Pattern)
+# Only this single option remains - no complex memory strategies
+enable_phase1_memory: true
+
+# Income distribution scenarios (corrected class names)
+income_distributions:
+  - distribution_id: 1
+    name: "Test Distribution A"
+    income_by_class:
+      High: 45000
+      "Medium high": 35000
+      Medium: 25000
+      "Medium low": 18000
+      Low: 12000
+  - distribution_id: 2
+    name: "Test Distribution B"
+    income_by_class:
+      High: 40000
+      "Medium high": 30000
+      Medium: 22000
+      "Medium low": 16000
+      Low: 10000
+
+# Agent configurations with negotiation-focused personalities
+agents:
+  - name: "TestEconomist"
+    model: "gpt-4.1-mini"
+    temperature: 0.0
+    personality: |
+      You are an economist participating in this negotiation about distributive justice principles.
+      You focus on efficiency and optimal resource allocation while considering fairness.
+      You make evidence-based decisions and engage constructively with other participants.
+      
+  - name: "TestPhilosopher"
+    model: "gpt-4.1-mini"
+    temperature: 0.0
+    personality: |
+      You are a philosopher participating in this negotiation about distributive justice principles.
+      You are concerned with justice and fairness for all members of society.
+      You consider the ethical implications of different distribution approaches.
+
+defaults:
+  personality: |
+    You are a participant in a negotiation about distributive justice principles.
+    You make thoughtful decisions balancing efficiency and fairness considerations.
+    You engage constructively and are open to well-reasoned arguments.
+  model: "gpt-4.1-mini"
+  temperature: 0.0
+
+# Simple logging configuration
+logging:
+  enabled: true
+  capture_raw_inputs: true
+  capture_raw_outputs: true
+
+# Output configuration
+output:
+  directory: test_results
+  formats: ["json"]
+
+# Earnings tracking configuration  
+earnings_tracking:
+  enabled: true
+  disclosure_style: "standard"
+  show_performance_context: true
+
+# ============================================================================
+# Key Changes from Message Structure Refinements:
+# ============================================================================
+# ✅ REMOVED: memory_strategy, phase1_memory_frequency, phase1_consolidation_strategy
+# ✅ REMOVED: phase1_memory_integration, phase1_reflection_depth
+# ✅ SIMPLIFIED: Only enable_phase1_memory option remains
+# ✅ UPDATED: Agent personalities use "negotiation" language, not "experiment"
+# ✅ UPDATED: All messages now use standardized format with MessageBuilder
+# ✅ UPDATED: Bank balance format: "You have a current bank balance of $X.XXXX"
+# ✅ UPDATED: "NEGOTIATION DESCRIPTION" instead of "EXPERIMENT DESCRIPTION"
+# ✅ REMOVED: Complex reasoning prompts from initial interactions
+# ============================================================================

@@ -384,7 +384,6 @@ class ExperimentConfig(BaseModel):
     agents: List[AgentConfig] = Field(..., description="List of agent configurations")
     defaults: DefaultConfig = Field(default_factory=DefaultConfig, description="Default values for agent properties")
     global_temperature: Optional[float] = Field(None, ge=0.0, le=2.0, description="Global temperature setting for all agents (0.0-2.0)")
-    memory_strategy: str = Field(default="decomposed", description="Memory strategy: recent|decomposed")
     public_history_mode: PublicHistoryMode = Field(default=PublicHistoryMode.FULL, description="Public history mode: full|summarized")
     logging: LoggingConfig = Field(default_factory=LoggingConfig, description="Logging configuration")
     output: OutputConfig = Field(default_factory=OutputConfig, description="Output configuration")
@@ -396,12 +395,8 @@ class ExperimentConfig(BaseModel):
     enable_detailed_examples: bool = Field(default=True, description="Enable detailed income distribution examples")
     enable_secret_ballot: bool = Field(default=True, description="Enable secret ballot voting in Phase 2")
     
-    # Phase 1 Memory Configuration
+    # Simplified Memory Configuration
     enable_phase1_memory: bool = Field(default=True, description="Enable Phase 1 individual memory generation")
-    phase1_memory_frequency: str = Field(default="each_activity", description="Phase 1 memory generation frequency: 'each_activity'|'each_round'|'phase_end'")
-    phase1_consolidation_strategy: str = Field(default="summary", description="Phase 1 memory consolidation strategy: 'summary'|'detailed'|'key_insights'")
-    phase1_memory_integration: bool = Field(default=True, description="Include Phase 1 memories in Phase 2 context")
-    phase1_reflection_depth: str = Field(default="standard", description="Depth of Phase 1 reflections: 'brief'|'standard'|'detailed'")
     
     # Earnings Tracking Configuration
     earnings_tracking: EarningsTrackingConfig = Field(default_factory=EarningsTrackingConfig, description="Earnings tracking configuration")
@@ -575,6 +570,67 @@ def detect_consensus(deliberation_responses: List[DeliberationResponse]) -> Cons
             rounds_to_consensus=0,
             total_messages=len(deliberation_responses)
         )
+
+
+class FullMemoryEntry(BaseModel):
+    """Entry for full memory mode storing complete interaction history."""
+    timestamp: datetime = Field(default_factory=datetime.now, description="When this interaction occurred")
+    interaction_type: str = Field(..., description="Type of interaction: 'system_prompt' | 'input_prompt' | 'agent_response'")
+    content: str = Field(..., description="Complete content of the interaction")
+    round_number: Optional[int] = Field(None, description="Round number if applicable")
+    sequence_number: int = Field(..., description="Sequential order of this interaction")
+
+
+class StandardizedMessage(BaseModel):
+    """Standardized message structure - simplified version."""
+    role_description: str = Field(..., description="Agent's personality and role")
+    negotiation_description: str = Field(..., description="Description of the negotiation context")
+    bank_balance: str = Field(..., description="Standardized bank balance message")
+    memory_context: str = Field(..., description="Agent's current memory")
+    task_instruction: str = Field(..., description="Specific task for this interaction")
+    
+    def to_system_prompt(self) -> str:
+        """Convert to system prompt (role + negotiation description only)."""
+        return f"""=== ROLE DESCRIPTION ===
+{self.role_description}
+
+=== NEGOTIATION DESCRIPTION ===
+{self.negotiation_description}"""
+    
+    def to_input_prompt(self) -> str:
+        """
+        Convert to input prompt with clean separation (Option 1).
+        Excludes role and negotiation descriptions to avoid duplication with system message.
+        Only includes interaction-specific content.
+        """
+        return f"""=== BANK BALANCE ===
+{self.bank_balance}
+
+=== MEMORY ===
+{self.memory_context}
+
+=== TASK INSTRUCTION ===
+{self.task_instruction}"""
+    
+    def to_legacy_input_prompt(self) -> str:
+        """
+        Convert to legacy input prompt (includes all sections for backward compatibility).
+        This method preserves the old behavior with duplication.
+        """
+        return f"""=== ROLE DESCRIPTION ===
+{self.role_description}
+
+=== NEGOTIATION DESCRIPTION ===
+{self.negotiation_description}
+
+=== BANK BALANCE ===
+{self.bank_balance}
+
+=== MEMORY ===
+{self.memory_context}
+
+=== TASK INSTRUCTION ===
+{self.task_instruction}"""
 
 
 def get_default_personality() -> str:

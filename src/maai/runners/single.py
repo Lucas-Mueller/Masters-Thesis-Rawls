@@ -79,6 +79,8 @@ async def run_experiment(config_path: str, output_dir: str = None, config_dir: s
         }
         
     except Exception as e:
+        print(f"❌ Experiment failed for config '{config_path}': {str(e)}")
+        print(f"   Check configuration file and parameters")
         return create_error_result(config_path, e)
 
 

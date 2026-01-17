@@ -273,3 +273,66 @@ class EarningsTrackingService:
             agent_id: earnings.total_earnings 
             for agent_id, earnings in self.agent_earnings.items()
         }
+    
+    def get_verified_bank_balance_message(self, agent_id: str) -> str:
+        """
+        Get verified, formatted bank balance message for use in standardized messages.
+        
+        Args:
+            agent_id: Agent identifier
+            
+        Returns:
+            Formatted bank balance message with current balance and recent transactions
+        """
+        self.initialize_agent_earnings(agent_id)
+        
+        earnings = self.agent_earnings[agent_id]
+        balance_msg = f"Current Balance: ${earnings.total_earnings:.4f}"
+        
+        if earnings.earnings_history:
+            recent_transactions = earnings.earnings_history[-3:]  # Last 3 transactions
+            balance_msg += "\nRecent Transactions:"
+            for transaction in recent_transactions:
+                balance_msg += f"\n  {transaction.context}: +${transaction.payout_amount:.4f}"
+        
+        if earnings.total_earnings == 0.0:
+            balance_msg += "\nNo earnings history yet."
+            
+        return balance_msg
+    
+    def validate_balance_accuracy(self, agent_id: str) -> bool:
+        """
+        Validate that calculated balance matches stored balance.
+        
+        Args:
+            agent_id: Agent identifier
+            
+        Returns:
+            True if balance is accurate, False otherwise
+        """
+        try:
+            self.initialize_agent_earnings(agent_id)
+            earnings = self.agent_earnings[agent_id]
+            
+            # Recalculate total from earnings history
+            calculated_total = sum(
+                update.payout_amount for update in earnings.earnings_history
+            )
+            
+            # Compare with stored total (allow small floating point differences)
+            difference = abs(calculated_total - earnings.total_earnings)
+            tolerance = 0.0001  # $0.0001 tolerance for floating point precision
+            
+            is_accurate = difference <= tolerance
+            
+            if not is_accurate:
+                print(f"WARNING: Bank balance validation failed for {agent_id}")
+                print(f"  Stored total: ${earnings.total_earnings:.4f}")
+                print(f"  Calculated total: ${calculated_total:.4f}")
+                print(f"  Difference: ${difference:.4f}")
+            
+            return is_accurate
+            
+        except Exception as e:
+            print(f"ERROR: Bank balance validation error for {agent_id}: {e}")
+            return False

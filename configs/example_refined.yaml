@@ -1,0 +1,159 @@
+experiment_id: example_message_structure_refined
+global_temperature: 0.1  # Global temperature for all agents
+
+# ============================================================================
+# EXAMPLE CONFIGURATION: Message Structure Refinements (Phase 5 Complete)
+# ============================================================================
+# This configuration demonstrates the new simplified patterns implemented in
+# the Message Structure Refinements. All services now use MessageBuilder for
+# standardized agent communication with the new negotiation-focused language.
+
+experiment:
+  max_rounds: 5
+  decision_rule: unanimity
+  timeout_seconds: 300
+
+# New game logic configuration
+individual_rounds: 4
+payout_ratio: 0.0001  # $1 per $10,000 income  
+enable_detailed_examples: true
+enable_secret_ballot: true
+
+# ============================================================================
+# SIMPLIFIED MEMORY CONFIGURATION (New Pattern)
+# ============================================================================
+# The complex memory system has been simplified to a single option:
+enable_phase1_memory: true  # Only this option remains
+
+# The following options have been REMOVED:
+# ❌ memory_strategy: "decomposed" | "recent" | "phase_aware_decomposed" 
+# ❌ phase1_memory_frequency: "each_activity" | "each_round" | "phase_end"
+# ❌ phase1_consolidation_strategy: "summary" | "detailed" | "key_insights"
+# ❌ phase1_memory_integration: bool
+# ❌ phase1_reflection_depth: "brief" | "standard" | "detailed"
+
+# Income distribution scenarios
+income_distributions:
+  - distribution_id: 1
+    name: "Balanced Distribution"
+    income_by_class:
+      High: 50000
+      "Medium high": 40000
+      Medium: 30000
+      "Medium low": 20000
+      Low: 10000
+  - distribution_id: 2
+    name: "Compressed Distribution" 
+    income_by_class:
+      High: 35000
+      "Medium high": 32000
+      Medium: 28000
+      "Medium low": 25000
+      Low: 22000
+  - distribution_id: 3
+    name: "Wide Distribution"
+    income_by_class:
+      High: 60000
+      "Medium high": 45000
+      Medium: 30000
+      "Medium low": 15000
+      Low: 5000
+
+# ============================================================================
+# AGENT CONFIGURATIONS WITH NEGOTIATION LANGUAGE
+# ============================================================================
+# Agent personalities now use "negotiation" instead of "experiment" language
+agents:
+  - name: "Economist"
+    model: "gpt-4.1-mini"
+    personality: |
+      You are an economist participating in this negotiation about distributive justice principles.
+      You focus on efficiency and optimal resource allocation while considering fairness.
+      You analyze income distributions systematically and prefer principles that maximize
+      overall welfare while ensuring reasonable equity. You make evidence-based decisions
+      and engage constructively with other participants.
+      
+  - name: "Philosopher"
+    model: "gpt-4.1-mini"
+    personality: |
+      You are a philosopher participating in this negotiation about distributive justice principles.
+      You are deeply concerned with justice and fairness for all members of society.
+      You approach decisions from ethical principles, focusing on what would be most just.
+      You carefully consider the moral implications of different distribution approaches
+      and advocate for those that protect the most vulnerable members of society.
+      
+  - name: "Pragmatist"
+    model: "gpt-4.1-mini"  
+    personality: |
+      You are a pragmatist participating in this negotiation about distributive justice principles.
+      You seek practical solutions that work in the real world, balancing idealism with realism.
+      You consider both the theoretical merits and practical implementation challenges
+      of different approaches. You value compromise and consensus-building among participants.
+
+defaults:
+  personality: |
+    You are a participant in a negotiation about distributive justice principles.
+    You make thoughtful decisions about justice principles, balancing efficiency and fairness.
+    You engage constructively in discussions and are open to changing your mind based on
+    compelling arguments from other participants.
+  model: "gpt-4.1-mini"
+  temperature: 0.1
+
+# Earnings tracking configuration
+earnings_tracking:
+  enabled: true
+  disclosure_points: ["after_round_2", "end_phase1", "after_group", "experiment_end"]
+  disclosure_style: "motivational"
+  show_performance_context: true
+  show_potential_ranges: true
+  include_phase_breakdown: true
+  congratulatory_threshold: 0.75
+  encouragement_threshold: 0.25
+
+# Logging configuration
+logging:
+  enabled: true
+  capture_raw_inputs: true
+  capture_raw_outputs: true
+  capture_memory_context: true
+  include_processing_times: true
+
+# Output configuration
+output:
+  directory: experiment_results
+  formats: ["json"]
+  include_feedback: true
+  include_transcript: true
+
+# ============================================================================
+# WHAT'S NEW IN MESSAGE STRUCTURE REFINEMENTS:
+# ============================================================================
+# 
+# 🎯 USER EXPERIENCE IMPROVEMENTS:
+# ✅ Agents see "negotiation" instead of "experiment" throughout
+# ✅ Standardized bank balance: "You have a current bank balance of $X.XXXX"
+# ✅ "NEGOTIATION DESCRIPTION" replaces "EXPERIMENT DESCRIPTION"
+# ✅ No complex reasoning requests in initial prompts
+# ✅ Simplified, natural interaction flow
+#
+# 🏗️ TECHNICAL IMPROVEMENTS:
+# ✅ MessageBuilder centralizes all agent communication
+# ✅ SimpleMemoryService provides single, consistent memory mode
+# ✅ All services integrated with standardized message structure
+# ✅ Backward compatibility maintained for existing systems
+# ✅ Comprehensive integration testing and validation
+#
+# 🔧 CONFIGURATION SIMPLIFICATIONS:
+# ✅ Single memory option (enable_phase1_memory) replaces complex strategies
+# ✅ No memory strategy configuration needed
+# ✅ Cleaner, more maintainable configuration files
+# ✅ Reduced cognitive overhead for researchers
+#
+# 📋 VALIDATION STATUS:
+# ✅ All core validation tests pass
+# ✅ All integration tests pass  
+# ✅ End-to-end service integration confirmed
+# ✅ Backward compatibility verified
+# ✅ Ready for production use
+#
+# ============================================================================

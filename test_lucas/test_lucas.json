@@ -1,0 +1,253 @@
+{
+  "experiment_metadata": {
+    "experiment_id": "test_lucas",
+    "start_time": "2025-07-23T17:36:40.195159",
+    "end_time": "2025-07-23T17:40:40.581342",
+    "total_duration_seconds": 240.386183,
+    "max_rounds": 2,
+    "decision_rule": "unanimity",
+    "final_consensus": {
+      "agreement_reached": true,
+      "agreed_principle": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 0,
+      "total_messages": 0
+    }
+  },
+  "TestAgent1": {
+    "overall": {
+      "model": "gpt-4o-mini",
+      "persona": "You are a test agent. When choosing principles 3 or 4, sometimes forget to specify constraint amounts.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.0
+    },
+    "round_0": {
+      "memory": "Phase 1 Reflection - post_individual_ranking: I learned that while maximizing average income can lead to higher overall wealth, it often neglects the needs of the most vulnerable. The experience highlighted the importance of balancing economic growth with social equity. I also realized that principles with constraints, like the floor or range constraints, can create a more just distribution by ensuring that no one is left behind, even if it means sacrificing some potential average income.",
+      "strategy": "individual_reflection"
+    },
+    "round_1": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nTestAgent2: Hello everyone,\n\nAs we gather to discuss the principles of distributive justice, I want to emphasize the importance of fairness and equity in our income distribution system. Each principle offers a unique approach to addressing the needs of our society, and it's crucial that we consider the implications of our choice.\n\nWhile maximizing the floor income ensures that the worst-off individuals are prioritized, it may limit overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving the most vulnerable behind.\n\nI believe a balanced approach is necessary. Therefore, I propose we adopt the principle of maximizing the average with a floor constraint. This allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. However, I must specify that the floor should be set at a reasonable level to ensure basic needs are met.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\n\n--- Current Round 1 ---\nSPEAKERS IN THIS ROUND SO FAR:\nTestAgent2: Hello everyone,\n\nAs we gather to discuss the principles of distributive justice, I want to emphasize the importance of fairness and equity in our income distribution system. Each principle offers a unique approach to addressing the needs of our society, and it's crucial that we consider the implications of our choice.\n\nWhile maximizing the floor income ensures that the worst-off individuals are prioritized, it may limit overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving the most vulnerable behind.\n\nI believe a balanced approach is necessary. Therefore, I propose we adopt the principle of maximizing the average with a floor constraint. This allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. However, I must specify that the floor should be set at a reasonable level to ensure basic needs are met.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nI appreciate the insights shared so far. As we deliberate on the principles of distributive justice, I want to highlight the importance of considering both equity and overall societal welfare. Each principle has its strengths and weaknesses, and our choice will significantly impact the well-being of all members in our society.\n\nMaximizing the floor income is commendable for prioritizing the worst-off, but it may hinder overall economic growth. Conversely, maximizing the average income could lead to greater disparities, potentially neglecting those who are most vulnerable.\n\nI resonate with the idea of ensuring a safety net while also striving for overall improvement. Therefore, I support the principle of maximizing the average with a floor constraint. This approach allows us to guarantee a minimum income for everyone, ensuring that basic needs are met while still aiming to enhance the average income.\n\nHowever, I realize I need to specify the floor amount. I propose we set the floor at a level that covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you."
+      },
+      "communication": "Hello everyone,\n\nI appreciate the insights shared so far. As we deliberate on the principles of distributive justice, I want to highlight the importance of considering both equity and overall societal welfare. Each principle has its strengths and weaknesses, and our choice will significantly impact the well-being of all members in our society.\n\nMaximizing the floor income is commendable for prioritizing the worst-off, but it may hinder overall economic growth. Conversely, maximizing the average income could lead to greater disparities, potentially neglecting those who are most vulnerable.\n\nI resonate with the idea of ensuring a safety net while also striving for overall improvement. Therefore, I support the principle of maximizing the average with a floor constraint. This approach allows us to guarantee a minimum income for everyone, ensuring that basic needs are met while still aiming to enhance the average income.\n\nHowever, I realize I need to specify the floor amount. I propose we set the floor at a level that covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "round_2": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 2,
+      "public_history": "SPEAKERS IN THIS ROUND SO FAR:\nTestAgent2: Hello everyone,\n\nI appreciate the thoughtful discussions we've had so far regarding the principles of distributive justice. It's clear that we all share a commitment to creating a fair and just income distribution system for our society.\n\nAs we've seen, maximizing the floor income prioritizes the welfare of the worst-off, which is undeniably important. However, it may come at the cost of overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving vulnerable individuals behind.\n\nI strongly believe that a balanced approach is essential. The principle of maximizing the average with a floor constraint allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. This way, we can protect the most vulnerable members of our society without sacrificing the potential for growth and improvement.\n\nTo ensure that we are all on the same page, I propose we set the floor at a level that adequately covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\n\nYour current choice: Principle 3",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 2.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\nPREVIOUS ROUNDS:\n\n--- Round 1 ---\nTestAgent2: Hello everyone,\n\nAs we gather to discuss the principles of distributive justice, I want to emphasize the importance of fairness and equity in our income distribution system. Each principle offers a unique approach to addressing the needs of our society, and it's crucial that we consider the implications of our choice.\n\nWhile maximizing the floor income ensures that the worst-off individuals are prioritized, it may limit overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving the most vulnerable behind.\n\nI believe a balanced approach is necessary. Therefore, I propose we adopt the principle of maximizing the average with a floor constraint. This allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. However, I must specify that the floor should be set at a reasonable level to ensure basic needs are met.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\nTestAgent1: Hello everyone,\n\nI appreciate the insights shared so far. As we deliberate on the principles of distributive justice, I want to highlight the importance of considering both equity and overall societal welfare. Each principle has its strengths and weaknesses, and our choice will significantly impact the well-being of all members in our society.\n\nMaximizing the floor income is commendable for prioritizing the worst-off, but it may hinder overall economic growth. Conversely, maximizing the average income could lead to greater disparities, potentially neglecting those who are most vulnerable.\n\nI resonate with the idea of ensuring a safety net while also striving for overall improvement. Therefore, I support the principle of maximizing the average with a floor constraint. This approach allows us to guarantee a minimum income for everyone, ensuring that basic needs are met while still aiming to enhance the average income.\n\nHowever, I realize I need to specify the floor amount. I propose we set the floor at a level that covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\n\n--- Current Round 2 ---\nSPEAKERS IN THIS ROUND SO FAR:\nTestAgent2: Hello everyone,\n\nI appreciate the thoughtful discussions we've had so far regarding the principles of distributive justice. It's clear that we all share a commitment to creating a fair and just income distribution system for our society.\n\nAs we've seen, maximizing the floor income prioritizes the welfare of the worst-off, which is undeniably important. However, it may come at the cost of overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving vulnerable individuals behind.\n\nI strongly believe that a balanced approach is essential. The principle of maximizing the average with a floor constraint allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. This way, we can protect the most vulnerable members of our society without sacrificing the potential for growth and improvement.\n\nTo ensure that we are all on the same page, I propose we set the floor at a level that adequately covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\n\nYour current choice: Principle 3\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nI appreciate the ongoing dialogue and the thoughtful perspectives shared so far. As we continue to deliberate on the principles of distributive justice, I want to emphasize the importance of finding a balance between equity and overall societal welfare.\n\nWhile maximizing the floor income is crucial for supporting the worst-off, it can limit our potential for economic growth. Conversely, maximizing the average income might lead to significant disparities, which could leave vulnerable individuals behind.\n\nI believe that the principle of maximizing the average with a floor constraint strikes the right balance. It allows us to guarantee a minimum income for everyone, ensuring that basic needs are met while still aiming to enhance the overall average income. This approach not only protects the most vulnerable but also encourages growth and improvement for society as a whole.\n\nTo ensure clarity and consensus, I propose we set the floor at a level that adequately covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you."
+      },
+      "communication": "Hello everyone,\n\nI appreciate the ongoing dialogue and the thoughtful perspectives shared so far. As we continue to deliberate on the principles of distributive justice, I want to emphasize the importance of finding a balance between equity and overall societal welfare.\n\nWhile maximizing the floor income is crucial for supporting the worst-off, it can limit our potential for economic growth. Conversely, maximizing the average income might lead to significant disparities, which could leave vulnerable individuals behind.\n\nI believe that the principle of maximizing the average with a floor constraint strikes the right balance. It allows us to guarantee a minimum income for everyone, ensuring that basic needs are met while still aiming to enhance the overall average income. This approach not only protects the most vulnerable but also encourages growth and improvement for society as a whole.\n\nTo ensure clarity and consensus, I propose we set the floor at a level that adequately covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "round_3": {
+      "memory": "Phase 1 Integration - individual_round_3: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "round_4": {
+      "memory": "Phase 1 Integration - individual_round_4: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 0,
+      "satisfaction": null
+    }
+  },
+  "TestAgent2": {
+    "overall": {
+      "model": "gpt-4o-mini",
+      "persona": "You are a test agent. When choosing principles 3 or 4, sometimes forget to specify constraint amounts.",
+      "instruction": "You are participating in a multi-agent deliberation to choose a distributive justice principle.",
+      "temperature": 0.0
+    },
+    "round_0": {
+      "memory": "Phase 1 Reflection - post_individual_ranking: I have learned that the choice of principle significantly impacts not just individual outcomes but also group dynamics and perceptions of fairness. The importance of specifying constraints in principles 3 and 4 has become clear to me; without them, the principles can be too vague to apply effectively. I also recognize that a balance between equity and efficiency is crucial for a just society.",
+      "strategy": "individual_reflection"
+    },
+    "round_1": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 1,
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 1.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\n\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nAs we gather to discuss the principles of distributive justice, I want to emphasize the importance of fairness and equity in our income distribution system. Each principle offers a unique approach to addressing the needs of our society, and it's crucial that we consider the implications of our choice.\n\nWhile maximizing the floor income ensures that the worst-off individuals are prioritized, it may limit overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving the most vulnerable behind.\n\nI believe a balanced approach is necessary. Therefore, I propose we adopt the principle of maximizing the average with a floor constraint. This allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. However, I must specify that the floor should be set at a reasonable level to ensure basic needs are met.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you."
+      },
+      "communication": "Hello everyone,\n\nAs we gather to discuss the principles of distributive justice, I want to emphasize the importance of fairness and equity in our income distribution system. Each principle offers a unique approach to addressing the needs of our society, and it's crucial that we consider the implications of our choice.\n\nWhile maximizing the floor income ensures that the worst-off individuals are prioritized, it may limit overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving the most vulnerable behind.\n\nI believe a balanced approach is necessary. Therefore, I propose we adopt the principle of maximizing the average with a floor constraint. This allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. However, I must specify that the floor should be set at a reasonable level to ensure basic needs are met.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "round_2": {
+      "memory": "No analysis provided",
+      "strategy": "No analysis provided",
+      "speaking_order": 1,
+      "public_history": "\nYour current choice: Principle 3",
+      "input_dict": {
+        "1": "Now it's your turn to speak publicly to the other agents in round 2.\n\nBased on your private analysis:\nSTRATEGY: No analysis provided\n\nPREVIOUS ROUNDS:\n\n--- Round 1 ---\nTestAgent2: Hello everyone,\n\nAs we gather to discuss the principles of distributive justice, I want to emphasize the importance of fairness and equity in our income distribution system. Each principle offers a unique approach to addressing the needs of our society, and it's crucial that we consider the implications of our choice.\n\nWhile maximizing the floor income ensures that the worst-off individuals are prioritized, it may limit overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving the most vulnerable behind.\n\nI believe a balanced approach is necessary. Therefore, I propose we adopt the principle of maximizing the average with a floor constraint. This allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. However, I must specify that the floor should be set at a reasonable level to ensure basic needs are met.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\nTestAgent1: Hello everyone,\n\nI appreciate the insights shared so far. As we deliberate on the principles of distributive justice, I want to highlight the importance of considering both equity and overall societal welfare. Each principle has its strengths and weaknesses, and our choice will significantly impact the well-being of all members in our society.\n\nMaximizing the floor income is commendable for prioritizing the worst-off, but it may hinder overall economic growth. Conversely, maximizing the average income could lead to greater disparities, potentially neglecting those who are most vulnerable.\n\nI resonate with the idea of ensuring a safety net while also striving for overall improvement. Therefore, I support the principle of maximizing the average with a floor constraint. This approach allows us to guarantee a minimum income for everyone, ensuring that basic needs are met while still aiming to enhance the average income.\n\nHowever, I realize I need to specify the floor amount. I propose we set the floor at a level that covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.\n\nYour current choice: Principle 3\n\n\nWhat do you want to say to the group? End with your current principle choice (1, 2, 3, or 4).\n"
+      },
+      "output_dict": {
+        "1": "Hello everyone,\n\nI appreciate the thoughtful discussions we've had so far regarding the principles of distributive justice. It's clear that we all share a commitment to creating a fair and just income distribution system for our society.\n\nAs we've seen, maximizing the floor income prioritizes the welfare of the worst-off, which is undeniably important. However, it may come at the cost of overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving vulnerable individuals behind.\n\nI strongly believe that a balanced approach is essential. The principle of maximizing the average with a floor constraint allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. This way, we can protect the most vulnerable members of our society without sacrificing the potential for growth and improvement.\n\nTo ensure that we are all on the same page, I propose we set the floor at a level that adequately covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you."
+      },
+      "communication": "Hello everyone,\n\nI appreciate the thoughtful discussions we've had so far regarding the principles of distributive justice. It's clear that we all share a commitment to creating a fair and just income distribution system for our society.\n\nAs we've seen, maximizing the floor income prioritizes the welfare of the worst-off, which is undeniably important. However, it may come at the cost of overall economic growth. On the other hand, maximizing the average income could lead to significant disparities, leaving vulnerable individuals behind.\n\nI strongly believe that a balanced approach is essential. The principle of maximizing the average with a floor constraint allows us to ensure that everyone has a guaranteed minimum income while still striving to enhance the overall average. This way, we can protect the most vulnerable members of our society without sacrificing the potential for growth and improvement.\n\nTo ensure that we are all on the same page, I propose we set the floor at a level that adequately covers essential living expenses, ensuring that no one falls below this threshold.\n\nIn light of this, I choose principle 3: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT. Thank you.",
+      "choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT"
+    },
+    "round_3": {
+      "memory": "Phase 1 Integration - individual_round_3: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "round_4": {
+      "memory": "Phase 1 Integration - individual_round_4: No analysis provided",
+      "strategy": "experience_integration"
+    },
+    "final": {
+      "agreement_reached": true,
+      "agreement_choice": "MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT",
+      "num_rounds": 0,
+      "satisfaction": null
+    }
+  },
+  "agent_1": {
+    "overall": {},
+    "round_0": {
+      "memory": "Phase 1 Consolidation: Across my individual experiences, I have gained a nuanced understanding of the trade-offs inherent in each distributive justice principle. Maximizing the floor income ensures fairness by prioritizing the worst-off but may limit overall economic growth. Maximizing average income can boost total wealth but risks increasing inequality and neglecting vulnerable individuals. Principles that incorporate constraints—either a minimum floor or a maximum income range—offer a balanced approach by protecting the least advantaged while still promoting economic efficiency. These constraints help ensure no one is left behind, even if it means sacrificing some potential gains in average income.",
+      "strategy": "memory_consolidation"
+    },
+    "earnings_history": [
+      {
+        "round_type": "group_outcome",
+        "round_number": null,
+        "payout_amount": 5.0,
+        "cumulative_total": 18.0,
+        "timestamp": "2025-07-23T17:40:30.267713",
+        "context": "Group decision: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT, High class, $50,000"
+      }
+    ],
+    "economic_outcomes": [
+      {
+        "round_number": 999,
+        "chosen_principle": 3,
+        "assigned_income_class": "High",
+        "actual_income": 50000,
+        "payout_amount": 5.0,
+        "timestamp": "2025-07-23T17:40:30.267566"
+      }
+    ],
+    "earnings_disclosures": [
+      {
+        "disclosure_point": "after_group",
+        "message": "Group Decision Payout: $5.00\nPhase 1 Total: $13.00\nGrand Total: $18.00",
+        "timestamp": "2025-07-23T17:40:30.268026"
+      },
+      {
+        "disclosure_point": "experiment_end",
+        "message": "Experiment Complete! Your total earnings: $18.00\n- Phase 1 (Individual): $13.00 (4 rounds)\n- Phase 2 (Group): $5.00 (final outcome)\nPerformance: 50th percentile (above average)\nThank you for your thoughtful participation in this distributive justice experiment.",
+        "timestamp": "2025-07-23T17:40:37.688175"
+      }
+    ],
+    "preference_rankings": [
+      {
+        "phase": "final",
+        "rankings": [
+          3,
+          1,
+          4,
+          2
+        ],
+        "certainty_level": "sure",
+        "reasoning": "I ranked principle 3 as the best because it balances the need to maximize average income while ensuring that everyone has a guaranteed minimum income. This approach addresses both equity and efficiency, making it a fair choice for society as a whole. Principle 1 follows closely, as it prioritizes the welfare of the worst-off individuals, which is crucial for social justice. Principle 4 is next, as it attempts to limit income disparity, but it may not ensure a minimum income for all. Finally, principle 2 is ranked the lowest because maximizing average income alone can lead to significant inequalities, neglecting the needs of the poorest members of society. My certainty is high because I believe that a balanced approach is essential for a just income distribution.",
+        "timestamp": "2025-07-23T17:40:37.687621"
+      }
+    ],
+    "earnings_summary": {
+      "phase1_earnings": 13.0,
+      "phase2_earnings": 5.0,
+      "total_earnings": 18.0,
+      "individual_round_payouts": [
+        4.0,
+        4.0,
+        3.0,
+        2.0
+      ],
+      "round_count": 4
+    }
+  },
+  "agent_2": {
+    "overall": {},
+    "round_0": {
+      "memory": "Phase 1 Consolidation: Across all individual experiences, I have gained a nuanced understanding of the trade-offs inherent in each distributive justice principle. Maximizing the floor income prioritizes the welfare of the worst-off but may constrain overall economic growth. Maximizing average income can boost total wealth but risks increasing inequality. Principles that incorporate constraints—either a minimum floor or a maximum income range—offer a balanced approach by ensuring fairness while still promoting prosperity. Specifying these constraints is crucial for practical application and fairness perceptions within the group.",
+      "strategy": "memory_consolidation"
+    },
+    "earnings_history": [
+      {
+        "round_type": "group_outcome",
+        "round_number": null,
+        "payout_amount": 1.0,
+        "cumulative_total": 16.0,
+        "timestamp": "2025-07-23T17:40:30.267905",
+        "context": "Group decision: MAXIMIZING THE AVERAGE WITH A FLOOR CONSTRAINT, Low class, $10,000"
+      }
+    ],
+    "economic_outcomes": [
+      {
+        "round_number": 999,
+        "chosen_principle": 3,
+        "assigned_income_class": "Low",
+        "actual_income": 10000,
+        "payout_amount": 1.0,
+        "timestamp": "2025-07-23T17:40:30.267878"
+      }
+    ],
+    "earnings_disclosures": [
+      {
+        "disclosure_point": "after_group",
+        "message": "Group Decision Payout: $1.00\nPhase 1 Total: $15.00\nGrand Total: $16.00",
+        "timestamp": "2025-07-23T17:40:31.789076"
+      },
+      {
+        "disclosure_point": "experiment_end",
+        "message": "Experiment Complete! Your total earnings: $16.00\n- Phase 1 (Individual): $15.00 (4 rounds)\n- Phase 2 (Group): $1.00 (final outcome)\nPerformance: 0th percentile (thank you for your participation)\nThank you for your thoughtful participation in this distributive justice experiment.",
+        "timestamp": "2025-07-23T17:40:38.929422"
+      }
+    ],
+    "preference_rankings": [
+      {
+        "phase": "final",
+        "rankings": [
+          3,
+          1,
+          4,
+          2
+        ],
+        "certainty_level": "sure",
+        "reasoning": "I ranked principle 3 as the best because it balances the need to maximize average income while ensuring that everyone has a guaranteed minimum income. This approach addresses both equity and efficiency, making it a fair choice for society as a whole. Principle 1 follows closely, as it prioritizes the welfare of the worst-off individuals, which is crucial for social justice. Principle 4 is next, as it attempts to limit income disparity, but it may not ensure a minimum income for the poorest. Lastly, principle 2 is ranked the lowest because maximizing average income alone can lead to significant inequalities, neglecting the needs of the most vulnerable members of society. My certainty is high because I believe that a balanced approach is essential for a just income distribution system.",
+        "timestamp": "2025-07-23T17:40:37.648482"
+      }
+    ],
+    "earnings_summary": {
+      "phase1_earnings": 15.0,
+      "phase2_earnings": 1.0,
+      "total_earnings": 16.0,
+      "individual_round_payouts": [
+        5.0,
+        5.0,
+        4.0,
+        1.0
+      ],
+      "round_count": 4
+    }
+  }
+}
